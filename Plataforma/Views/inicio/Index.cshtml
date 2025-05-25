@@ -1,0 +1,51 @@
+﻿@{
+    ViewData["Title"] = "Bienvenido";
+    Layout = "_Layout";
+}
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<UsuarioIdentidad> UserManager
+
+<link rel="stylesheet" href="~/css/inicio/inicio.css" asp-append-version="true" />
+
+<div class="welcome-banner">
+    <div class="welcome-text">
+        <h3>Bienvenido @UserManager.GetUserAsync(User).Result.Nombre</h3>
+        <p>some good phrase</p>
+    </div>
+    <div class="profile">
+        <div class="circle"></div>
+    </div>
+</div>
+
+<div class="inferior">
+    <div class="cursos">
+        <h4>Cursos actuales</h4>
+        @foreach (var curso in Model)
+        {
+            <div class="curso-item">
+                <div class="curso-header">
+                    <p class="curso-title">@curso.Nombre</p>
+                    <button class="toggle-modules">
+                        <i class="fa-solid fa-chevron-up"></i>
+                    </button>
+                </div>
+                <ul class="modules-list">
+                    @foreach (var modulo in curso.Modulos)
+                    {
+                        <li>@modulo.Titulo</li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+
+    <div class="enlaces">
+        <a href="/inicio/cursos" class="enlace-item"><p>Explorar cursos</p><i class="fa-solid fa-chevron-right"></i></a>
+        <a href="#" class="enlace-item"><p>Ir a mis cursos</p><i class="fa-solid fa-chevron-right"></i></a>
+    </div>
+</div>
+
+
+
+
+<script src="~/js/inicio/inicio.js" asp-append-version="true"></script>

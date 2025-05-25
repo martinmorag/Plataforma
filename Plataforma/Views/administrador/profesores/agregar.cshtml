@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Agregar profesor";
+    Layout = "_Layout";
+}
+@model Plataforma.Models.Administracion.AdministracionViewModel
+
+<link rel="stylesheet" href="~/css/administrador/profesores/agregar.css" asp-append-version="true" />
+
+
+
+<h2 class="crear-title">Agregar Profesor</h2>
+
+<div>
+    <form asp-controller="Profesores" asp-action="Create" method="post" class="crear-form">
+        <div asp-validation-summary="ModelOnly" style="color:red;"></div>
+        <div class="form-div">
+            <label asp-for="RegistroProfesor.Nombre" style="display:block;"></label>
+            <input asp-for="RegistroProfesor.Nombre" style="width:100%; padding:8px; margin-bottom:10px; box-sizing:border-box;">
+            <span asp-validation-for="RegistroProfesor.Nombre" style="color:red;"></span>
+        </div>
+        <div class="form-div">
+            <label asp-for="RegistroProfesor.Apellido" style="display:block;"></label>
+            <input asp-for="RegistroProfesor.Apellido" style="width:100%; padding:8px; margin-bottom:10px; box-sizing:border-box;">
+            <span asp-validation-for="RegistroProfesor.Apellido" style="color:red;"></span>
+        </div>
+        <div class="form-div">
+            <label asp-for="RegistroProfesor.Email" style="display:block;"></label>
+            <input asp-for="RegistroProfesor.Email" style="width:100%; padding:8px; margin-bottom:10px; box-sizing:border-box;">
+            <span asp-validation-for="RegistroProfesor.Email" style="color:red;"></span>
+        </div>
+        <div class="form-div">
+            <label asp-for="RegistroProfesor.Password" style="display:block;"></label>
+            <input asp-for="RegistroProfesor.Password" class="form-control" type="password" />
+            <span asp-validation-for="RegistroProfesor.Password" class="text-danger"></span>
+        </div>
+        <div class="form-div">
+            <label asp-for="RegistroProfesor.ConfirmPassword" class="control-label"></label>
+            <input asp-for="RegistroProfesor.ConfirmPassword" class="form-control" type="password" />
+            <span asp-validation-for="RegistroProfesor.ConfirmPassword" class="text-danger"></span>
+        </div>
+        <div>
+            <input type="submit" value="Agregar" style="background-color:#007bff; color:white; padding:10px 15px; border:none; cursor:pointer;">
+        </div>
+    </form>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

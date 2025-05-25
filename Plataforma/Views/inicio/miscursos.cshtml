@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Mis Cursos";
+    Layout = "_Layout";
+}
+@model Plataforma.Models.Estudiantes.MisCursosViewModel;
+
+<link rel="stylesheet" href="~/css/inicio/miscursos.css" asp-append-version="true" />
+
+<div class="page-container">
+    <h1 class="page-title">Mis Cursos</h1>
+
+    @if (Model.cursos != null && Model.cursos.Any())
+    {
+        <div class="courses-grid">
+            @foreach (var curso in Model.cursos)
+            {
+                <div class="course-card-wrapper">
+                    <div class="course-card">
+                        <h3>@curso.Nombre</h3>
+
+                        <a asp-controller="curso" asp-action="Index" asp-route-cursoId="@curso.CursoId" class="access-button" >
+                            Ir al Curso
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-courses-message">
+            <p>Aún no estás inscrito en ningún curso. ¡Explora nuestros <a asp-controller="Cursos" asp-action="Cursos">cursos disponibles</a>!</p>
+        </div>
+    }
+</div>

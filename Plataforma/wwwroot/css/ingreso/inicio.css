@@ -1,0 +1,108 @@
+﻿/* General body styling */
+body {
+    background-color: #f4f4f4; /* Light grey background */
+    margin: 0;
+    padding: 0;
+    min-height: 100vh; /* Ensure the page covers the entire viewport height */
+    overflow: hidden;
+}
+
+main {
+    display: flex;
+    height: 93vh;
+    overflow: hidden;
+}
+.logo-image {
+    padding: 1rem;
+}
+.image {
+    height: 100%;
+    width: 70%;
+    background-image: url('../../images/instituto.webp'); /* Replace 'your-image.jpg' with your image URL */
+    background-size: cover; /* Cover the entire background */
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Prevent the image from repeating */
+}
+
+/* Login container */
+.login-container {
+    margin: 0 auto;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background for the form */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    padding: 20px;
+    width: 30%; /* Adjust width as needed */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.login-form-wrapper {
+    width: 100%;
+}
+/* Login form heading */
+.login-container h2 {
+    text-align: center;
+    color: #333; /* Dark grey color for the heading */
+    margin-bottom: 20px;
+}
+
+/* Form group (label + input) */
+.form-group {
+    margin-bottom: 15px;
+}
+
+    /* Label styling */
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555; /* Medium grey color for labels */
+    }
+
+    /* Input field styling */
+    .form-group input {
+        padding: 8px;
+        border: 1px solid #ddd; /* Light grey border */
+        border-radius: 4px;
+        box-sizing: border-box; /* Include padding and border in element's total width */
+    }
+
+/* Button styling */
+.btn-primary {
+    background-color: #007bff; /* Blue color for the button */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+    }
+
+/* Remember me checkbox and label */
+.form-check {
+    display: flex;
+    align-items: center;
+    padding-left: 1rem;
+}
+.form-check label  {
+    margin: 0 0 0 .5rem;
+}
+
+.form-check-input {
+    margin-right: 5px;
+}
+
+#togglePassword {
+    position: absolute;
+    right: 10px;
+    top: 70%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+/* Validation error styling */
+.text-danger {
+    color: #dc3545; /* Red color for error messages */
+    font-size: 0.8em;
+}

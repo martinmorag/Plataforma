@@ -1,0 +1,70 @@
+﻿@model Plataforma.Models.Tarea
+
+@{
+    ViewData["Title"] = "Crear Tarea";
+}
+
+<link rel="stylesheet" href="~/css/tareas/crear.css" asp-append-version="true" />
+
+<div class="form-container">
+    <h2 class="form-title">Crear Tarea para <span class="class-name">@Model.Clase.Nombre</span></h2>
+
+    <div class="form-card">
+        <h4 class="card-header">Detalles de la Tarea</h4>
+        <hr class="divider" />
+        <form asp-controller="tareas" asp-action="Create" enctype="multipart/form-data">
+            @* Changed asp-action to "Crear" to match the HttpPost action *@
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+            <div class="form-group">
+                <label asp-for="Nombre" class="form-label">Nombre de la Asignación</label>
+                <input asp-for="Nombre" class="form-input" />
+                <span asp-validation-for="Nombre" class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Descripcion" class="form-label">Descripción</label>
+                <textarea asp-for="Descripcion" class="form-textarea" rows="3"></textarea>
+                <span asp-validation-for="Descripcion" class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="FechaVencimiento" class="form-label">Fecha de Vencimiento</label> @* Changed "Fecha de Entrega" to "Fecha de Vencimiento" *@
+                <input asp-for="FechaVencimiento" type="datetime-local" class="form-input" value="@(Model.FechaVencimiento != default(DateTime) ? Model.FechaVencimiento.ToString("yyyy-MM-ddTHH:mm") : "")" />
+                <span asp-validation-for="FechaVencimiento" class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TipoEntregaEsperado" class="form-label">Tipo de Entrega Esperado (para estudiantes)</label>
+                @* Changed from input for ContentType to a select for TipoEntregaEsperado *@
+                <select asp-for="TipoEntregaEsperado" class="form-input">
+                    <option value="any">Cualquiera (PDF, Video)</option>
+                    <option value="file">Documento</option>
+                    <option value="video">Video</option>
+                </select>
+                <span asp-validation-for="TipoEntregaEsperado" class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="archivoAsignacion" class="form-label">Archivo de la Asignación (opcional, PDF, Video, Imagen)</label> @* Changed name to archivoAsignacion *@
+                <input type="file" name="archivoAsignacion" id="archivoAsignacion" class="form-input" accept=".pdf,video/*,image/*" /> @* Added accept for images *@
+                <span class="validation-error">@ViewData.ModelState["archivoAsignacion"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
+            </div>
+
+            <input type="hidden" asp-for="ClaseId" /> @* No need for value attribute here, asp-for handles it *@
+
+            <div class="form-actions">
+                <button type="submit" class="submit-button">Crear Asignación</button>
+                <a asp-action="Index" asp-controller="Clase" asp-route-id="@Model.ClaseId" class="return-link">Volver a la Clase</a> @* Example: Redirect to class index *@
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<script src="~/js/tareas/crear.js" asp-append-version="true"></script>

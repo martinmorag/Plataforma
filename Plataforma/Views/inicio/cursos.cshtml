@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Manejar mis cursos";
+    Layout = "_Layout";
+}
+@model Plataforma.Models.Inicio.SeleccionCursos
+
+<link rel="stylesheet" href="~/css/inicio/cursos.css" asp-append-version="true" />
+
+<div class="return-button-container">
+    <a href="@Url.Action("Index", "inicio")" id="returnToMainButton">Volver</a>
+</div>
+
+
+<h2>Explorar Cursos</h2>
+
+<div class="course-list-container">
+    @foreach (var curso in Model.Cursos)
+    {
+        <div class="course-row available-course-row" data-course-id="@curso.CursoId" data-original-state="available">
+            <h3>@curso.Nombre</h3>
+            <span class="course-status">DISPONIBLE</span>
+        </div>
+    }
+
+    @foreach (var curso in Model.CursosEstudiante)
+    {
+        <div class="course-row registered-course-row" data-course-id="@curso.CursoEstudianteId" data-original-state="registered">
+            <h3>@curso.Curso.Nombre</h3>
+            <span class="course-status">REGISTRADO</span>
+        </div>
+    }
+</div>
+
+<div class="save-changes-container">
+    <button id="saveChangesButton" disabled>Guardar Cambios</button>
+</div>
+
+
+
+
+<script src="~/js/inicio/cursos.js" asp-append-version="true"></script>

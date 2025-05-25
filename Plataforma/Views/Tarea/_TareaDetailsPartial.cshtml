@@ -1,0 +1,112 @@
+﻿@model Plataforma.Models.Cursos.TareaDetailsViewModel
+
+@* This partial view renders the details of a single task. *@
+
+<div class="tarea-details-container" id="current-tarea-details">
+    <div class="tarea-header">
+        <h1>@Model.Nombre</h1>
+        <p class="due-date">Fecha Límite: @Model.FechaLimite.ToShortDateString()</p>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Descripcion))
+    {
+        <div class="tarea-description">
+            <h3>Descripción</h3>
+            <p>@Model.Descripcion</p>
+        </div>
+    }
+
+    @* Dynamic Content Section *@
+    <div class="tarea-content-section">
+        @if (Model.TipoContenido == "video" && !string.IsNullOrEmpty(Model.ContenidoUrl))
+        {
+            <h3>Contenido del Video</h3>
+            <div class="video-player-container">
+                <video id="my-video"
+                       class="video-js vjs-default-skin vjs-big-play-centered"
+                       controls
+                       preload="auto"
+                       data-setup='{}'
+                       data-tarea-id="@Model.TareaId" @* Pass TareaId to JS via data attribute *@
+                       data-initial-time="@(ViewBag.InitialVideoTime ?? 0)" @* Initial time from backend *@
+                       data-completed="@(ViewBag.VideoCompleted?.ToString().ToLower() ?? "false")">
+                    @* Video completion status *@
+                    <source src="@Model.ContenidoUrl" type="video/mp4" />
+                    <p class="vjs-no-js">
+                        To view this video please enable JavaScript, and consider upgrading to a
+                        web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+                    </p>
+                </video>
+            </div>
+        }
+        else if (Model.TipoContenido == "Texto" && !string.IsNullOrEmpty(Model.TextoContenido))
+        {
+            <h3>Contenido de la Tarea</h3>
+            <div class="tarea-text-content">
+                @Html.Raw(Model.TextoContenido)
+            </div>
+        }
+        else if (Model.TipoContenido == "Documento" && !string.IsNullOrEmpty(Model.ContenidoUrl))
+        {
+            <h3>Documento de la Tarea</h3>
+            <p>Puedes descargar o ver el documento a continuación:</p>
+            <a href="@Model.ContenidoUrl" target="_blank" class="btn btn-info">
+                <i class="fa-solid fa-file-arrow-down"></i> Descargar Documento
+            </a>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                No hay contenido específico para esta tarea.
+            </div>
+        }
+    </div>
+
+    <hr />
+
+    @* Submission Section (can be moved to its own partial if it gets complex) *@
+    <div class="tarea-submission-section">
+        <h3>Tu Entrega</h3>
+        @if (Model.HasSubmitted)
+        {
+            <p>
+                <strong>Estado:</strong>
+                <span class="badge @(Model.IsSubmittedApproved ? "badge-success" : (Model.SubmissionStatusText == "EnRevision" ? "badge-warning" : "badge-danger"))">
+                    @Model.SubmissionStatusText
+                </span>
+            </p>
+            @if (Model.SubmissionFecha.HasValue)
+            {
+                <p><strong>Fecha de Entrega:</strong> @Model.SubmissionFecha.Value.ToShortDateString()</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.SubmittedFileUrl))
+            {
+                <p><strong>Archivo Entregado:</strong> <a href="@Model.SubmittedFileUrl" target="_blank">Ver archivo</a></p>
+            }
+            @if (!string.IsNullOrEmpty(Model.SubmissionComentarios))
+            {
+                <div class="professor-comments">
+                    <h4>Comentarios del Profesor:</h4>
+                    <p>@Model.SubmissionComentarios</p>
+                </div>
+            }
+
+            @if (Model.SubmissionStatusText == "Reprobado" || Model.SubmissionStatusText == "Pendiente") // Allow re-submission if reprobado or still pending
+            {
+                <a href="#" class="btn btn-warning submit-task-btn" data-task-id="@Model.TareaId">Revisar y Entregar @(Model.SubmissionStatusText == "Reprobado" ? "Nuevamente" : "")</a>
+            }
+            else if (Model.SubmissionStatusText == "Aprobado" || Model.SubmissionStatusText == "EnRevision")
+            {
+                <a href="#" class="btn btn-secondary view-submission-btn" data-task-id="@Model.TareaId">Ver Detalle de Entrega</a>
+            }
+        }
+        else // Not submitted yet
+        {
+            <p class="alert alert-info">Aún no has entregado esta tarea.</p>
+            <a href="#" class="btn btn-primary submit-task-btn" data-task-id="@Model.TareaId">Entregar Tarea</a>
+        }
+    </div>
+</div>
+
+
+<script src="~/js/curso/tarea.js" asp-append-version="true"></script>

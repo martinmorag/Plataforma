@@ -1,0 +1,91 @@
+﻿@model Plataforma.Models.Cursos.ClaseViewModel
+
+<link rel="stylesheet" href="~/css/curso/detalles.css" asp-append-version="true" />
+
+@* This partial view renders the details of a single class, including its tasks. *@
+
+<div class="class-details-main">
+    <h2>@Model.Nombre</h2>
+    @if (!string.IsNullOrEmpty(Model.Descripcion))
+    {
+        <p class="class-description-long">@Model.Descripcion</p>
+    }
+
+    @if (Model.HasTareas && Model.Tareas.Any())
+    {
+        <div class="class-tasks-section">
+            <h3><i class="fa-solid fa-clipboard-list"></i> Tareas de la Clase</h3>
+            <ul class="task-list">
+                @foreach (var tarea in Model.Tareas)
+                {
+                    <li class="task-item @(tarea.IsSubmittedApproved ? "task-completed" : "task-pending")">
+                        <div class="task-header">
+                            <span class="task-status-icon">
+                                @if (tarea.IsSubmittedApproved)
+                                {
+                                    <i class="fa-solid fa-check-circle completed-icon"></i>
+                                }
+                                else if (tarea.SubmissionStatusText == "EnRevision")
+                                {
+                                    <i class="fa-solid fa-hourglass-half in-review-icon"></i>
+                                }
+                                else if (tarea.SubmissionStatusText == "Reprobado")
+                                {
+                                    <i class="fa-solid fa-circle-xmark failed-icon"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa-regular fa-circle pending-icon"></i>
+                                }
+                            </span>
+                            <h4>@tarea.Nombre</h4>
+                            <span class="task-due-date">Fecha Límite: @tarea.FechaLimite.ToShortDateString()</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(tarea.Descripcion))
+                        {
+                            <p class="task-description-short">@tarea.Descripcion</p>
+                        }
+                        <div class="task-meta">
+                            <span class="badge task-status-badge @(tarea.IsSubmittedApproved ? "badge-success" : (tarea.SubmissionStatusText == "EnRevision" ? "badge-warning" : (tarea.SubmissionStatusText == "Reprobado" ? "badge-danger" : "badge-info")))">
+                                @tarea.SubmissionStatusText
+                            </span>
+                            @if (tarea.HasFileRequirement)
+                            {
+                                <span class="task-requirement"><i class="fa-solid fa-file-arrow-up"></i> Requiere archivo</span>
+                            }
+                        </div>
+                        <div class="task-actions">
+                            <a href="/api/Tarea/GetTareaDetails?tareaId=@tarea.TareaId"
+                               class="btn btn-primary btn-sm task-link"
+                               data-tarea-id="@tarea.TareaId">
+                                @* Add a data-tarea-id for easier JS access *@
+                                @if (tarea.IsSubmittedApproved)
+                                {
+                                    <span>Ver Entrega</span>
+                                }
+                                else if (tarea.SubmissionStatusText == "EnRevision")
+                                {
+                                    <span>Ver Entrega</span>
+                                }
+                                else if (tarea.SubmissionStatusText == "Reprobado")
+                                {
+                                    <span>Revisar Entrega</span>
+                                }
+                                else
+                                {
+                                    <span>Entregar Tarea</span>
+                                }
+                            </a>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    else
+    {
+        <div class="no-tasks-message">
+            <p><i class="fa-solid fa-info-circle"></i> Esta clase no tiene tareas asignadas.</p>
+        </div>
+    }
+</div>

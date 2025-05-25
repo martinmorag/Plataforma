@@ -1,0 +1,352 @@
+﻿.course-page-wrapper {
+    display: flex; /* Enables flexbox for two-column layout */
+    flex-grow: 1; /* Allows wrapper to expand and fill available height */
+    width: 100%; /* Max width for the entire course page content */
+    height: 100vh;
+    margin: 0 auto; /* Center on page with some top/bottom margin */
+    background-color: #ffffff; /* White background for the content area */
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    overflow: hidden; /* For rounded corners */
+}
+
+/* --- Course Sidebar (Left Column) --- */
+.course-sidebar {
+    width: 300px; /* Fixed width for the sidebar */
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+    background-color: #f8f9fa; /* Lighter background for sidebar */
+    border-right: 1px solid #e0e0e0;
+    padding: 25px 0; /* Vertical padding */
+    box-sizing: border-box; /* Include padding in width */
+    display: flex; /* Flex container for header, nav, footer */
+    flex-direction: column; /* Stack items vertically */
+}
+
+.sidebar-header {
+    padding: 0 25px 20px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+    .sidebar-header h3 {
+        margin-top: 0;
+        color: #2c3e50;
+        font-size: 1.6em;
+        font-weight: 600;
+    }
+
+    .sidebar-header p {
+        font-size: 0.9em;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+.progress-bar-container {
+    width: 100%;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    height: 8px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #28a745; /* Bootstrap success green */
+    border-radius: 5px;
+    transition: width 0.4s ease-in-out;
+}
+
+.module-navigation {
+    flex-grow: 1; /* Allow navigation to take available space */
+    overflow-y: auto; /* Scrollable if modules exceed height */
+    padding-right: 10px; /* Space for scrollbar */
+}
+
+.module-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.module-nav-item {
+    margin-bottom: 5px;
+}
+
+.module-nav-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 25px; /* Horizontal padding, less vertical */
+    background-color: #f0f4f7;
+    color: #34495e;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+    user-select: none; /* Prevent text selection on click */
+    position: relative; /* For arrow positioning */
+    border: 1px solid #e9ecef; /* Subtle border */
+    margin-right: 10px; /* Account for scrollbar area */
+}
+
+    .module-nav-header:hover {
+        background-color: #e5edf2;
+    }
+
+    /* Module completion status in sidebar header */
+    .module-nav-header.completed {
+        background-color: #d4edda; /* Light green for completed modules */
+        color: #155724; /* Darker green text */
+        border-color: #c3e6cb;
+    }
+
+    .module-nav-header .module-status-icon {
+        margin-right: 10px;
+        font-size: 1.1em;
+    }
+
+    .module-nav-header .completed-icon {
+        color: #28a745; /* Green checkmark */
+    }
+
+    .module-nav-header .pending-icon {
+        color: #6c757d; /* Gray for pending */
+    }
+
+
+    .module-nav-header .arrow {
+        margin-left: auto; /* Push arrow to the right */
+        transition: transform 0.3s ease;
+        font-size: 0.9em;
+        color: #7f8c8d;
+    }
+
+.class-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 0; /* Hidden by default */
+    overflow: hidden;
+    transition: max-height 0.5s ease-out; /* Smooth slide effect */
+    background-color: #fdfdfd; /* Lighter background for classes */
+    border-top: 1px solid #eee;
+    border-radius: 0 0 5px 5px;
+    padding-bottom: 5px; /* Small padding at bottom when open */
+    margin-right: 10px; /* Account for scrollbar area */
+}
+
+    .class-nav-list.expanded {
+        max-height: 1000px; /* Large enough to show all classes */
+        padding-top: 10px;
+    }
+
+.class-nav-item {
+    padding: 8px 25px 8px 45px; /* Indent classes */
+    font-size: 0.95em;
+    border-bottom: 1px dashed #f5f5f5;
+}
+
+    .class-nav-item:last-child {
+        border-bottom: none;
+    }
+
+    .class-nav-item a {
+        text-decoration: none;
+        color: #495057; /* Dark gray text */
+        display: flex;
+        align-items: center;
+        transition: color 0.2s ease;
+    }
+
+        .class-nav-item a:hover {
+            color: #007bff; /* Blue on hover */
+        }
+
+    /* Class completion status in sidebar classes */
+    .class-nav-item .class-status-icon {
+        margin-right: 8px;
+        font-size: 0.8em;
+        min-width: 15px; /* Ensure icon doesn't move text */
+        text-align: center;
+    }
+
+    .class-nav-item .completed-icon {
+        color: #28a745; /* Green checkmark */
+    }
+
+    .class-nav-item .pending-icon {
+        color: #adb5bd; /* Light gray circle */
+    }
+
+    .class-nav-item .class-meta-icon {
+        margin-left: 8px;
+        font-size: 0.7em;
+        color: #888;
+    }
+
+.no-classes-nav, .no-modules-nav {
+    padding: 10px 25px;
+    color: #888;
+    font-style: italic;
+    font-size: 0.85em;
+    text-align: center;
+}
+
+.sidebar-footer {
+    padding: 20px 25px 0;
+    margin-top: auto; /* Push to bottom */
+    border-top: 1px solid #eee;
+}
+
+.btn-back-to-courses {
+    width: 100%;
+    display: block;
+    text-align: center;
+    background-color: #6c757d; /* Gray for back button */
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+    .btn-back-to-courses:hover {
+        background-color: #5a6268;
+    }
+
+    .btn-back-to-courses i {
+        margin-right: 8px;
+    }
+
+
+/* --- Course Main Content (Right Column) --- */
+.course-main-content {
+    flex-grow: 1; /* Takes remaining space */
+    padding: 40px;
+    overflow-y: auto; /* Scroll if content exceeds height */
+}
+
+.course-title-section {
+    margin-bottom: 30px;
+}
+
+    .course-title-section h1 {
+        color: #2c3e50;
+        font-size: 3em;
+        font-weight: 700;
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+
+.course-description-main {
+    color: #555;
+    font-size: 1.1em;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.course-metadata-main {
+    font-size: 0.9em;
+    color: #777;
+}
+
+    .course-metadata-main strong {
+        color: #444;
+    }
+
+.main-content-placeholder {
+    background-color: #fdfdfd;
+    border: 1px dashed #e0e0e0;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    color: #888;
+    line-height: 1.6;
+    margin-top: 50px; /* Space from header */
+}
+
+    .main-content-placeholder img {
+        max-width: 100%;
+        height: auto;
+        margin-top: 25px;
+        border-radius: 8px;
+        opacity: 0.8;
+    }
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .course-page-wrapper {
+        flex-direction: column; /* Stack columns on smaller screens */
+        border-radius: 0; /* No rounded corners if it takes full width */
+        box-shadow: none;
+        margin: 0; /* Remove side margins on full width */
+    }
+
+    .course-sidebar {
+        width: 100%; /* Full width sidebar */
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0; /* Separator at bottom */
+        padding: 15px 0;
+        max-height: 80vh; /* Limit height for mobile (scrollable) */
+    }
+
+    .sidebar-header {
+        padding: 0 20px 15px;
+        margin-bottom: 15px;
+    }
+
+        .sidebar-header h3 {
+            font-size: 1.4em;
+        }
+
+    /* Adjust padding for full width modules/classes */
+    .module-nav-header {
+        padding-left: 20px;
+        margin-right: 0; /* Remove margin for scrollbar */
+    }
+
+    .class-nav-list {
+        margin-right: 0; /* Remove margin for scrollbar */
+    }
+
+    .class-nav-item {
+        padding-left: 40px;
+    }
+
+    .course-main-content {
+        padding: 30px 20px;
+    }
+
+    .course-title-section h1 {
+        font-size: 2.2em;
+    }
+
+    .course-description-main {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 576px) {
+    .course-header h1 {
+        font-size: 2em;
+    }
+
+    .course-description-main {
+        font-size: 0.9em;
+    }
+
+    .course-sidebar {
+        padding: 10px 0;
+    }
+
+    .sidebar-header {
+        padding: 0 15px 10px;
+    }
+
+    .module-nav-header, .class-nav-item {
+        padding-left: 15px;
+    }
+
+    .class-nav-item {
+        padding-left: 35px;
+    }
+}

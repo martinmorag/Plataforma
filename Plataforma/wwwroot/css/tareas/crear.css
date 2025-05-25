@@ -1,0 +1,99 @@
+﻿.form-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-title {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.class-name {
+    font-weight: bold;
+    color: #007bff; /* You can change this */
+}
+
+.form-card {
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+
+.card-header {
+    color: #28a745; /* You can change this */
+    margin-bottom: 10px;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.divider {
+    border-top: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.form-textarea {
+    resize: vertical;
+}
+
+.validation-error {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.form-actions {
+    margin-top: 20px;
+}
+
+.submit-button {
+    background-color: #007bff; /* You can change this */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+    .submit-button:hover {
+        background-color: #0056b3;
+    }
+
+.return-link {
+    color: #6c757d; /* You can change this */
+    text-decoration: none;
+    margin-left: 15px;
+    font-size: 1rem;
+}
+
+    .return-link:hover {
+        color: #495057;
+    }

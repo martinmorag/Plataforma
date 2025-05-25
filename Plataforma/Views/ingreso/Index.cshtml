@@ -1,0 +1,50 @@
+﻿@model Plataforma.Models.LoginModel
+@{
+    ViewData["Title"] = "Ingreso";
+    Layout = "_Layout";
+}
+
+<link rel="stylesheet" href="~/css/ingreso/inicio.css" asp-append-version="true" />
+
+<div class="login-container">
+    <img src="~/images/Logo.png" alt="Logo" class="logo-image" />
+    <div class="login-form-wrapper">
+        <div class="login-form">
+            <h2>Iniciar Sesión</h2>
+            <form asp-controller="ingreso" asp-action="login" method="post">
+                <div class="form-group">
+                    <label asp-for="Email">Correo Electrónico</label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="Ingrese su correo electrónico" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group position-relative">
+                    <label asp-for="Password">Contraseña</label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Ingrese su contraseña" id="passwordInput" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                    <span id="togglePassword">
+                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                        <i class="fa-solid fa-eye-slash d-none" id="eyeSlashIcon"></i>
+                    </span>
+                </div>
+
+                <div class="form-group form-check">
+                    <input asp-for="RememberMe" class="check" id="rememberMe" />
+                    <label class="check-label" for="rememberMe">Recordarme</label>
+                </div>
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <button type="submit" class="btn-primary">Ingresar</button>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="image"></div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+<script src="~/js/ingreso/inicio.js" asp-append-version="true"></script>

@@ -1,0 +1,134 @@
+﻿@{
+    Layout = "_ModuloLayout"; 
+}
+@model Plataforma.Models.Cursos.CursoClasesViewModel
+
+<link rel="stylesheet" href="~/css/curso/inicio.css" asp-append-version="true" />
+
+
+<div class="course-page-wrapper">
+    <aside class="course-sidebar">
+        <div class="sidebar-header">
+            <h3>Contenido del Curso</h3>
+            @if (Model.TotalClases > 0)
+            {
+                <p>@Model.CompletedClases de @Model.TotalClases clases completadas</p>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: @((double)Model.CompletedClases / Model.TotalClases * 100)%;"></div>
+                </div>
+            }
+            else
+            {
+                <p>No hay clases definidas aún.</p>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: 0%;"></div>
+                </div>
+            }
+        </div>
+        <nav class="module-navigation">
+            <ul class="module-list">
+                @if (Model.Modulos != null && Model.Modulos.Any())
+                {
+                    @foreach (var modulo in Model.Modulos)
+                    {
+                        <li class="module-nav-item">
+                            <div class="module-nav-header @(modulo.IsCompleted ? "completed" : "")" onclick="toggleModule(this)">
+                                <span class="module-status-icon">
+                                    @if (modulo.IsCompleted)
+                                    {
+                                        <i class="fa-solid fa-circle-check completed-icon" title="Módulo Completado"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa-solid fa-circle-notch pending-icon" title="Módulo Pendiente"></i>
+                                    }
+                                </span>
+                                <span>@modulo.Nombre</span>
+                                <span class="arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                            </div>
+                            <ul class="class-nav-list module-content">
+                                @if (modulo.Clases != null && modulo.Clases.Any())
+                                {
+                                    @foreach (var clase in modulo.Clases)
+                                    {
+                                        <li class="class-nav-item @(clase.IsCompleted ? "completed" : "")">
+                                            @* Changed href to void(0) and added data-class-id and onclick *@
+                                            <a href="javascript:void(0);" data-class-id="@clase.ClaseId" onclick="loadClassDetails(this, '@clase.ClaseId')">
+                                                <span class="class-status-icon">
+                                                    @if (clase.IsCompleted)
+                                                    {
+                                                        <i class="fa-solid fa-check completed-icon" title="Clase Completada"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fa-regular fa-circle pending-icon" title="Clase Pendiente"></i>
+                                                    }
+                                                </span>
+                                                @clase.Nombre
+                                                @if (clase.HasTareas)
+                                                {
+                                                    <i class="fa-solid fa-clipboard-list class-meta-icon" title="Tiene Tareas"></i>
+                                                }
+                                            </a>
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li class="no-classes-nav">No hay clases en este módulo.</li>
+                                }
+                            </ul>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li class="no-modules-nav">No hay módulos definidos para este curso.</li>
+                }
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <a asp-controller="Estudiante" asp-action="MisCursos" class="btn btn-back-to-courses">
+                <i class="fa-solid fa-arrow-left"></i> Volver a Mis Cursos
+            </a>
+        </div>
+    </aside>
+
+    <main class="course-main-content">
+        <div class="course-title-section">
+            <h1>@Model.CursoNombre</h1>
+            @if (!string.IsNullOrEmpty(Model.CursoDescripcion))
+            {
+                <p class="course-description-main">@Model.CursoDescripcion</p>
+            }
+            <div class="course-metadata-main">
+                @if (!string.IsNullOrEmpty(Model.Nivel))
+                {
+                    <span>Nivel: <strong>@Model.Nivel</strong></span>
+                }
+                @if (!string.IsNullOrEmpty(Model.InstructorNombre))
+                {
+                    <span> | Instructor: <strong>@Model.InstructorNombre</strong></span>
+                }
+            </div>
+        </div>
+
+        <div id="class-details-container" class="main-content-area">
+            @* Initial content or loaded class details will go here *@
+            <div class="initial-placeholder">
+                <p>Selecciona una clase del menú de la izquierda para empezar.</p>
+                <p>Aquí se mostrará el contenido de la clase, incluyendo sus videos, descripciones y tareas.</p>
+                <img src="https://via.placeholder.com/600x300?text=Contenido+Principal+del+Curso" alt="Placeholder for main content" class="img-fluid" />
+            </div>
+        </div>
+
+        <div id="tarea-details-container" style="display: none;">
+            @* Task details will be loaded here when a task is clicked *@
+        </div>
+
+    </main>
+</div>
+
+<script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+<link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+<script src="~/js/curso/inicio.js" asp-append-version="true"></script>

@@ -1,0 +1,53 @@
+﻿@model Plataforma.Models.Administracion.AdministracionViewModel
+
+@{
+    ViewData["Title"] = "Editar Profesor";
+}
+
+<h1>Editar Profesor</h1>
+
+<hr />
+<div>
+    <form asp-controller="Profesores" asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="ProfesorAEditar.Id" />
+
+        <div class="form-group">
+            <label asp-for="ProfesorAEditar.Nombre" class="control-label"></label>
+            <input asp-for="ProfesorAEditar.Nombre" class="form-control" />
+            <span asp-validation-for="ProfesorAEditar.Nombre" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ProfesorAEditar.Apellido" class="control-label"></label>
+            <input asp-for="ProfesorAEditar.Apellido" class="form-control" />
+            <span asp-validation-for="ProfesorAEditar.Apellido" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ProfesorAEditar.Email" class="control-label"></label>
+            <input asp-for="ProfesorAEditar.Email" class="form-control" />
+            <span asp-validation-for="ProfesorAEditar.Email" class="text-danger"></span>
+        </div>
+
+        <h2>Cambiar Contraseña (Opcional)</h2>
+        <div class="form-group">
+            <label asp-for="NuevaPassword" class="control-label">Nueva Contraseña</label>
+            <input type="password" asp-for="NuevaPassword" class="form-control" />
+            <span asp-validation-for="NuevaPassword" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ConfirmarNuevaPassword" class="control-label">Confirmar Nueva Contraseña</label>
+            <input type="password" asp-for="ConfirmarNuevaPassword" class="form-control" />
+            <span asp-validation-for="ConfirmarNuevaPassword" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Guardar Cambios" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,133 @@
+﻿@{
+    var cursos = ViewBag.Cursos as List<Plataforma.Models.Curso>;
+    var modulos = ViewBag.Modulos as List<Plataforma.Models.Modulo>;
+    var clases = ViewBag.Clases as List<Plataforma.Models.Clase>;
+
+    ViewData["Title"] = "Cursos";
+}
+@model Plataforma.Models.Modulo
+
+<link rel="stylesheet" href="~/css/cursos/inicio.css" asp-append-version="true" />
+
+
+<form id="uploadForm" class="upload-tarea-container">
+    <h2 class="upload-tarea-title">Cargar Tarea</h2>
+    <div class="form-group">
+        <label for="courseSelect" class="upload-tarea-label">Elige el curso:</label>
+        <select id="courseSelect" class="upload-tarea-select">
+            <option value="">Seleccione un curso</option>
+        </select>
+    </div>
+    <div class="form-group" id="moduloSelectGroup" style="display: none;">
+        <label for="moduloSelect" class="upload-tarea-label">Elige el módulo:</label>
+        <select id="moduloSelect" class="upload-tarea-select">
+            <option value="">Seleccione un módulo</option>
+        </select>
+    </div>
+    <div class="form-group" id="claseSelectGroup" style="display: none;">
+        <label for="claseSelect" class="upload-tarea-label">Elige la clase:</label>
+        <select id="claseSelect" class="upload-tarea-select">
+            <option value="">Seleccione una clase</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="upload-tarea-label">Tipo de Contenido:</label>
+        <div class="radio-group">
+            <div class="radio-div">
+                <input type="radio" id="fileOption" name="contentType" value="file" class="upload-tarea-radio">
+                <label for="fileOption" class="upload-tarea-radio-label">
+                    <i class="fas fa-file"></i> <p>Archivo</p>
+                </label>
+            </div>
+            <div class="radio-div">
+                <input type="radio" id="videoOption" name="contentType" value="video" class="upload-tarea-radio">
+                <label for="videoOption" class="upload-tarea-radio-label">
+                    <i class="fas fa-video"></i> <p>Video</p>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="form-group" id="claseIdGroup" style="display: none;">
+        <label for="claseId" class="upload-tarea-label">ID de Clase:</label>
+        <input type="text" id="claseId" class="upload-tarea-input" readonly>
+    </div>
+    <button type="submit" class="upload-tarea-button" disabled>Continuar</button>
+    <div id="uploadTareaStatus" class="upload-tarea-status"></div>
+</form>
+
+
+
+
+<div class="create-module-class">
+<form asp-action="CrearModulo" method="post" class="upload-tarea-container">
+        <h3 class="upload-tarea-title">Crear Módulo</h3>
+    <div class="form-group">
+        <label for="cursoIdModulo" class="upload-tarea-label">Seleccione el Curso:</label>
+        <select asp-for="CursoId" class="upload-tarea-select" asp-items="@(new SelectList(cursos, "CursoId", "Nombre"))">
+            <option value="">Seleccione un curso</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="moduloTitle" class="upload-tarea-label">Título del Módulo:</label>
+        <input type="text" id="moduloTitle" name="Title" class="upload-tarea-input" required />
+    </div>
+    <button type="submit" class="upload-tarea-button">Crear Módulo</button>
+    <div id="crearModuloStatus" class="upload-tarea-status"></div>
+</form>
+
+
+
+<form asp-action="CrearClase" method="post" class="upload-tarea-container">
+    <h3 class="upload-tarea-title">Crear Clase</h3>
+    <div class="form-group">
+        <label for="cursoIdForClase" class="upload-tarea-label">Seleccione el Curso:</label>
+        <select asp-for="CursoId" id="cursoIdForClase" class="upload-tarea-select" asp-items="@(new SelectList(cursos, "CursoId", "Nombre"))">
+            <option value="">Seleccione un curso</option>
+        </select>
+    </div>
+    <div class="form-group" id="moduloSelectForClaseGroup" style="display: none;">
+        <label for="moduloIdForClase" class="upload-tarea-label">Seleccione el Módulo:</label>
+            <select id="moduloIdForClase" name="ModuloId"  class="upload-tarea-select" required>
+            <option value="">Seleccione un módulo</option>
+            @if (modulos != null)
+            {
+                foreach (var modulo in modulos)
+                {
+                    <option value="@modulo.ModuloId" data-curso-id="@modulo.CursoId">@modulo.Titulo</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="claseNombre" class="upload-tarea-label">Nombre de la Clase:</label>
+        <input type="text" id="claseNombre" name="Nombre" class="upload-tarea-input" required />
+    </div>
+    <button type="submit" class="upload-tarea-button">Crear Clase</button>
+    <div id="crearClaseStatus" class="upload-tarea-status"></div>
+</form>
+</div>
+
+
+
+
+
+@using Newtonsoft.Json
+@{
+    var settings = new JsonSerializerSettings
+    {
+        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+    };
+
+    var cursosJson = JsonConvert.SerializeObject(ViewBag.Cursos, settings);
+    var modulosJson = JsonConvert.SerializeObject(ViewBag.Modulos, settings);
+    var clasesJson = JsonConvert.SerializeObject(ViewBag.Clases, settings);
+}
+<script>
+    const cursos = @Html.Raw(cursosJson);
+    const modulos = @Html.Raw(modulosJson);
+    const clases = @Html.Raw(clasesJson);
+</script>
+
+
+<script src="~/js/cursos/inicio.js" asp-append-version="true"></script>
+

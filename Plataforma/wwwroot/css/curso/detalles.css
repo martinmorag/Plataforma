@@ -1,0 +1,343 @@
+﻿/* Add to your existing curso-index.css */
+
+/* --- Main Content Area Styling (for dynamically loaded content) --- */
+.main-content-area {
+    padding-top: 20px; /* Space from course-title-section */
+}
+
+/* Initial Placeholder */
+.initial-placeholder {
+    background-color: #fdfdfd;
+    border: 1px dashed #e0e0e0;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    color: #888;
+    line-height: 1.6;
+    margin-top: 20px; /* Space from course-title-section */
+}
+
+    .initial-placeholder img {
+        max-width: 100%;
+        height: auto;
+        margin-top: 25px;
+        border-radius: 8px;
+        opacity: 0.8;
+    }
+
+
+/* Class Details within Main Content */
+.class-details-main {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+    .class-details-main h2 {
+        color: #2c3e50;
+        font-size: 2.5em;
+        margin-top: 0;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #f0f4f7;
+        padding-bottom: 10px;
+    }
+
+    .class-details-main .class-description-long {
+        font-size: 1.05em;
+        line-height: 1.8;
+        color: #555;
+        margin-bottom: 30px;
+    }
+
+/* Class Materials Section */
+.class-materials {
+    background-color: #e6f7ff; /* Light blue */
+    border: 1px solid #91d5ff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+    .class-materials h3 {
+        color: #0056b3; /* Darker blue */
+        margin-top: 0;
+        font-size: 1.4em;
+        margin-bottom: 10px;
+    }
+
+        .class-materials h3 i {
+            margin-right: 10px;
+            color: #007bff;
+        }
+
+    .class-materials p {
+        color: #333;
+        font-size: 0.95em;
+        margin-bottom: 15px;
+    }
+
+    .class-materials .btn-info {
+        background-color: #17a2b8; /* Bootstrap info blue */
+        color: #fff;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.2s ease;
+    }
+
+        .class-materials .btn-info:hover {
+            background-color: #138496;
+        }
+
+        .class-materials .btn-info i {
+            margin-right: 8px;
+        }
+
+
+/* Class Tasks Section */
+.class-tasks-section {
+    margin-top: 30px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+    .class-tasks-section h3 {
+        color: #2c3e50;
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+
+        .class-tasks-section h3 i {
+            margin-right: 10px;
+            color: #7f8c8d;
+        }
+
+.task-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.task-item {
+    background-color: #fcfcfc;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: box-shadow 0.2s ease;
+}
+
+    .task-item:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    .task-item.task-completed {
+        background-color: #e6ffe6; /* Very light green */
+        border-color: #a3e6a3;
+    }
+
+        .task-item.task-completed .task-header h4 {
+            color: #28a745;
+        }
+
+
+.task-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+    .task-header h4 {
+        margin: 0;
+        font-size: 1.3em;
+        color: #34495e;
+        flex-grow: 1; /* Allows title to take space */
+    }
+
+.task-status-icon {
+    margin-right: 12px;
+    font-size: 1.5em;
+    min-width: 25px; /* Fixed width to prevent text shifting */
+    text-align: center;
+}
+
+    .task-status-icon .completed-icon {
+        color: #28a745;
+    }
+    /* Green */
+    .task-status-icon .in-review-icon {
+        color: #ffc107;
+    }
+    /* Orange/Yellow */
+    .task-status-icon .failed-icon {
+        color: #dc3545;
+    }
+    /* Red */
+    .task-status-icon .pending-icon {
+        color: #6c757d;
+    }
+/* Gray */
+
+
+.task-due-date {
+    font-size: 0.85em;
+    color: #888;
+    white-space: nowrap; /* Prevent wrapping */
+}
+
+.task-description-short {
+    font-size: 0.95em;
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.task-meta {
+    display: flex;
+    align-items: center;
+    font-size: 0.85em;
+    color: #777;
+    margin-bottom: 15px;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75em;
+    margin-right: 10px;
+}
+
+.badge-success {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+.task-requirement {
+    display: flex;
+    align-items: center;
+    color: #007bff;
+}
+
+    .task-requirement i {
+        margin-right: 5px;
+    }
+
+.task-actions {
+    text-align: right;
+}
+
+    .task-actions .btn {
+        padding: 7px 14px;
+        font-size: 0.9em;
+        border-radius: 5px;
+    }
+
+    .task-actions .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+        .task-actions .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+
+
+.no-tasks-message {
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    margin-top: 30px;
+}
+
+    .no-tasks-message i {
+        margin-right: 10px;
+        color: #a9a9a9;
+    }
+
+/* Loading and Error messages */
+.loading-spinner, .error-message {
+    text-align: center;
+    padding: 50px 20px;
+    color: #6c757d;
+    font-size: 1.2em;
+}
+
+    .loading-spinner i {
+        font-size: 2em;
+        margin-right: 10px;
+        color: #007bff;
+    }
+
+    .error-message i {
+        font-size: 2em;
+        margin-right: 10px;
+        color: #dc3545;
+    }
+
+
+/* Adjustments for sidebar active link */
+.class-nav-item a.active {
+    background-color: #e0f2f7; /* Light blue for active link */
+    border-left: 3px solid #007bff; /* Blue line on left */
+    font-weight: 600;
+    color: #007bff; /* Blue text */
+}
+
+/* Responsive adjustments for new content */
+@media (max-width: 768px) {
+    .class-details-main {
+        padding: 20px;
+    }
+
+        .class-details-main h2 {
+            font-size: 2em;
+        }
+
+    .class-tasks-section h3 {
+        font-size: 1.5em;
+    }
+
+    .task-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .task-due-date {
+        margin-top: 5px;
+        margin-left: 37px; /* Align with task name */
+    }
+
+    .task-actions {
+        text-align: left;
+        margin-top: 15px;
+    }
+}

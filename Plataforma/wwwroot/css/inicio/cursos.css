@@ -1,0 +1,195 @@
+﻿/* Previous CSS styles... */
+
+/* --- Return Button Styling --- */
+.return-button-container {
+    text-align: left;
+    margin-top: 40px; /* Space above the button */
+    margin-bottom: 20px; /* Space below if content follows */
+    margin: 40px 0 20px 20px;
+}
+
+#returnToMainButton {
+    background-color: #95a5a6; /* A neutral gray */
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1em;
+    cursor: pointer;
+    text-decoration: none; /* Remove underline for anchor tag */
+    display: inline-block; /* Allows padding and alignment for anchor tag */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+
+
+
+h2 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.2em;
+}
+
+/* Course List Container (unchanged) */
+.course-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 800px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+}
+
+/* Base Course Row Style (modified cursor, added selected state) */
+.course-row {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    cursor: pointer; /* Indicate it's clickable */
+    position: relative; /* For checkmark positioning if used */
+}
+
+    .course-row h3 {
+        margin: 0;
+        font-size: 1.4em;
+        color: #34495e;
+        flex-grow: 1;
+        text-align: left;
+    }
+
+/* Status Indicator (on the right side of the row) - unchanged */
+.course-status {
+    font-weight: bold;
+    font-size: 0.9em;
+    padding: 6px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Style for Available (Not Registered) Courses - unchanged */
+.available-course-row {
+    border-left: 6px solid #3498db;
+}
+
+    .available-course-row h3 {
+        color: #3498db;
+    }
+
+    .available-course-row .course-status {
+        background-color: rgba(52, 152, 219, 0.1);
+        color: #3498db;
+    }
+
+/* Style for Registered Courses - unchanged */
+.registered-course-row {
+    border-left: 6px solid #27ae60;
+    background-color: #e8f5e9;
+}
+
+    .registered-course-row h3 {
+        color: #27ae60;
+    }
+
+    .registered-course-row .course-status {
+        background-color: rgba(39, 174, 96, 0.15);
+        color: #27ae60;
+    }
+
+        /* Checkmark for Registered Courses - unchanged */
+        .registered-course-row .course-status::before {
+            content: '✓';
+            font-size: 1.2em;
+            line-height: 1;
+        }
+
+/* --- New Styles for Selection/Deselection --- */
+
+/* State when an available course is "selected" for registration */
+.course-row.selected-for-register {
+    border-left: 6px solid #f39c12; /* Orange for pending registration */
+    background-color: #fff9e6; /* Light yellow background */
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
+}
+
+    .course-row.selected-for-register .course-status {
+        background-color: rgba(243, 156, 18, 0.15);
+        color: #f39c12;
+    }
+
+        .course-row.selected-for-register .course-status::before {
+            content: '+'; /* Plus sign for "adding" */
+            font-size: 1.2em;
+            color: #f39c12;
+        }
+
+
+/* State when a registered course is "selected" for deregistration */
+.course-row.selected-for-deregister {
+    border-left: 6px solid #c0392b; /* Red for pending deregistration */
+    background-color: #fcebeb; /* Light red background */
+    box-shadow: 0 4px 15px rgba(192, 57, 43, 0.2);
+    /* Make the original checkmark disappear */
+    opacity: 0.7; /* Slightly faded */
+}
+
+    .course-row.selected-for-deregister .course-status {
+        background-color: rgba(192, 57, 43, 0.15);
+        color: #c0392b;
+    }
+
+        .course-row.selected-for-deregister .course-status::before {
+            content: '-'; /* Minus sign for "removing" */
+            font-size: 1.2em;
+            color: #c0392b;
+        }
+
+/* --- Save Changes Button --- */
+.save-changes-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#saveChangesButton {
+    background-color: #2ecc71; /* Green save button */
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2em;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    /* Initially hidden/disabled */
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none; /* Make it unclickable when hidden */
+}
+
+    #saveChangesButton.visible {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto; /* Make it clickable when visible */
+    }
+
+    #saveChangesButton:hover {
+        background-color: #27ae60;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
+    }
+
+    #saveChangesButton:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }

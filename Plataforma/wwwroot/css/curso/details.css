@@ -1,0 +1,86 @@
+﻿.tarea-details-container {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    margin-bottom: 20px;
+}
+
+.tarea-header h1 {
+    color: #343a40;
+    margin-bottom: 5px;
+}
+
+.tarea-header .due-date {
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+.tarea-description, .tarea-content-section, .tarea-submission-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+    .tarea-content-section h3, .tarea-submission-section h3 {
+        color: #495057;
+        margin-bottom: 15px;
+    }
+
+.video-player-container {
+    margin-bottom: 20px;
+    background-color: black; /* To make video player look good */
+}
+
+.tarea-text-content {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: white;
+}
+
+    .btn-info:hover {
+        background-color: #138496;
+        border-color: #138496;
+    }
+
+.badge {
+    padding: .4em .6em;
+    border-radius: .25rem;
+    font-size: 0.8em;
+}
+
+.badge-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.professor-comments {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #e9f7ef;
+    border: 1px solid #d4edda;
+    border-left: 5px solid #28a745;
+    border-radius: 5px;
+}
