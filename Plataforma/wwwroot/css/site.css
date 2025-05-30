@@ -152,9 +152,9 @@ main {
     }
 
     /* Hover & Active States */
-    .nav-link:hover, .logout-button:hover {
+/*    .nav-link:hover, .logout-button:hover {
         color: var(--hover-light);
-    }
+    }*/
 
         
 /* Role-specific accent colors for hover/active */

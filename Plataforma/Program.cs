@@ -82,15 +82,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>(); // Or IdentityRole<string>
-    if (!await roleManager.RoleExistsAsync("Administrador"))
-    {
-        await roleManager.CreateAsync(new IdentityRole<Guid>("Administrador")); // Or IdentityRole<string>
-    }
-}
-
 app.UseAuthentication();
 app.UseAuthorization();
 

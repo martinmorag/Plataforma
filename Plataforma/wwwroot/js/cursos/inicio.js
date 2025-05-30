@@ -140,7 +140,7 @@ if (cursoIdForClaseSelect && moduloIdForClaseSelect && moduloSelectForClaseGroup
             filteredModulos.forEach(modulo => {
                 const option = document.createElement('option');
                 option.value = modulo.ModuloId;
-                option.textContent = modulo.Title;
+                option.textContent = modulo.Titulo;
                 option.dataset.cursoId = modulo.CursoId; // Keep the curso ID for filtering (already in HTML)
                 moduloIdForClaseSelect.appendChild(option);
             });

@@ -8,10 +8,10 @@ using Plataforma.Models.Inicio;
 using Plataforma.Models.Profesores;
 using System.Runtime.ConstrainedExecution;
 using System.Security.Claims;
+using System.Threading;
 
 namespace Plataforma.Controllers
 {
-    [Authorize(Roles = "Profesor")]
     public class cursosController : Controller
     {
         private readonly UserManager<UsuarioIdentidad> _userManager;
@@ -92,13 +92,22 @@ namespace Plataforma.Controllers
             if (curso != null)
             {
                 modulo.Curso = curso;
+                modulo.ModuloId = Guid.NewGuid();
             }
 
             if (ModelState.IsValid)
             {
+                var maxExistingOrder = await _context.modulos
+                                     .Where(m => m.CursoId == modulo.CursoId)
+                                     .Select(m => (int?)m.Order) // Cast to int? to handle no existing modules
+                                     .MaxAsync();
+
+                // Assign the new order: maxOrder + 1, or 0 if no modules exist yet for this curso
+                modulo.Order = (maxExistingOrder.HasValue ? maxExistingOrder.Value : -1) + 1;
+
                 _context.modulos.Add(modulo);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "cursos");
             }
             if (!ModelState.IsValid)
             {
@@ -108,12 +117,12 @@ namespace Plataforma.Controllers
                     Console.WriteLine($"- {error.ErrorMessage}");
                 }
                 ViewBag.Cursos = _context.cursos.ToList();
-                return View("Index");
+                return View(modulo);
             }
             Console.WriteLine("not worked");
             // If there are errors, you might want to repopulate ViewBag.Cursos and return the view
             ViewBag.Cursos = _context.cursos.ToList();
-            return View("Index");
+            return View(modulo);
         }
 
         [HttpPost]
@@ -124,12 +133,22 @@ namespace Plataforma.Controllers
             if (modulo != null)
             {
                 clase.Modulo = modulo;
+                clase.ClaseId = Guid.NewGuid();
             }
             if (ModelState.IsValid)
             {
+                var maxExistingOrder = await _context.clases
+                                             .Where(c => c.ModuloId == clase.ModuloId)
+                                             .OrderByDescending(c => c.Order)
+                                             .Select(c => (int?)c.Order)
+                                             .MaxAsync();
+
+                // Assign the new order:
+                clase.Order = (maxExistingOrder.HasValue ? maxExistingOrder.Value : -1) + 1;
+
                 _context.clases.Add(clase);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index"); // Or wherever you want to redirect
+                return RedirectToAction("Index", "cursos");
             }
             if (!ModelState.IsValid)
             {
@@ -139,11 +158,11 @@ namespace Plataforma.Controllers
                     Console.WriteLine($"- {error.ErrorMessage}");
                 }
                 ViewBag.Cursos = _context.cursos.ToList();
-                return View("Index");
+                return View(clase);
             }
             // If there are errors, you might want to repopulate ViewBag.Modulos and return the view
             ViewBag.Modulos = _context.modulos.ToList();
-            return View("Index"); 
+            return View(clase);
         }
         [HttpPost]
         public async Task<IActionResult> ManageCourses([FromBody] CourseChangesModel changes)

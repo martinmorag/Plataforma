@@ -10,6 +10,7 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 2rem;
     margin-bottom: 30px; /* Space below the button */
     padding-bottom: 20px;
     border-bottom: 1px solid #eee; /* Subtle separator */
