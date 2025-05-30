@@ -76,7 +76,6 @@ namespace Plataforma.Controllers
                 InstructorNombre = instructorName,
                 TotalClases = curso.Modulos.SelectMany(m => m.Clases).Count(),
                 CompletedClases = 0, // Initialize to 0, will be updated later
-
                 Modulos = curso.Modulos.Select(m => new ModuloViewModel
                 {
                     ModuloId = m.ModuloId,

@@ -1,12 +1,17 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Plataforma.Data;
 using Plataforma.Models;
 using Plataforma.Models.Inicio;
+using Plataforma.Models.Profesores;
+using System.Runtime.ConstrainedExecution;
+using System.Security.Claims;
 
 namespace Plataforma.Controllers
 {
+    [Authorize(Roles = "Profesor")]
     public class cursosController : Controller
     {
         private readonly UserManager<UsuarioIdentidad> _userManager;
@@ -32,6 +37,52 @@ namespace Plataforma.Controllers
             ViewBag.Clases = clases;
 
             return View("~/Views/profesor/cursos/Index.cshtml");
+        }
+        [Route("profesor")]
+        public async Task<IActionResult> Inicio()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            // Load courses associated with the current professor
+            var profesorCourses = await _context.CursoProfesores
+                                            .Where(cp => cp.ProfesorId == user.Id)
+                                            .Include(cp => cp.Curso) // Eagerly load the Curso details
+                                            .OrderBy(cp => cp.Curso.Nombre)
+                                            .Select(cp => cp.Curso) // Select just the Curso objects
+                                            .ToListAsync();
+
+            return View("~/Views/profesor/Index.cshtml", profesorCourses);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleCourseAvailability(Guid cursoId, bool isAvailable)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) // Check if user is logged in
+            {
+                return Json(new { success = false, message = "Usuario no autenticado." });
+            }
+
+            var curso = await _context.cursos.FindAsync(cursoId);
+
+            if (curso == null)
+            {
+                return Json(new { success = false, message = "Curso no encontrado." }); // Return JSON for AJAX
+            }
+
+            var isProfesorAuthorized = await _context.CursoProfesores
+                                                    .AnyAsync(cp => cp.ProfesorId == user.Id && cp.CursoId == cursoId);
+
+            if (!isProfesorAuthorized)
+            {
+                return Json(new { success = false, message = "No autorizado para modificar este curso." }); // Return JSON for AJAX
+            }
+
+            curso.Disponible = isAvailable;
+            await _context.SaveChangesAsync();
+
+            // Still return JSON, don't redirect
+            return Json(new { success = true, newStatus = curso.Disponible });
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -156,7 +207,7 @@ namespace Plataforma.Controllers
                         // Assuming CursoEstudiante needs a unique ID too, if it's not handled by EF automatically
                         // If CursoEstudianteId is a Guid primary key for the join table itself
                         // you might need to generate it. If it's identity, EF handles it.
-                        _context.CursoEstudiantes.Add(new CursoEstudiante
+                        _context.CursoEstudiantes.Add(new Models.ProfesorCursoDto
                         {
                             CursoEstudianteId = Guid.NewGuid(), // Only if this is the PK and needs explicit GUID
                             EstudianteId = user.Id,

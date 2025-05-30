@@ -5,6 +5,8 @@ using Plataforma.Data;
 using Plataforma.Models;
 using Xabe.FFmpeg.Downloader;
 using Xabe.FFmpeg;
+using Plataforma.Servicios;
+using DotNetEnv;
 
 DotNetEnv.Env.Load();
 
@@ -20,7 +22,8 @@ FFmpeg.SetExecutablesPath(ffmpegPath);
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("ConnectionStrings:EmailSettings"));
+builder.Services.AddTransient<IEmailSender, EmailSend>(); 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 builder.Services.AddSession();
@@ -62,11 +65,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.AddAuthentication();
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOnly", policy =>
-        policy.RequireRole("Administrador")); // Requires the "Admin" role
-});
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 

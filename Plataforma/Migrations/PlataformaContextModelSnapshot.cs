@@ -217,6 +217,9 @@ namespace Plataforma.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Disponible")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -225,24 +228,6 @@ namespace Plataforma.Migrations
                     b.HasKey("CursoId");
 
                     b.ToTable("cursos");
-                });
-
-            modelBuilder.Entity("Plataforma.Models.CursoEstudiante", b =>
-                {
-                    b.Property<Guid>("CursoId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("EstudianteId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CursoEstudianteId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("CursoId", "EstudianteId");
-
-                    b.HasIndex("EstudianteId");
-
-                    b.ToTable("CursoEstudiantes");
                 });
 
             modelBuilder.Entity("Plataforma.Models.CursoProfesor", b =>
@@ -291,6 +276,9 @@ namespace Plataforma.Migrations
                     b.Property<Guid>("TareaId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("TareaId1")
+                        .HasColumnType("uuid");
+
                     b.HasKey("EntregaId");
 
                     b.HasIndex("ArchivoId")
@@ -299,6 +287,8 @@ namespace Plataforma.Migrations
                     b.HasIndex("EstudianteId");
 
                     b.HasIndex("TareaId");
+
+                    b.HasIndex("TareaId1");
 
                     b.ToTable("entregas");
                 });
@@ -325,6 +315,24 @@ namespace Plataforma.Migrations
                     b.HasIndex("CursoId");
 
                     b.ToTable("modulos");
+                });
+
+            modelBuilder.Entity("Plataforma.Models.ProfesorCursoDto", b =>
+                {
+                    b.Property<Guid>("CursoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("EstudianteId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CursoEstudianteId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("CursoId", "EstudianteId");
+
+                    b.HasIndex("EstudianteId");
+
+                    b.ToTable("CursoEstudiantes");
                 });
 
             modelBuilder.Entity("Plataforma.Models.Tarea", b =>
@@ -530,25 +538,6 @@ namespace Plataforma.Migrations
                     b.Navigation("Modulo");
                 });
 
-            modelBuilder.Entity("Plataforma.Models.CursoEstudiante", b =>
-                {
-                    b.HasOne("Plataforma.Models.Curso", "Curso")
-                        .WithMany("CursoEstudiantes")
-                        .HasForeignKey("CursoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Plataforma.Models.Estudiante", "Estudiante")
-                        .WithMany("CursoEstudiantes")
-                        .HasForeignKey("EstudianteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Curso");
-
-                    b.Navigation("Estudiante");
-                });
-
             modelBuilder.Entity("Plataforma.Models.CursoProfesor", b =>
                 {
                     b.HasOne("Plataforma.Models.Curso", "Curso")
@@ -587,6 +576,10 @@ namespace Plataforma.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Plataforma.Models.Tarea", null)
+                        .WithMany("Entregas")
+                        .HasForeignKey("TareaId1");
+
                     b.Navigation("Archivo");
 
                     b.Navigation("Estudiante");
@@ -603,6 +596,25 @@ namespace Plataforma.Migrations
                         .IsRequired();
 
                     b.Navigation("Curso");
+                });
+
+            modelBuilder.Entity("Plataforma.Models.ProfesorCursoDto", b =>
+                {
+                    b.HasOne("Plataforma.Models.Curso", "Curso")
+                        .WithMany("CursoEstudiantes")
+                        .HasForeignKey("CursoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Plataforma.Models.Estudiante", "Estudiante")
+                        .WithMany("CursoEstudiantes")
+                        .HasForeignKey("EstudianteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Curso");
+
+                    b.Navigation("Estudiante");
                 });
 
             modelBuilder.Entity("Plataforma.Models.Tarea", b =>
@@ -640,6 +652,11 @@ namespace Plataforma.Migrations
             modelBuilder.Entity("Plataforma.Models.Modulo", b =>
                 {
                     b.Navigation("Clases");
+                });
+
+            modelBuilder.Entity("Plataforma.Models.Tarea", b =>
+                {
+                    b.Navigation("Entregas");
                 });
 
             modelBuilder.Entity("Plataforma.Models.Estudiante", b =>

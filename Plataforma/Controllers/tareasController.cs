@@ -1,25 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Plataforma.Data;
 using Plataforma.Models;
+using Plataforma.Models.Profesores;
 using System.Net.Http;
 using Xabe.FFmpeg;
 
 namespace Plataforma.Controllers
 {
+    [Authorize(Roles = "Profesor")]
     public class tareasController : Controller
     {
         private readonly PlataformaContext _context;
         private readonly HttpClient _httpClient; 
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _environment;
+        private readonly UserManager<UsuarioIdentidad> _userManager;
 
-        public tareasController(PlataformaContext context, IHttpClientFactory httpClientFactory, IConfiguration configuration, IWebHostEnvironment environment) // Modify this
+        public tareasController(PlataformaContext context, IHttpClientFactory httpClientFactory, IConfiguration configuration, IWebHostEnvironment environment, UserManager<UsuarioIdentidad> userManager) // Modify this
         {
             _context = context;
             _httpClient = httpClientFactory.CreateClient();
             _configuration = configuration; // Add this
             _environment = environment;
+            _userManager = userManager;
         }
         [HttpGet("profesor/tareas/crear")]
         public IActionResult crear(Guid claseId, string contentType)
@@ -41,6 +47,115 @@ namespace Plataforma.Controllers
 
             // Pass the data to the view
             return View("~/Views/profesor/tareas/crear.cshtml", tarea);
+        }
+        [HttpGet]
+        [Route("profesor/tareas/ver")] // Example route
+        public async Task<IActionResult> MisCursosYTareas()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Redirect("/Identity/Account/Login"); // Redirect to login if not authenticated
+            }
+
+            Guid profesorId = user.Id;
+
+            // Get courses assigned to the current professor
+            var cursos = await _context.CursoProfesores
+                                       .Where(cp => cp.ProfesorId == profesorId)
+                                       .Select(cp => new Models.Profesores.ProfesorCursoDto
+                                       {
+                                           CursoId = cp.Curso.CursoId,
+                                           NombreCurso = cp.Curso.Nombre,
+                                           TotalClases = cp.Curso.Modulos.SelectMany(m => m.Clases).Count(),
+                                           TotalTareas = cp.Curso.Modulos.SelectMany(m => m.Clases).SelectMany(cl => cl.Tareas).Count()
+                                       })
+                                       .ToListAsync();
+
+            // Pass courses to the view
+            ViewBag.Cursos = cursos;
+
+            // Optionally, pre-load tasks for the first course
+            if (cursos.Any())
+            {
+                var firstCursoId = cursos.First().CursoId;
+                var tareas = await _context.tareas
+                                           .Include(t => t.Clase)
+                                               .ThenInclude(cl => cl.Modulo)
+                                                   .ThenInclude(m => m.Curso)
+                                           .Where(t => t.Clase.Modulo.CursoId == firstCursoId)
+                                           .Select(t => new ProfesorTareaViewModel
+                                           {
+                                               TareaId = t.TareaId,
+                                               Nombre = t.Nombre,
+                                               FechaLimite = t.FechaVencimiento,
+                                               ClaseNombre = t.Clase.Nombre,
+                                               TotalEntregas = t.Entregas.Count(),
+                                               EntregasPendientes = t.Entregas.Count(e => e.Estado == Entrega.EstadoEntrega.EnRevision || e.Estado == Entrega.EstadoEntrega.EnProgreso)
+                                           })
+                                           .ToListAsync();
+                ViewBag.Tareas = tareas;
+                ViewBag.SelectedCursoNombre = cursos.First().NombreCurso;
+            }
+            else
+            {
+                ViewBag.Tareas = new List<ProfesorTareaViewModel>();
+                ViewBag.SelectedCursoNombre = "Ninguno";
+            }
+
+            return View("~/Views/profesor/tareas/ver.cshtml");
+        }
+        [HttpGet]
+        [Route("profesor/tareas/entregas")] // Example route
+        public async Task<IActionResult> VerEntregas(Guid tareaId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Redirect("/Identity/Account/Login");
+            }
+
+            Guid profesorId = user.Id;
+
+            var tarea = await _context.tareas
+                                      .Include(t => t.Clase)
+                                          .ThenInclude(cl => cl.Modulo)
+                                              .ThenInclude(m => m.Curso)
+                                                  .ThenInclude(c => c.CursoProfesores) // To check professor assignment
+                                      .FirstOrDefaultAsync(t => t.TareaId == tareaId);
+
+            if (tarea == null)
+            {
+                return NotFound("Tarea no encontrada.");
+            }
+
+            // Verify the professor has access to this task's course
+            var isProfesorAssignedToCurso = tarea.Clase.Modulo.Curso.CursoProfesores.Any(cp => cp.ProfesorId == profesorId);
+            if (!isProfesorAssignedToCurso)
+            {
+                return Forbid("No tienes permiso para ver esta tarea.");
+            }
+
+            var entregas = await _context.entregas
+                                         .Include(e => e.Estudiante)
+                                         .Include(e => e.Archivo)
+                                         .Where(e => e.TareaId == tareaId)
+                                         .Select(e => new ProfesorEntregaViewModel
+                                         {
+                                             EntregaId = e.EntregaId,
+                                             EstudianteNombre = e.Estudiante.Nombre + " " + e.Estudiante.Apellido,
+                                             Estado = e.Estado,
+                                             FechaEntrega = e.FechaEntrega,
+                                             ComentariosProfesor = e.ComentariosProfesor,
+                                             // For MVC, the URL needs to point to your *API* endpoint
+                                             ArchivoUrl = e.Archivo != null ? $"/api/Profesores/DownloadSubmittedFile/{e.EntregaId}" : null,
+                                             ArchivoNombreOriginal = e.Archivo != null ? e.Archivo.FileName : null,
+                                         })
+                                         .ToListAsync();
+
+            ViewBag.TareaNombre = tarea.Nombre;
+            ViewBag.TareaId = tareaId; // Pass TaskId to the view for evaluation modal
+            return View("~/Views/profesor/tareas/entregas.cshtml", entregas);
         }
         [HttpPost]
         [ValidateAntiForgeryToken] // Always add this for POST actions that modify data

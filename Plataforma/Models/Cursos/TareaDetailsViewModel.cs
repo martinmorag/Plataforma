@@ -16,8 +16,9 @@
         public bool HasSubmitted { get; set; }
         public string SubmissionStatusText { get; set; } // "Pendiente", "EnRevision", "Aprobado", "Reprobado"
         public bool IsSubmittedApproved { get; set; }
-        public string SubmittedFileUrl { get; set; } // URL of the file submitted by the student
-        public string SubmissionComentarios { get; set; } // Comments from the professor
+        public string? SubmittedFileUrl { get; set; } // URL of the file submitted by the student
+        public string? SubmissionComentarios { get; set; } // Comments from the professor
         public DateTime? SubmissionFecha { get; set; } // Date of submission
+        public Guid? ClaseId { get; set; }
     }
 }

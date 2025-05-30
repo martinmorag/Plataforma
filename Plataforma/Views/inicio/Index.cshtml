@@ -4,47 +4,70 @@
 }
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<UsuarioIdentidad> UserManager
+@model IEnumerable<Plataforma.Models.Curso>
 
 <link rel="stylesheet" href="~/css/inicio/inicio.css" asp-append-version="true" />
 
 <div class="welcome-banner">
     <div class="welcome-text">
-        <h3>Bienvenido @UserManager.GetUserAsync(User).Result.Nombre</h3>
-        <p>some good phrase</p>
-    </div>
-    <div class="profile">
-        <div class="circle"></div>
+        @{
+            // A safer way to get the user's name in Razor, handling async
+            var user = await UserManager.GetUserAsync(User);
+            var userName = user?.Nombre ?? "Estudiante"; // Default if name isn't found
+        }
+        <h3>¡Hola, @userName!</h3>
+        <p>Tu viaje de aprendizaje continúa. ¡Sigue adelante con tus tareas y descubre nuevas habilidades!</p>
     </div>
 </div>
 
-<div class="inferior">
-    <div class="cursos">
-        <h4>Cursos actuales</h4>
-        @foreach (var curso in Model)
+<div class="inferior-sections-container">
+    <div class="courses-section">
+        <h4 class="section-title">Cursos actuales</h4>
+        @if (!Model.Any())
         {
-            <div class="curso-item">
-                <div class="curso-header">
-                    <p class="curso-title">@curso.Nombre</p>
-                    <button class="toggle-modules">
-                        <i class="fa-solid fa-chevron-up"></i>
-                    </button>
+            <p class="no-courses-message">Aún no estás inscrito en ningún curso.</p>
+        }
+        else
+        {
+            @foreach (var curso in Model)
+            {
+                <div class="course-item">
+                    <div class="course-header">
+                        <p class="course-title">@curso.Nombre</p>
+                        <button class="toggle-modules-btn" aria-expanded="false" aria-controls="modules-list-@curso.CursoId">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <ul class="modules-list" id="modules-list-@curso.CursoId">
+                        @if (!curso.Modulos.Any())
+                        {
+                            <li class="no-modules-message">Este curso no tiene módulos aún.</li>
+                        }
+                        else
+                        {
+                            @foreach (var modulo in curso.Modulos)
+                            {
+                                <li>@modulo.Titulo</li>
+                            }
+                        }
+                    </ul>
                 </div>
-                <ul class="modules-list">
-                    @foreach (var modulo in curso.Modulos)
-                    {
-                        <li>@modulo.Titulo</li>
-                    }
-                </ul>
-            </div>
+            }
         }
     </div>
 
-    <div class="enlaces">
-        <a href="/inicio/cursos" class="enlace-item"><p>Explorar cursos</p><i class="fa-solid fa-chevron-right"></i></a>
-        <a href="#" class="enlace-item"><p>Ir a mis cursos</p><i class="fa-solid fa-chevron-right"></i></a>
+    <div class="links-section">
+        <h4 class="section-title">Explorar y Navegar</h4>
+        <a asp-controller="inicio" asp-action="cursos" class="link-item">
+            <p>Explorar todos los cursos</p>
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+        <a asp-controller="inicio" asp-action="miscursos" class="link-item">
+            <p>Ver mis cursos</p>
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
     </div>
 </div>
-
 
 
 

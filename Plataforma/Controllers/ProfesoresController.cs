@@ -4,9 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Plataforma.Models.Administracion;
 using Plataforma.Models;
 using Plataforma.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Plataforma.Models.Profesores;
 
 namespace Plataforma.Controllers
 {
+    [Authorize(Roles = "Profesor")]
     public class ProfesoresController : Controller
     {
         private readonly PlataformaContext _context;

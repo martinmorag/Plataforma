@@ -34,14 +34,6 @@
     margin-bottom: 20px;
 }
 
-.upload-tarea-label {
-    display: block;
-    color: #555; /* Darker gray for labels */
-    font-size: 16px;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-
 .upload-tarea-select {
     width: calc(100% - 12px);
     padding: 10px;
@@ -49,52 +41,150 @@
     border-radius: 6px;
     font-size: 16px;
     color: #333;
-    appearance: none; /* Remove default arrow */
-    background-image: url('data:image/svg+xml;utf8,<svg fill="#555" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
-    background-repeat: no-repeat;
-    background-position-x: calc(100% - 10px);
-    background-position-y: 50%;
-    cursor: pointer;
 }
 
     .upload-tarea-select:focus {
         outline: none;
-        border-color: #3066BE; /* Blue focus outline */
-        box-shadow: 0 0 6px rgba(48, 102, 190, 0.5); /* Subtle blue glow on focus */
+        border-color: #3066BE;
+        box-shadow: 0 0 6px rgba(48, 102, 190, 0.5);
     }
 
+.upload-tarea-label {
+    display: block; /* Ensures label takes full width */
+    margin-bottom: 1rem; /* Space between label and radio cards */
+    font-size: 1.25rem; /* Larger font for main label */
+    font-weight: 600;
+    color: #333; /* Darker text for better contrast */
+}
 
-
-
+/* Container for the radio cards */
 .radio-group {
     display: flex;
+    gap: 1.5rem; /* Space between the cards */
+    flex-wrap: wrap; /* Allow cards to wrap on smaller screens */
+    justify-content: center; /* Center cards when wrapped */
 }
-.radio-div {
-    background-color: #3066BE;
-    width: 9rem;
-    height: 9rem;
-    border-radius: 10px;
+
+/* Individual Radio Card Style */
+.radio-card {
+    background-color: #f8f9fa; /* Light grey background for unselected state */
+    width: 10rem; /* Slightly larger width */
+    height: 10rem; /* Keep aspect ratio square */
+    border-radius: 12px; /* Slightly more rounded corners */
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1rem;
-    margin: 1rem;
-    border: 2px solid transparent; /* Initially transparent border */
-    cursor: pointer; /* Indicate it's clickable */
-    transition: border-color 0.3s ease, background-color 0.3s ease;
+    justify-content: center; /* Center content vertically and horizontally */
+    padding: 1.5rem;
+    border: 2px solid #e0e0e0; /* Subtle border for unselected */
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth transitions for all properties */
+    position: relative; /* For the hidden input */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Subtle shadow */
 }
-.upload-tarea-radio-label {
+
+/* Hide the actual radio input */
+.radio-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none; /* Ensure it doesn't interfere with label clicks */
+}
+
+/* Styles for the visible label content within the card */
+.radio-label {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    width: 100%; /* Make label fill the card */
+    height: 100%;
+    color: #6c757d; /* Muted text color for unselected */
+    font-weight: 500;
+    font-size: 1.1rem;
+    text-align: center;
+    cursor: pointer; /* Ensure label itself is clickable */
 }
-.upload-tarea-radio, .upload-tarea-radio-label p, .upload-tarea-radio-label i {
-    margin: .5rem;
-    color: white;
+
+    /* Icon styling */
+    .radio-label i {
+        font-size: 2.5rem; /* Larger icon */
+        margin-bottom: 0.8rem; /* Space between icon and text */
+        color: #adb5bd; /* Muted icon color */
+        transition: color 0.3s ease;
+    }
+
+    /* Text styling */
+    .radio-label span {
+        margin: 0; /* Remove default margin from original p */
+        transition: color 0.3s ease;
+    }
+
+/* Hover state for the radio cards */
+.radio-card:hover {
+    border-color: #8bbce1; /* Lighter blue border on hover */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
-.upload-tarea-radio-label i {
-    font-size: 1.5rem;
+
+    /* Change icon and text color on hover */
+    .radio-card:hover .radio-label,
+    .radio-card:hover .radio-label i {
+        color: #495057; /* Slightly darker text/icon on hover */
+    }
+
+/* Styles when the radio input is checked */
+.radio-input:checked + .radio-label {
+    background-color: #007bff; /* Brand blue background for selected */
+    color: #ffffff; /* White text for selected */
+    border-color: #007bff; /* Blue border for selected */
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.25); /* Stronger shadow for selected */
+    transform: translateY(-2px); /* Maintain a slight lift */
 }
+
+    /* Change icon color when checked */
+    .radio-input:checked + .radio-label i {
+        color: #ffffff; /* White icon for selected */
+    }
+
+/* Ensure the card itself changes background when checked */
+.radio-input:checked ~ .radio-label { /* Use ~ to target sibling label */
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+/* Fallback for older browsers or if using label for input */
+.radio-input:checked + .radio-label .radio-card {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 500px) {
+    .radio-group {
+        flex-direction: column; /* Stack cards vertically on very small screens */
+        align-items: center; /* Center them when stacked */
+    }
+
+    .radio-card {
+        width: 80%; /* Make cards wider on small screens for easier tapping */
+        max-width: 200px; /* Limit max width */
+        height: 8rem; /* Adjust height for less vertical space */
+        padding: 1rem;
+    }
+
+    .radio-label i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .radio-label span {
+        font-size: 1rem;
+    }
+}
+
+
+
 
 
 

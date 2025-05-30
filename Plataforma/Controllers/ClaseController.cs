@@ -58,7 +58,7 @@ namespace Plataforma.Controllers
                 Order = clase.Order,
                 HasTareas = clase.Tareas != null && clase.Tareas.Any(),
                 IsCompleted = false, // Will be set after populating tasks
-
+                
                 Tareas = clase.Tareas.OrderBy(t => t.Nombre).Select(t =>
                 {
                     bool isSubmittedApproved = approvedSubmittedTareaIds.Contains(t.TareaId);

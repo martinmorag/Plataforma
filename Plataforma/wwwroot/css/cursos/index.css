@@ -1,0 +1,204 @@
+﻿/* Styles for the course management list */
+h1 {
+    margin: 2rem 0 0 0;
+}
+a:hover {
+    color: white;
+}
+/* Styles for the global "Ver Todas las Tareas" link */
+.all-tasks-link-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px; /* Space below the button */
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee; /* Subtle separator */
+}
+
+.btn-primary {
+    background-color: #007bff; /* Standard primary blue */
+    color: #ffffff;
+    border: 1px solid #007bff;
+    padding: 12px 25px; /* Larger padding for a prominent button */
+    font-size: 1.1em; /* Slightly larger text */
+    border-radius: 6px;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    height: fit-content;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+        border-color: #0056b3;
+    }
+
+    .btn-primary i {
+        margin-right: 8px; /* Space for the icon */
+    }
+
+
+/* Styles for the course management list */
+.course-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.course-item {
+    background-color: #ffffff; /* White background for cards */
+    border: 1px solid #e0e0e0; /* Light border */
+    border-radius: 8px;
+    padding: 20px 25px; /* Comfortable padding */
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+
+/* New: Container for course name and toggle */
+.course-info-and-toggle {
+    display: flex;
+    justify-content: space-between; /* Pushes name to left, toggle to right */
+    align-items: center; /* Vertically aligns elements */
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    gap: 15px; /* Space between items if they wrap */
+}
+
+.course-name {
+    margin: 0; /* Remove default h2 margin */
+    font-size: 1.8em; /* Prominent course name */
+    color: #333; /* Darker text for readability */
+    flex-grow: 1; /* Allows course name to take available space */
+}
+
+/* New: Grouped status text and toggle switch */
+.course-status-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between status text and toggle switch */
+    font-size: 1.1em;
+    color: #555;
+}
+
+.status-text {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+    .status-text.available {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-text.unavailable {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+/* Toggle Switch (Ensure these styles are defined if not already) */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 28px;
+    flex-shrink: 0; /* Prevent switch from shrinking */
+}
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 28px;
+}
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+
+.create-content-link {
+    display: inline-block; /* Makes the anchor behave like a block element so you can apply padding, etc. */
+    padding: 10px 20px; /* Adjust padding as needed */
+    background-color: #007bff; /* Example background color (a common blue) */
+    color: white; /* Text color */
+    text-decoration: none; /* Removes the default underline */
+    border-radius: 5px; /* Slightly rounded corners */
+    font-size: 1.25rem; /* Larger font size, similar to btn-lg */
+    font-weight: 500; /* Medium font weight */
+    border: 1px solid #007bff; /* A small border */
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition for hover effects */
+}
+
+    .create-content-link:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+        border-color: #0056b3;
+        cursor: pointer; /* Changes cursor to a pointer on hover */
+    }
+
+    .create-content-link i {
+        margin-right: 8px; /* Space between icon and text */
+    }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .all-tasks-link-container {
+        text-align: center; /* Center the button on small screens */
+    }
+
+    .course-item {
+        padding: 15px 20px;
+    }
+
+    .course-info-and-toggle {
+        flex-direction: column; /* Stack name and toggle vertically */
+        align-items: flex-start; /* Align stacked items to the left */
+        gap: 10px;
+    }
+
+    .course-name {
+        font-size: 1.5em;
+    }
+
+    .course-status-toggle {
+        flex-direction: row; /* Keep status text and toggle side-by-side */
+        width: 100%; /* Take full width if necessary */
+        justify-content: flex-start; /* Align to the left */
+    }
+
+    .toggle-switch {
+        margin-left: 0; /* Adjust if needed */
+    }
+}

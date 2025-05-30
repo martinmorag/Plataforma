@@ -1,5 +1,99 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<Plataforma.Models.Curso>
+
 @{
+    ViewData["Title"] = "Gestionar Cursos";
+    Layout = "_Layout";
+}
+
+<link rel="stylesheet" href="~/css/cursos/index.css" asp-append-version="true" />
+
+
+
+<h1>Gestionar Cursos</h1>
+<p class="lead">Administra la disponibilidad de tus cursos y accede a las tareas.</p>
+
+<div class="all-tasks-link-container">
+    <a asp-controller="cursos" asp-action="Index" class="create-content-link">
+        <i class="fas fa-plus-circle"></i> Crear Tareas, Módulos y Clases
+    </a>
+    <a asp-controller="tareas" asp-action="MisCursosYTareas" class="btn btn-primary btn-lg">
+        <i class="fas fa-tasks"></i> Ver Todas las Tareas
+    </a>
+</div>
+<div class="admin-links-container">
+    
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info" role="alert">
+        No tienes cursos asignados actualmente.
+    </div>
+}
+else
+{
+    <ul class="course-list">
+        @foreach (var curso in Model)
+        {
+            <li class="course-item">
+                <div class="course-info-and-toggle">
+                    <h2 class="course-name">@curso.Nombre</h2>
+                    <div class="course-status-toggle">
+                        <span class="status-text @(curso.Disponible ? "available" : "unavailable")">
+                            @(curso.Disponible ? "Disponible" : "No Disponible")
+                        </span>
+                        <label class="toggle-switch">
+                            <input type="checkbox"
+                                   data-curso-id="@curso.CursoId"
+                            @(curso.Disponible ? "checked" : "")
+                                   class="course-availability-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="~/js/cursos/index.js" asp-append-version="true"></script>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.course-availability-toggle').on('change', function () {
+                var checkbox = $(this);
+                var cursoId = checkbox.data('curso-id');
+                var statusText = checkbox.closest('.course-status-toggle').find('.status-text'); // Corrected selector
+                var isAvailable = checkbox.is(':checked');
+
+                $.ajax({
+                    url: '@Url.Action("ToggleCourseAvailability", "cursos")', // Keep this with Razor
+                    type: 'POST',
+                    data: {
+                        cursoId: cursoId,
+                        isAvailable: isAvailable,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            if (response.newStatus) {
+                                statusText.text('Disponible').removeClass('unavailable').addClass('available');
+                                checkbox.prop('checked', true);
+                            } else {
+                                statusText.text('No Disponible').removeClass('available').addClass('unavailable');
+                                checkbox.prop('checked', false);
+                            }
+                        } else {
+                            checkbox.prop('checked', !checkbox.prop('checked'));
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        checkbox.prop('checked', !checkbox.prop('checked'));
+                    }
+                });
+            });
+        });
+    </script>
 }

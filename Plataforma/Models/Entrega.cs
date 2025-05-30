@@ -27,7 +27,8 @@ namespace Plataforma.Models
             EnRevision,
             EnProgreso,
             Aprobado,
-            Reprobado
+            Reprobado,
+            Rehacer
         }
 
         [Required]

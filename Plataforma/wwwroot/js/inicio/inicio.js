@@ -1,19 +1,17 @@
-﻿const cursoItems = document.querySelectorAll('.curso-item');
+﻿const toggleButtons = document.querySelectorAll('.toggle-modules-btn');
 
-cursoItems.forEach(item => {
-    const header = item.querySelector('.curso-header');
-    const modulesList = item.querySelector('.modules-list');
-    const toggleButton = item.querySelector('.toggle-modules');
-    const chevronIcon = toggleButton.querySelector('i');
+toggleButtons.forEach(button => {
+    button.addEventListener('click', function () {
+        const modulesList = this.closest('.course-item').querySelector('.modules-list');
+        const icon = this.querySelector('i');
 
-    header.addEventListener('click', function () {
+        // Toggle the 'open' class for CSS transition
         modulesList.classList.toggle('open');
-        chevronIcon.classList.toggle('rotated');
-    });
-
-    toggleButton.addEventListener('click', function (event) {
-        event.stopPropagation();
-        modulesList.classList.toggle('open');
-        chevronIcon.classList.toggle('rotated');
+        // Toggle aria-expanded for accessibility
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', !isExpanded);
+        // Toggle the icon rotation
+        icon.classList.toggle('fa-chevron-down');
+        icon.classList.toggle('fa-chevron-up'); // Or just add/remove a 'rotated' class as per your original CSS
     });
 });

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Plataforma.Models
 {
-    public class CursoEstudiante
+    public class ProfesorCursoDto
     {
         [Key]
         public Guid CursoEstudianteId { get; set; }

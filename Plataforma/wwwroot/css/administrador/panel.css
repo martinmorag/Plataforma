@@ -1,53 +1,309 @@
-﻿/* Lista de estudiantes */
-
-.table-container {
-    height: 10em;
-    display: none;
+﻿.admin-panel-container {
+    max-width: 1200px; /* Max width for content to prevent stretching */
+    margin: 2rem auto; /* Center the panel with some top/bottom margin */
+    padding: 20px;
 }
-table {
+
+    .admin-panel-container h1 {
+        font-size: 2.5rem;
+        color: #2c3e50; /* Darker, prominent heading */
+        margin-bottom: 2rem;
+        text-align: center;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 1rem;
+    }
+
+/* --- Section Headers (for lists) --- */
+.user-list-section {
+    margin-bottom: 3rem;
+}
+
+.section-header {
     display: flex;
-    flex-flow: column;
-    height: 100%;
-    width: 100%;
-}
-table thead {
-    /* head takes the height it requires, 
-and it's not scaled when table is resized */
-    flex: 0 0 auto;
-    width: calc(100% - 0.9em);
-}
-table tbody {
-    /* body takes all the remaining available space */
-    flex: 1 1 auto;
-    display: block;
-    overflow-y: scroll;
-}
-table tbody tr {
-    width: 100%;
-    border-bottom: .5px solid gray;
-}
-table thead, table tbody tr {
-    display: table;
-    table-layout: fixed;
-}
-
-
-
-
-
-
-.title-list-s, .title-list-p {
-    display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Space between title and actions */
     align-items: center;
-    margin: 1rem;
+    background-color: #eef4f8;
+    padding: 15px 25px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
-.title-list-s i, .title-list-p i {
-    margin: 0 2rem 0 0;
-    padding: .75rem;
+
+.section-title {
+    font-size: 1.8rem;
+    color: #2c5f9b;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* New: Container for header actions */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between the "Add" button and the "Toggle" button */
+}
+
+/* New: Style for the "Add New" button */
+.add-new-btn {
+    display: inline-flex; /* Allows icon and text to sit side-by-side */
+    align-items: center;
+    gap: 8px; /* Space between icon and text */
+    padding: 10px 20px;
+    font-size: 0.95em;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none; /* Remove underline from anchor button */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+/* Specific Bootstrap button overrides (if needed, otherwise rely on Bootstrap's defaults) */
+.btn-success {
+    background-color: #28a745; /* A standard green */
+    border-color: #28a745;
+    color: #fff;
+}
+
+    .btn-success:hover {
+        background-color: #218838; /* Darker green on hover */
+        border-color: #1e7e34;
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2); /* Subtle shadow on hover */
+    }
+
+/* Existing toggle button styling... */
+.toggle-table-btn {
+    background: none;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
     border-radius: 50%;
-    transition: ease-out .2s;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.title-list-s i:hover, .title-list-p i:hover {
-    background: #D6D6D6;
+
+    .toggle-table-btn:hover {
+        background-color: rgba(44, 95, 155, 0.1);
+    }
+
+    .toggle-table-btn i {
+        font-size: 1.2em;
+        color: #2c5f9b;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .toggle-table-btn[aria-expanded="false"] i {
+        transform: rotate(180deg);
+    }
+
+/* --- Table Container --- */
+.table-container {
+    /* Base styles for the container */
+    overflow-y: auto; /* Enable vertical scrolling when content exceeds max-height */
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    background-color: #fff; /* Ensure it has a background so content doesn't show through if parent is transparent */
+    /* Transition properties for smooth hide/show */
+    transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out, border 0.4s ease-in-out; /* Add border to transition for seamless look */
+    /*
+        IMPORTANT: Set an initial max-height that's large enough for content.
+        When you first load the page, the table is visible, so it should have a max-height.
+        A very large value (like 1000px) is usually safe if you don't know the exact content height.
+    */
+    max-height: 1000px; /* Or a larger value if your tables can be very long */
+}
+
+    .table-container.collapsed {
+        max-height: 0; /* Collapse to 0 height */
+        overflow: hidden; /* Hide overflowing content */
+        padding: 0; /* Remove padding when collapsed */
+        border: none; /* Hide border when collapsed */
+    }
+
+.no-data-message {
+    text-align: center;
+    padding: 30px;
+    color: #666;
+    font-style: italic;
+    background-color: #fdfdfd;
+    border-radius: 0 0 8px 8px;
+}
+
+/* --- Table Styling --- */
+table {
+    width: 100%;
+    border-collapse: collapse; /* Removes default table spacing */
+    background-color: #fff; /* White background for table rows */
+}
+
+    table thead {
+        position: sticky; /* Sticky header for scrolling tables */
+        top: 0;
+        background-color: #f8f8f8; /* Slightly different background for header */
+        z-index: 10; /* Ensure header stays on top of content */
+        box-shadow: 0 2px 2px rgba(0, 0, 0, 0.03); /* Small shadow for header */
+    }
+
+    table th,
+    table td {
+        padding: 15px 20px;
+        text-align: left;
+        border-bottom: 1px solid #eee; /* Light line between rows */
+    }
+
+    table th {
+        font-weight: 600;
+        color: #555;
+        text-transform: uppercase;
+        font-size: 0.9em;
+    }
+
+    table tbody tr:hover {
+        background-color: #f5fafd; /* Light blue on hover for rows */
+    }
+
+/* Action column styling */
+.action-column {
+    width: 180px; /* Fixed width for action buttons */
+    text-align: center; /* Center the buttons */
+    white-space: nowrap; /* Prevent buttons from wrapping */
+}
+
+    .action-column .btn {
+        margin: 0 5px; /* Space between buttons */
+        padding: 8px 15px;
+        border-radius: 5px;
+        font-size: 0.85em;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+/* Bootstrap Button Overrides (Optional, if you want custom styling) */
+.btn-primary {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+    .btn-primary:hover {
+        background-color: #2184c7;
+        border-color: #2184c7;
+    }
+
+.btn-danger {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+    .btn-danger:hover {
+        background-color: #c0392b;
+        border-color: #c0392b;
+    }
+
+
+/* --- Modal Styling (using Bootstrap classes but enhancing them) --- */
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    background-color: #2c5f9b; /* Darker blue header */
+    color: white;
+    border-bottom: none;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding: 15px 20px;
+}
+
+    .modal-header .btn-close {
+        filter: invert(1); /* Makes the close button white */
+    }
+
+.modal-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.modal-body {
+    padding: 25px;
+    font-size: 1.05rem;
+    color: #555;
+}
+
+    .modal-body strong {
+        color: #333;
+    }
+
+.modal-footer {
+    border-top: 1px solid #eee;
+    padding: 15px 25px;
+    background-color: #f8f8f8;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+    /* Ensure consistent button sizing within modals */
+    .modal-footer .btn {
+        min-width: 90px; /* Give buttons a consistent width */
+    }
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .admin-panel-container {
+        padding: 15px;
+        margin: 1rem auto;
+    }
+
+        .admin-panel-container h1 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+    .section-header {
+        flex-direction: column; /* Stack header elements */
+        align-items: flex-start;
+        padding: 15px;
+    }
+
+    /* Specific Bootstrap button overrides (if needed, otherwise rely on Bootstrap's defaults) */
+    .btn-success {
+        background-color: #28a745; /* A standard green */
+        border-color: #28a745;
+        color: #fff;
+    }
+
+        .btn-success:hover {
+            background-color: #218838; /* Darker green on hover */
+            border-color: #1e7e34;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2); /* Subtle shadow on hover */
+        }
+
+    /* Existing toggle button styling... */
+    .toggle-table-btn {
+        background: none;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 50%;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .toggle-table-btn:hover {
+            background-color: rgba(44, 95, 155, 0.1);
+        }
+
+        .toggle-table-btn i {
+            font-size: 1.2em;
+            color: #2c5f9b;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .toggle-table-btn[aria-expanded="false"] i {
+            transform: rotate(180deg);
+        }
 }

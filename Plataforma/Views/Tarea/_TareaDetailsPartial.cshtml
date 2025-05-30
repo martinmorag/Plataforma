@@ -1,11 +1,16 @@
 ﻿@model Plataforma.Models.Cursos.TareaDetailsViewModel
 
-@* This partial view renders the details of a single task. *@
+<link rel="stylesheet" href="~/css/curso/details.css" asp-append-version="true" />
 
 <div class="tarea-details-container" id="current-tarea-details">
-    <div class="tarea-header">
+    <div class="tarea-header-with-button">
         <h1>@Model.Nombre</h1>
-        <p class="due-date">Fecha Límite: @Model.FechaLimite.ToShortDateString()</p>
+        <a href="javascript:void(0);"
+           data-class-id="@Model.ClaseId"
+           onclick="loadClassDetailsFromTask(this, '@Model.ClaseId')"
+           class="btn btn-outline-primary return-to-class-btn-in-header">
+            <i class="fa-solid fa-arrow-left"></i> Volver a la Clase
+        </a>
     </div>
 
     @if (!string.IsNullOrEmpty(Model.Descripcion))
@@ -27,8 +32,8 @@
                        controls
                        preload="auto"
                        data-setup='{}'
-                       data-tarea-id="@Model.TareaId" @* Pass TareaId to JS via data attribute *@
-                       data-initial-time="@(ViewBag.InitialVideoTime ?? 0)" @* Initial time from backend *@
+                       data-tarea-id="@Model.TareaId" 
+                       data-initial-time="@(ViewBag.InitialVideoTime ?? 0)"
                        data-completed="@(ViewBag.VideoCompleted?.ToString().ToLower() ?? "false")">
                     @* Video completion status *@
                     <source src="@Model.ContenidoUrl" type="video/mp4" />
@@ -95,16 +100,40 @@
             {
                 <a href="#" class="btn btn-warning submit-task-btn" data-task-id="@Model.TareaId">Revisar y Entregar @(Model.SubmissionStatusText == "Reprobado" ? "Nuevamente" : "")</a>
             }
-            else if (Model.SubmissionStatusText == "Aprobado" || Model.SubmissionStatusText == "EnRevision")
-            {
-                <a href="#" class="btn btn-secondary view-submission-btn" data-task-id="@Model.TareaId">Ver Detalle de Entrega</a>
-            }
+            @* else if (Model.SubmissionStatusText == "Aprobado" || Model.SubmissionStatusText == "EnRevision") *@
+            @* { *@
+            @*     <a href="#" class="btn btn-secondary view-submission-btn" data-task-id="@Model.TareaId">Ver Detalle de Entrega</a> *@
+            @* } *@
         }
         else // Not submitted yet
         {
             <p class="alert alert-info">Aún no has entregado esta tarea.</p>
-            <a href="#" class="btn btn-primary submit-task-btn" data-task-id="@Model.TareaId">Entregar Tarea</a>
+            <button type="button" class="btn btn-primary" onclick="showSubmissionForm('@Model.TareaId')">Entregar Tarea</button>
         }
+            @* Submission Form (hidden by default) *@
+            <div id="submission-form-container-@Model.TareaId" class="mt-4" style="display:none;">
+                <h4>Formulario de Entrega</h4>
+                <form id="submissionForm-@Model.TareaId" enctype="multipart/form-data">
+                    <input type="hidden" name="TareaId" value="@Model.TareaId" />
+                    @Html.AntiForgeryToken() @* Include Anti-Forgery Token for POST requests *@
+
+                    <div class="mb-3">
+                        <label for="submittedFile-@Model.TareaId" class="form-label">Archivo de Entrega (PDF, DOCX, TXT)</label>
+                        <input type="file" class="form-control" id="submittedFile-@Model.TareaId" name="SubmittedFile" accept=".pdf,.doc,.docx,.txt" required />
+                        <div class="form-text">Tamaño máximo: 10MB. Formatos permitidos: .pdf, .doc, .docx, .txt.</div>
+                    </div>
+                   
+                    <div class="mb-3">
+                        <label for="comments-@Model.TareaId" class="form-label">Comentarios (opcional)</label>
+                        <textarea class="form-control" id="comments-@Model.TareaId" name="Comments" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Enviar Entrega</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideSubmissionForm('@Model.TareaId')">Cancelar</button>
+                </form>
+                <div id="submission-message-@Model.TareaId" class="mt-2"></div>
+            </div>
+        
     </div>
 </div>
 

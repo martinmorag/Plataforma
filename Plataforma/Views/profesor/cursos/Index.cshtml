@@ -4,6 +4,7 @@
     var clases = ViewBag.Clases as List<Plataforma.Models.Clase>;
 
     ViewData["Title"] = "Cursos";
+    Layout = "_Layout";
 }
 @model Plataforma.Models.Modulo
 
@@ -33,16 +34,16 @@
     <div class="form-group">
         <label class="upload-tarea-label">Tipo de Contenido:</label>
         <div class="radio-group">
-            <div class="radio-div">
+            <div class="radio-card">
                 <input type="radio" id="fileOption" name="contentType" value="file" class="upload-tarea-radio">
                 <label for="fileOption" class="upload-tarea-radio-label">
-                    <i class="fas fa-file"></i> <p>Archivo</p>
+                    <i class="fas fa-file"></i> <span>Archivo</span>
                 </label>
             </div>
-            <div class="radio-div">
+            <div class="radio-card">
                 <input type="radio" id="videoOption" name="contentType" value="video" class="upload-tarea-radio">
                 <label for="videoOption" class="upload-tarea-radio-label">
-                    <i class="fas fa-video"></i> <p>Video</p>
+                    <i class="fas fa-video"></i> <span>Video</span>
                 </label>
             </div>
         </div>

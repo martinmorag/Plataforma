@@ -88,7 +88,7 @@
             </ul>
         </nav>
         <div class="sidebar-footer">
-            <a asp-controller="Estudiante" asp-action="MisCursos" class="btn btn-back-to-courses">
+            <a asp-controller="inicio" asp-action="miscursos" class="btn btn-back-to-courses">
                 <i class="fa-solid fa-arrow-left"></i> Volver a Mis Cursos
             </a>
         </div>
@@ -96,20 +96,22 @@
 
     <main class="course-main-content">
         <div class="course-title-section">
-            <h1>@Model.CursoNombre</h1>
-            @if (!string.IsNullOrEmpty(Model.CursoDescripcion))
-            {
-                <p class="course-description-main">@Model.CursoDescripcion</p>
-            }
-            <div class="course-metadata-main">
-                @if (!string.IsNullOrEmpty(Model.Nivel))
+            <div>
+                <h1>@Model.CursoNombre</h1>
+                @if (!string.IsNullOrEmpty(Model.CursoDescripcion))
                 {
-                    <span>Nivel: <strong>@Model.Nivel</strong></span>
+                    <p class="course-description-main">@Model.CursoDescripcion</p>
                 }
-                @if (!string.IsNullOrEmpty(Model.InstructorNombre))
-                {
-                    <span> | Instructor: <strong>@Model.InstructorNombre</strong></span>
-                }
+                <div class="course-metadata-main">
+                    @if (!string.IsNullOrEmpty(Model.Nivel))
+                    {
+                        <span>Nivel: <strong>@Model.Nivel</strong></span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.InstructorNombre))
+                    {
+                        <span> | Instructor: <strong>@Model.InstructorNombre</strong></span>
+                    }
+                </div>
             </div>
         </div>
 

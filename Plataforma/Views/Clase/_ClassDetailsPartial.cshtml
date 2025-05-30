@@ -2,8 +2,6 @@
 
 <link rel="stylesheet" href="~/css/curso/detalles.css" asp-append-version="true" />
 
-@* This partial view renders the details of a single class, including its tasks. *@
-
 <div class="class-details-main">
     <h2>@Model.Nombre</h2>
     @if (!string.IsNullOrEmpty(Model.Descripcion))

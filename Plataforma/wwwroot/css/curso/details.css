@@ -6,12 +6,26 @@
     margin-bottom: 20px;
 }
 
-.tarea-header h1 {
-    color: #343a40;
-    margin-bottom: 5px;
+/* --- NEW CSS FOR HEADER WITH BUTTON --- */
+.tarea-header-with-button {
+    display: flex; /* Enable Flexbox */
+    align-items: center; /* Vertically align items */
+    justify-content: space-between; /* Push items to opposite ends */
+    margin-bottom: 10px; /* Space below the header */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 15px; /* Space between items if they wrap */
 }
 
-.tarea-header .due-date {
+.tarea-header-with-button h1 {
+    margin: 0; /* Remove default h1 margin */
+    font-size: 2.2rem; /* Adjust font size */
+    color: #333;
+    /* Optional: If h1 should take most space on smaller screens, allow it to grow */
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 150px; /* Ensures h1 doesn't shrink too much */
+}
+.due-date {
     color: #6c757d;
     font-size: 0.9em;
 }
@@ -38,7 +52,17 @@
     padding: 15px;
     border-radius: 5px;
 }
-
+.return-to-class-btn-in-header {
+    background-color: #6c757d; /* Gray for back button */
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    transition: background-color 0.2s ease;
+}
+.return-to-class-btn-in-header:hover {
+    background-color: #5a6268;
+    color: white;
+}
 .btn-info {
     background-color: #17a2b8;
     border-color: #17a2b8;

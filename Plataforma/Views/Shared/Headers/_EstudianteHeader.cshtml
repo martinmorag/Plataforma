@@ -1,0 +1,33 @@
+﻿<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+
+<header class="app-header professional-theme">
+    <div class="header-container">
+        <a class="logo" asp-controller="inicio" asp-action="Index">
+            C.F.P.
+        </a>
+        <button class="menu-toggle" aria-label="Toggle navigation" data-target="#estudiante-nav-links">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <nav class="main-nav" id="estudiante-nav-links">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="inicio" asp-action="miscursos">Mis Cursos</a>
+                </li>
+                @* Add more estudiante-specific links here *@
+                <li class="nav-item">
+                    <form asp-controller="ingreso" asp-action="logout" method="post" class="logout-form">
+                        <button type="submit" class="nav-link logout-button">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </button>
+                        @Html.AntiForgeryToken()
+                    </form>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<script src="~/js/site.js" asp-append-version="true"></script>

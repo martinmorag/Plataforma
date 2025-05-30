@@ -1,0 +1,139 @@
+﻿@model IEnumerable<Plataforma.Models.Profesores.ProfesorEntregaViewModel>
+
+@{
+    ViewData["Title"] = $"Entregas para: {ViewBag.TareaNombre}";
+    var tareaId = (Guid)ViewBag.TareaId;
+    Layout = "_Layout";
+}
+
+<link rel="stylesheet" href="~/css/tareas/entregas.css" asp-append-version="true" />
+
+
+
+
+<div class="page-container">
+    <h1>Entregas para: @ViewBag.TareaNombre</h1>
+
+    <a asp-controller="tareas" asp-action="MisCursosYTareas" class="back-button">
+        <i class="fa-solid fa-arrow-left"></i> Volver a Mis Cursos y Tareas
+    </a>
+
+    @if (!Model.Any())
+    {
+        <div class="info-message">Aún no hay entregas para esta tarea.</div>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Estudiante</th>
+                    <th>Estado</th>
+                    <th>Fecha Entrega</th>
+                    <th>Comentarios Estudiante</th>
+                    <th>Tipo de Entrega</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entrega in Model)
+                {
+                    <tr>
+                        <td>@entrega.EstudianteNombre</td>
+                        <td>
+                            <span class="status-badge @GetStatusClass(entrega.Estado)">
+                                @(entrega.Estado?.ToString() ?? "Desconocido")
+                            </span>
+                        </td>
+                        <td>@(entrega.FechaEntrega?.ToShortDateString() ?? "N/A")</td>
+                        <td>@(string.IsNullOrEmpty(entrega.ComentariosEstudiante) ? "Sin comentarios" : entrega.ComentariosEstudiante)</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(entrega.ArchivoUrl))
+                            {
+                                <span class="type-badge file-type">Archivo</span>
+                            }
+                            else
+                            {
+                                <span class="type-badge unknown-type">N/A</span>
+                            }
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(entrega.ArchivoUrl))
+                            {
+                                <a href="#" class="action-button download-button"
+                                   data-entrega-id="@entrega.EntregaId"
+                                   data-file-name="@(entrega.ArchivoNombreOriginal ?? "archivo")">
+                                    <i class="fa-solid fa-download"></i> @(entrega.ArchivoNombreOriginal ?? "Archivo")
+                                </a>
+                            }
+                            <button type="button" class="action-button evaluate-button"
+                                    data-entrega-id="@entrega.EntregaId"
+                                    data-current-status="@(entrega.Estado?.ToString() ?? "")"
+                                    data-current-comments="@entrega.ComentariosProfesor">
+                                <i class="fa-solid fa-pencil"></i> Evaluar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    @* Evaluation Modal - Custom classes applied *@
+    <div class="modal-overlay" id="evaluationModalOverlay">
+        <div class="modal-content-custom" id="evaluationModal">
+            <div class="modal-header-custom">
+                <h5 class="modal-title-custom" id="evaluationModalLabel">Evaluar Entrega</h5>
+                <button type="button" class="close-button" id="closeModalButton" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body-custom">
+                <form id="evaluationForm">
+                    <input type="hidden" id="modalEntregaId" name="EntregaId" />
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <label for="modalStatus" class="form-label">Estado</label>
+                        <select class="form-select-custom" id="modalStatus" name="Estado">
+                            @foreach (var status in Enum.GetValues(typeof(Entrega.EstadoEntrega)))
+                            {
+                                <option value="@status">@status</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalComments" class="form-label">Comentarios del Profesor</label>
+                        <textarea class="form-control-custom" id="modalComments" name="ComentariosProfesor" rows="5"></textarea>
+                    </div>
+                </form>
+                <div id="evaluationMessage" class="message-area"></div>
+            </div>
+            <div class="modal-footer-custom">
+                <button type="button" class="action-button secondary-button" id="cancelEvaluationBtn">Cerrar</button>
+                <button type="button" class="action-button primary-button" id="saveEvaluationBtn">Guardar Evaluación</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/js/tareas/entregas.js" asp-append-version="true"></script>
+
+
+
+
+
+@functions {
+    // Helper function to get the CSS class based on the EntregaEstado enum
+    // This replicates the logic from your JavaScript, ensuring consistency
+    public string GetStatusClass(Entrega.EstadoEntrega? estado)
+    {
+        return estado switch
+        {
+            Entrega.EstadoEntrega.Aprobado => "status-approved",
+            Entrega.EstadoEntrega.EnRevision => "status-in-review",
+            Entrega.EstadoEntrega.EnProgreso => "status-in-progress",
+            Entrega.EstadoEntrega.Rehacer => "status-redo", // New status
+            Entrega.EstadoEntrega.Reprobado => "status-rejected",
+            _ => "status-unknown"
+        };
+    }
+}

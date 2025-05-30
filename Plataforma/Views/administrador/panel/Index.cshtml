@@ -6,109 +6,121 @@
 
 <link rel="stylesheet" href="~/css/administrador/panel.css" asp-append-version="true" />
 
+<div class="admin-panel-container">
+    <h1>@ViewData["Title"]</h1>
 
-<div class="title-list-s">
-    <h2>Lista de Estudiantes</h2><i class="fa-solid fa-chevron-up"></i>
-</div>
-<div class="table-container">
-    <table>
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.ListaEstudiantes.FirstOrDefault().Nombre)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ListaEstudiantes.FirstOrDefault().Apellido)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ListaEstudiantes.FirstOrDefault().Email)
-                </th>
-                <th></th>
-                <th></th>
-            </tr> 
-         </thead> 
-         <tbody> 
-             @foreach (var item in Model.ListaEstudiantes) 
-             { 
-                 <tr> 
-                     <td> 
-                         @Html.DisplayFor(modelItem => item.Nombre) 
-                     </td> 
-                     <td> 
-                         @Html.DisplayFor(modelItem => item.Apellido) 
-                     </td> 
-                     <td> 
-                         @Html.DisplayFor(modelItem => item.Email) 
-                     </td> 
-                     <td> 
-                         <a asp-controller="administrador" asp-action="editar_estudiantes" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Editar</a> 
-                     </td> 
-                     <td> 
-                         <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModalEstudiante" data-student-id="@item.Id" data-student-name="@item.Nombre @item.Apellido">Eliminar</button> 
-                     </td> 
-                 </tr> 
-             } 
-         </tbody> 
-     </table>
- </div>
-
-
-
-<div class="title-list-p">
-    <h2>Lista de Profesores</h2><i class="fa-solid fa-chevron-up"></i>
-</div>
-<div class="table-container">
-    <table>
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.ListaProfesores.FirstOrDefault().Nombre)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ListaProfesores.FirstOrDefault().Apellido)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ListaProfesores.FirstOrDefault().Email)
-                </th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.ListaProfesores)
+    <section class="user-list-section">
+        <div class="section-header student-header">
+            <h2 class="section-title">Lista de Estudiantes</h2>
+            <div class="header-actions">
+                <a asp-controller="administrador" asp-action="agregar_estudiante" class="btn btn-success add-new-btn">
+                    <i class="fa-solid fa-plus"></i> Agregar Estudiante
+                </a>
+                <button class="toggle-table-btn" data-target="student-table-container" aria-expanded="true">
+                    <i class="fa-solid fa-chevron-up"></i>
+                </button>
+            </div>
+        </div>
+        <div id="student-table-container" class="table-container active">
+            @if (!Model.ListaEstudiantes.Any())
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Nombre)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Apellido)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Email)
-                    </td>
-                    <td>
-                        <a asp-controller="administrador" asp-action="editar_profesores" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Editar</a>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModalProfesor" data-profesor-id="@item.Id" data-profesor-name="@item.Nombre @item.Apellido">Eliminar</button>
-                    </td>
-                </tr>
+                <p class="no-data-message">No hay estudiantes registrados aún.</p>
             }
-        </tbody>
-    </table>
+            else
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.ListaEstudiantes.FirstOrDefault().Nombre)</th>
+                            <th>@Html.DisplayNameFor(model => model.ListaEstudiantes.FirstOrDefault().Apellido)</th>
+                            <th>@Html.DisplayNameFor(model => model.ListaEstudiantes.FirstOrDefault().Email)</th>
+                            <th class="action-column">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ListaEstudiantes)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.Nombre)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Apellido)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                                <td class="action-column">
+                                    <a asp-controller="administrador" asp-action="editar_estudiantes" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Editar</a>
+                                    <button type="button" class="btn btn-danger btn-sm delete-btn"
+                                            data-bs-toggle="modal" data-bs-target="#confirmDeleteModalEstudiante"
+                                            data-user-id="@item.Id" data-user-name="@item.Nombre @item.Apellido">
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </section>
+
+    <section class="user-list-section">
+        <div class="section-header professor-header">
+            <h2 class="section-title">Lista de Profesores</h2>
+            <div class="header-actions">
+                <a asp-controller="administrador" asp-action="agregar_profesor" class="btn btn-success add-new-btn">
+                    <i class="fa-solid fa-plus"></i> Agregar Profesor
+                </a>
+                <button class="toggle-table-btn" data-target="professor-table-container" aria-expanded="true">
+                    <i class="fa-solid fa-chevron-up"></i>
+                </button>
+            </div>
+        </div>
+        <div id="professor-table-container" class="table-container active">
+            @if (!Model.ListaProfesores.Any())
+            {
+                <p class="no-data-message">No hay profesores registrados aún.</p>
+            }
+            else
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.ListaProfesores.FirstOrDefault().Nombre)</th>
+                            <th>@Html.DisplayNameFor(model => model.ListaProfesores.FirstOrDefault().Apellido)</th>
+                            <th>@Html.DisplayNameFor(model => model.ListaProfesores.FirstOrDefault().Email)</th>
+                            <th class="action-column">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ListaProfesores)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.Nombre)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Apellido)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                                <td class="action-column">
+                                    <a asp-controller="administrador" asp-action="editar_profesores" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Editar</a>
+                                    <button type="button" class="btn btn-danger btn-sm delete-btn"
+                                            data-bs-toggle="modal" data-bs-target="#confirmDeleteModalProfesor"
+                                            data-user-id="@item.Id" data-user-name="@item.Nombre @item.Apellido">
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </section>
 </div>
 
-
-<div class="modal fade" id="confirmDeleteModalEstudiante" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+<div class="modal fade" id="confirmDeleteModalEstudiante" tabindex="-1" aria-labelledby="confirmDeleteModalLabelEstudiante" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                <h5 class="modal-title" id="confirmDeleteModalLabelEstudiante">Confirmar Eliminación de Estudiante</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
-                ¿Estás seguro de que deseas eliminar a <span id="studentToDeleteName"></span>?
+                ¿Estás seguro de que deseas eliminar a <strong id="studentToDeleteName"></strong>? Esta acción es irreversible.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -121,16 +133,15 @@
     </div>
 </div>
 
-
-<div class="modal fade" id="confirmDeleteModalProfesor" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+<div class="modal fade" id="confirmDeleteModalProfesor" tabindex="-1" aria-labelledby="confirmDeleteModalLabelProfesor" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                <h5 class="modal-title" id="confirmDeleteModalLabelProfesor">Confirmar Eliminación de Profesor</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
-                ¿Estás seguro de que deseas eliminar a <span id="profesorToDeleteName"></span>?
+                ¿Estás seguro de que deseas eliminar a <strong id="profesorToDeleteName"></strong>? Esta acción es irreversible.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -142,38 +153,6 @@
         </div>
     </div>
 </div>
-
-
-
-<div class="modal fade" id="confirmDeleteModalProfesor" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                ¿Estás seguro de que deseas eliminar a <span id="profesorToDeleteName"></span>?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form id="deleteFormProfesor" asp-controller="Profesores" asp-action="Delete" method="post">
-                    <input type="hidden" id="profesorToDeleteId" name="id" />
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-
-
-
-
-
-
 
 <script src="~/js/administrador/panel.js" asp-append-version="true"></script>
 
@@ -181,4 +160,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
+}..

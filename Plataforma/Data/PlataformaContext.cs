@@ -23,7 +23,7 @@ namespace Plataforma.Data
         public DbSet<Tarea> tareas { get; set; }
         public DbSet<Entrega> entregas { get; set; }
         public DbSet<Archivo> archivos { get; set; }
-        public DbSet<CursoEstudiante> CursoEstudiantes { get; set; }  
+        public DbSet<ProfesorCursoDto> CursoEstudiantes { get; set; }  
         public DbSet<CursoProfesor> CursoProfesores { get; set; } 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -47,15 +47,15 @@ namespace Plataforma.Data
                 .HasValue<UsuarioIdentidad>("UsuarioIdentidad") // Valor para usuarios genéricos
                 .HasValue<Profesor>("Profesor");
 
-            builder.Entity<CursoEstudiante>()
+            builder.Entity<ProfesorCursoDto>()
                 .HasKey(ce => new { ce.CursoId, ce.EstudianteId }); // Composite key
 
-            builder.Entity<CursoEstudiante>()
+            builder.Entity<ProfesorCursoDto>()
                 .HasOne(ce => ce.Curso)
                 .WithMany(c => c.CursoEstudiantes)
                 .HasForeignKey(ce => ce.CursoId);
 
-            builder.Entity<CursoEstudiante>()
+            builder.Entity<ProfesorCursoDto>()
                 .HasOne(ce => ce.Estudiante)
                 .WithMany(s => s.CursoEstudiantes)
                 .HasForeignKey(ce => ce.EstudianteId);

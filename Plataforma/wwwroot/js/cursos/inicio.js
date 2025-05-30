@@ -73,7 +73,7 @@ claseSelect.addEventListener("change", function () {
     }
 });
 
-const radioDivs = document.querySelectorAll('.radio-div');
+const radioDivs = document.querySelectorAll('.radio-card');
 const radioInputs = document.querySelectorAll('.upload-tarea-radio');
 
 radioDivs.forEach((div, index) => {

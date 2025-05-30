@@ -40,7 +40,7 @@ namespace Plataforma.Controllers
                         if (await _userManager.IsInRoleAsync(user, "Estudiante"))
                             return RedirectToAction("Index", "inicio");
                         if (await _userManager.IsInRoleAsync(user, "Profesor"))
-                            return RedirectToAction("Dashboard", "profesor");
+                            return RedirectToAction("Inicio", "cursos");
                     }
                     else
                     {

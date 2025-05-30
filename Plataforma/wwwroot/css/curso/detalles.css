@@ -305,7 +305,7 @@
 
 
 /* Adjustments for sidebar active link */
-.class-nav-item a.active {
+.class-nav-item.active {
     background-color: #e0f2f7; /* Light blue for active link */
     border-left: 3px solid #007bff; /* Blue line on left */
     font-weight: 600;
