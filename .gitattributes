@@ -59,3 +59,23 @@
 #*.RTF   diff=astextplain
 wwwroot/ffmpeg/ffmpeg.exe filter=lfs diff=lfs merge=lfs -text
 wwwroot/ffmpeg/ffprobe.exe filter=lfs diff=lfs merge=lfs -text
+
+# Auto-detect text files and normalize line endings to LF (Unix-style) in the repository
+* text=auto
+
+# Explicitly ensure certain file types are always LF in the repository,
+# and Git handles conversion to CRLF on checkout for Windows users.
+*.js text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.cs text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+# ... add other text file extensions here
+
+# Explicitly define binary files (no line ending conversion)
+*.png binary
+*.jpg binary
+*.gif binary
+*.zip binary
+# ... etc.

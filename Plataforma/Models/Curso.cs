@@ -13,6 +13,7 @@ namespace Plataforma.Models
         [StringLength(200)]
         public string Nombre { get; set; }
         public bool Disponible { get; set; }
+        public string ImageUrl { get; set; }
         // Navigation property: A course can have many modules
         public ICollection<Modulo> Modulos { get; set; } = new List<Modulo>();
 

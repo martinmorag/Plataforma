@@ -1,0 +1,324 @@
+﻿/* --- Base Styles & Typography --- */
+:root {
+    --primary-color: #4CAF50; /* Green for success/primary actions */
+    --secondary-color: #2196F3; /* Blue for available/info */
+    --accent-color: #FFC107; /* Amber for pending changes */
+    --danger-color: #F44336; /* Red for deregister/errors */
+    --text-dark: #333;
+    --text-light: #fff;
+    --bg-light: #f8f9fa;
+    --card-bg: #fff;
+    --border-light: #e0e0e0;
+    --shadow-light: rgba(0, 0, 0, 0.08);
+    --shadow-hover: rgba(0, 0, 0, 0.15);
+}
+
+a:hover {
+    color: white;
+}
+
+/* --- Page Container & Header --- */
+.admin-page-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 25px;
+}
+
+.admin-header-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.back-button {
+    background-color: #607D8B; /* Blue Grey */
+    color: var(--text-light);
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.95em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+    .back-button:hover {
+        background-color: #546E7A;
+    }
+
+    .back-button i {
+        /* Assuming you have Font Awesome or similar for icons */
+        font-size: 1.1em;
+    }
+
+.page-main-title {
+    color: var(--text-dark);
+    font-size: 2.2em;
+    font-weight: 600;
+    margin: 0;
+    text-align: right;
+}
+
+.student-name-highlight {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+/* --- Course List Grid --- */
+.course-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+/* --- Course Card Items --- */
+.course-card-item {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px var(--shadow-light);
+    overflow: hidden; /* Ensures image corners are rounded */
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
+    display: flex;
+    flex-direction: column; /* Stack image, then content */
+}
+
+    .course-card-item:hover {
+        box-shadow: 0 8px 20px var(--shadow-hover);
+    }
+
+.course-card-image-wrapper {
+    width: 100%;
+    height: 180px; /* Fixed height for image area */
+    overflow: hidden;
+    background-color: #e0e0e0; /* Fallback background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.course-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Crop and cover the area */
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.course-card-item:hover .course-card-image {
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+.placeholder-image {
+    object-fit: contain; /* Don't crop placeholder */
+    background-color: #f5f5f5;
+    border: 1px dashed #ccc;
+    font-size: 0.8em; /* If text is added to placeholder */
+    color: #888;
+}
+
+.course-card-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Allows content area to take remaining space */
+}
+
+.course-card-title {
+    font-size: 1.3em;
+    color: var(--text-dark);
+    margin: 0 0 10px 0;
+    line-height: 1.3;
+    min-height: 2.6em; /* Ensure consistent height for titles */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limit to 2 lines */
+    -webkit-box-orient: vertical;
+}
+
+.course-card-status {
+    font-weight: 600;
+    font-size: 0.85em;
+    padding: 6px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    align-self: flex-start; /* Align status to left */
+    margin-top: auto; /* Pushes status to the bottom if content above is shorter */
+}
+
+/* --- Status Specific Styles --- */
+.status-available {
+    background-color: rgba(33, 150, 243, 0.1); /* Light Blue */
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+}
+
+.status-registered {
+    background-color: rgba(76, 175, 80, 0.1); /* Light Green */
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+/* --- Interactive States --- */
+
+/* Base style for available courses */
+.available-course-item {
+    border: 2px solid transparent; /* Default transparent border */
+}
+
+/* Style for available course when selected for registration */
+.course-card-item.selected-for-register {
+    border-color: var(--accent-color); /* Amber border */
+    box-shadow: 0 0 0 3px var(--accent-color), 0 4px 12px var(--shadow-light); /* Highlight ring */
+    background-color: #FFFDE7; /* Light yellow background */
+}
+
+    .course-card-item.selected-for-register .course-card-status {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #E65100; /* Darker amber */
+    }
+
+        .course-card-item.selected-for-register .course-card-status::before {
+            content: '+ '; /* Plus sign */
+        }
+
+/* Base style for registered courses */
+.registered-course-item {
+    border: 2px solid transparent; /* Default transparent border */
+}
+
+    .registered-course-item .course-card-status::before {
+        content: '✓ '; /* Checkmark for registered */
+    }
+
+
+/* Style for registered course when selected for deregistration */
+.course-card-item.selected-for-deregister {
+    border-color: var(--danger-color); /* Red border */
+    box-shadow: 0 0 0 3px var(--danger-color), 0 4px 12px var(--shadow-light); /* Highlight ring */
+    background-color: #FFEBEE; /* Light red background */
+    opacity: 0.8;
+}
+
+    .course-card-item.selected-for-deregister .course-card-status {
+        background-color: rgba(244, 67, 54, 0.2);
+        color: #D32F2F; /* Darker red */
+    }
+
+        .course-card-item.selected-for-deregister .course-card-status::before {
+            content: '- '; /* Minus sign */
+        }
+
+
+/* --- Save Changes Button --- */
+.save-changes-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+}
+
+.save-changes-btn {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    padding: 15px 35px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+    opacity: 0; /* Hidden by default */
+    transform: translateY(10px);
+    pointer-events: none; /* Make it unclickable when hidden */
+}
+
+    .save-changes-btn.visible {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto; /* Make it clickable when visible */
+    }
+
+    .save-changes-btn:hover:not(:disabled) {
+        background-color: #43A047; /* Darker green on hover */
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .save-changes-btn:disabled {
+        background-color: #CFD8DC; /* Light grey */
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+        opacity: 0.6;
+    }
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .admin-page-container {
+        padding: 0 20px;
+    }
+
+    .admin-header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .page-main-title {
+        font-size: 2em;
+        text-align: left;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-page-container {
+        margin: 20px auto;
+    }
+
+    .page-main-title {
+        font-size: 1.8em;
+    }
+
+    .course-list-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .course-card-image-wrapper {
+        height: 160px;
+    }
+
+    .course-card-title {
+        font-size: 1.2em;
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-page-container {
+        padding: 0 15px;
+    }
+
+    .course-list-grid {
+        grid-template-columns: 1fr; /* Stack cards vertically */
+    }
+
+    .course-card-image-wrapper {
+        height: 140px;
+    }
+
+    .course-card-content {
+        padding: 15px;
+    }
+
+    .save-changes-btn {
+        padding: 12px 25px;
+        font-size: 1em;
+    }
+}

@@ -1,0 +1,71 @@
+﻿@model Plataforma.Models.Administracion.SeleccionCursosProfesor
+
+@{
+    ViewData["Title"] = "Gestionar Cursos del Profesor"; // Changed title
+    Layout = "_Layout";
+}
+@Html.AntiForgeryToken()
+<link rel="stylesheet" href="~/css/administrador/profesores/cursos.css" asp-append-version="true" />
+
+
+<div class="admin-page-container">
+    <div class="admin-header-section">
+        <a href="@Url.Action("panel", "administrador")" class="back-button">
+            <i class="fas fa-arrow-left"></i> Volver a Profesores
+        </a>
+        <h2 class="page-main-title">Gestionar Cursos para <span class="student-name-highlight">@ViewData["ProfesorName"]</span></h2>
+    </div>
+
+
+    <form id="assignmentForm" method="post" action="@Url.Action("GuardarAsignacionesProfesor", "Administrador")">
+        <input type="hidden" name="ProfesorId" value="@Model.ProfesorId" /> 
+
+        <div class="course-list-grid">
+            @foreach (var curso in Model.Cursos)
+            {
+                <div class="course-card-item available-course-item" data-course-id="@curso.CursoId" data-original-state="available">
+                    <div class="course-card-image-wrapper">
+                        @if (!string.IsNullOrEmpty(curso.ImageUrl))
+                        {
+                            <img src="@curso.ImageUrl" alt="Imagen del curso @curso.Nombre" class="course-card-image" />
+                        }
+                        else
+                        {
+                            <img src="~/images/default-course-placeholder.jpg" alt="No hay imagen disponible" class="course-card-image placeholder-image" />
+                        }
+                    </div>
+                    <div class="course-card-content">
+                        <h3 class="course-card-title">@curso.Nombre</h3>
+                        <span class="course-card-status status-available">DISPONIBLE</span>
+                    </div>
+                </div>
+            }
+
+            @foreach (var cursoProfesor in Model.CursoProfesor)
+            {
+                <div class="course-card-item assigned-course-item" data-course-id="@cursoProfesor.CursoId" data-original-state="assigned">
+                    <div class="course-card-image-wrapper">
+                        @if (!string.IsNullOrEmpty(cursoProfesor.Curso.ImageUrl))
+                        {
+                            <img src="@cursoProfesor.Curso.ImageUrl" alt="Imagen del curso @cursoProfesor.Curso.Nombre" class="course-card-image" />
+                        }
+                        else
+                        {
+                            <img src="~/images/default-course-placeholder.jpg" alt="No hay imagen disponible" class="course-card-image placeholder-image" />
+                        }
+                    </div>
+                    <div class="course-card-content">
+                        <h3 class="course-card-title">@cursoProfesor.Curso.Nombre</h3>
+                        <span class="course-card-status status-assigned">ASIGNADO</span> 
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="save-changes-footer">
+            <button id="saveChangesButton" class="save-changes-btn" disabled>Guardar Cambios</button>
+        </div>
+    </form>
+</div>
+
+<script src="~/js/administrador/profesores/cursos.js" asp-append-version="true"></script>

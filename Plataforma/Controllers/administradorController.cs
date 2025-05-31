@@ -18,10 +18,6 @@ namespace Plataforma.Controllers
             _userManager = userManager;
             _context = context;
         }
-        public IActionResult Index()
-        {
-            return View();
-        }
         public async Task<IActionResult> panel()
         {
             // Get students
@@ -53,6 +49,89 @@ namespace Plataforma.Controllers
 
             // Pasar el ViewModel combinado a la vista
             return View("panel/Index", viewModel);
+        }
+        // Gestionar profesores y cursos
+        [HttpGet("administrador/profesores/cursos")]
+        public async Task<IActionResult> GestionarInscripciones(Guid profesorId)
+        {
+            // 1. Verify the professor exists
+            var profesor = await _context.profesores.FindAsync(profesorId);
+            if (profesor == null)
+            {
+                return NotFound($"Profesor con ID {profesorId} no encontrado.");
+            }
+
+            // 2. Get courses the specific professor is already assigned to
+            var cursosActualesDelProfesor = await _context.CursoProfesores
+                                                        .Where(pc => pc.ProfesorId == profesorId)
+                                                        .Include(pc => pc.Curso) // Eager load Curso details
+                                                        .ToListAsync();
+
+            // Get a list of CourseIds that the professor is currently assigned to
+            var cursosAsignadosIds = cursosActualesDelProfesor.Select(pc => pc.CursoId).ToList();
+
+            // 3. Get all courses that the professor is NOT currently assigned to
+            var cursosDisponiblesParaAsignar = await _context.cursos
+                                                           .Where(c => !cursosAsignadosIds.Contains(c.CursoId))
+                                                           .ToListAsync();
+
+            var viewModel = new SeleccionCursosProfesor
+            {
+                ProfesorId = profesorId,
+                Cursos = cursosDisponiblesParaAsignar, // This now only contains non-assigned courses
+                CursoProfesor = cursosActualesDelProfesor // This contains currently assigned courses
+            };
+
+            ViewData["ProfesorName"] = profesor.Nombre + " " + profesor.Apellido;
+
+            return View("~/Views/administrador/profesores/cursos.cshtml", viewModel);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GuardarAsignacionesProfesor(SeleccionCursosProfesor model)
+        {
+            Guid profesorId = model.ProfesorId;
+
+            // Optional: Re-verify professor exists
+            var profesor = await _context.profesores.FindAsync(profesorId);
+            if (profesor == null)
+            {
+                return NotFound($"Profesor con ID {profesorId} no encontrado.");
+            }
+
+            // 1. Handle De-assignment (remove courses the professor is no longer assigned to)
+            foreach (var cursoIdToDeassign in model.CursosSeleccionadosParaInscripcion)
+            {
+                var existingAssignment = await _context.CursoProfesores // Assuming _context.ProfesorCursos is your DbSet for ProfesorCursoDto
+                                                       .FirstOrDefaultAsync(pc => pc.ProfesorId == profesorId && pc.CursoId == cursoIdToDeassign);
+                if (existingAssignment != null)
+                {
+                    _context.CursoProfesores.Remove(existingAssignment);
+                }
+            }
+
+            // 2. Handle Assignment (add courses the professor is now assigned to teach)
+            foreach (var cursoIdToAssign in model.CursosSeleccionadosParaInscripcion)
+            {
+                // Check if professor is already assigned to this course to prevent duplicates
+                var alreadyAssigned = await _context.CursoProfesores
+                                                    .AnyAsync(pc => pc.ProfesorId == profesorId && pc.CursoId == cursoIdToAssign);
+                if (!alreadyAssigned)
+                {
+                    var newAssignment = new CursoProfesor // This DTO or entity should represent the Professor-Course relationship
+                    {
+                        ProfesorId = profesorId,
+                        CursoId = cursoIdToAssign
+                    };
+                    _context.CursoProfesores.Add(newAssignment);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = $"Asignaciones para {profesor.Nombre} {profesor.Apellido} actualizadas exitosamente.";
+
+            // Redirect back to the admin panel or a professor details page
+            return RedirectToAction("panel", "administrador");
         }
         // ESTUDIANTES
         [Route("administrador/estudiantes/agregar")]
