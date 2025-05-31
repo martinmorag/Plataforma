@@ -11,17 +11,28 @@
 
     @if (Model.cursos != null && Model.cursos.Any())
     {
-        <div class="courses-grid">
+        <div class="course-list-grid">
             @foreach (var curso in Model.cursos)
             {
-                <div class="course-card-wrapper">
-                    <div class="course-card">
-                        <h3>@curso.Nombre</h3>
-
-                        <a asp-controller="curso" asp-action="Index" asp-route-cursoId="@curso.CursoId" class="access-button" >
-                            Ir al Curso
-                        </a>
+                <div class="course-card-item default-course-item">
+                    @* Added default-course-item for general styling *@
+                    <div class="course-card-image-wrapper">
+                        @if (!string.IsNullOrEmpty(curso.ImageUrl))
+                        {
+                            <img src="@curso.ImageUrl" alt="Imagen del curso @curso.Nombre" class="course-card-image" />
+                        }
+                        else
+                        {
+                            <img src="~/images/default-course-placeholder.jpg" alt="No hay imagen disponible" class="course-card-image placeholder-image" />
+                        }
                     </div>
+                    <div class="course-card-content">
+                        <h3 class="course-card-title">@curso.Nombre</h3>
+                    </div>
+
+                    <a asp-controller="curso" asp-action="Index" asp-route-cursoId="@curso.CursoId" class="access-button">
+                        Ir al Curso
+                    </a>
                 </div>
             }
         </div>
@@ -33,3 +44,5 @@
         </div>
     }
 </div>
+
+<script src="~/js/inicio/miscursos.js" asp-append-version="true"></script>

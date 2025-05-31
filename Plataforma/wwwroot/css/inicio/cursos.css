@@ -1,195 +1,330 @@
-﻿/* Previous CSS styles... */
-
-/* --- Return Button Styling --- */
-.return-button-container {
-    text-align: left;
-    margin-top: 40px; /* Space above the button */
-    margin-bottom: 20px; /* Space below if content follows */
-    margin: 40px 0 20px 20px;
+﻿/* --- Base Styles & Typography --- */
+:root {
+    --primary-color: #28a745; /* Green for primary actions/enrollment */
+    --secondary-color: #17a2b8; /* Info Blue for available */
+    --accent-color: #ffc107; /* Yellow for pending enrollment */
+    --danger-color: #dc3545; /* Red for de-enrollment */
+    --text-dark: #333;
+    --text-light: #fff;
+    --bg-light: #f8f9fa;
+    --card-bg: #fff;
+    --border-light: #e0e0e0;
+    --shadow-light: rgba(0, 0, 0, 0.08);
+    --shadow-hover: rgba(0, 0, 0, 0.15);
 }
 
-#returnToMainButton {
-    background-color: #95a5a6; /* A neutral gray */
+a:hover {
     color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 6px;
-    font-size: 1em;
-    cursor: pointer;
-    text-decoration: none; /* Remove underline for anchor tag */
-    display: inline-block; /* Allows padding and alignment for anchor tag */
-    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 
-
-
-h2 {
-    color: #2c3e50;
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 2.2em;
+/* --- Page Container & Header --- */
+.page-container { /* Reusing class for consistency in layout */
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 25px;
 }
 
-/* Course List Container (unchanged) */
-.course-list-container {
+.header-section { /* Reusing class for consistency in layout */
     display: flex;
-    flex-direction: column;
-    gap: 15px;
-    max-width: 800px;
-    margin: 0 auto;
-    padding-bottom: 40px;
-}
-
-/* Base Course Row Style (modified cursor, added selected state) */
-.course-row {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px 25px;
-    display: flex;
+    align-items: center;
     justify-content: space-between;
+    margin-bottom: 40px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.back-button {
+    background-color: #6c757d; /* Grey */
+    color: var(--text-light);
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.95em;
+    display: inline-flex;
     align-items: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
-    cursor: pointer; /* Indicate it's clickable */
-    position: relative; /* For checkmark positioning if used */
+    gap: 8px;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-    .course-row h3 {
-        margin: 0;
-        font-size: 1.4em;
-        color: #34495e;
-        flex-grow: 1;
-        text-align: left;
+    .back-button:hover {
+        background-color: #5a6268;
     }
 
-/* Status Indicator (on the right side of the row) - unchanged */
-.course-status {
-    font-weight: bold;
-    font-size: 0.9em;
-    padding: 6px 12px;
-    border-radius: 20px;
-    white-space: nowrap;
-    margin-left: 20px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+    .back-button i {
+        font-size: 1.1em;
+    }
+
+.page-main-title { /* Reusing class for consistency in layout */
+    color: var(--text-dark);
+    font-size: 2.2em;
+    font-weight: 600;
+    margin: 2rem 0;
+    text-align: right;
 }
 
-/* Style for Available (Not Registered) Courses - unchanged */
-.available-course-row {
-    border-left: 6px solid #3498db;
-}
 
-    .available-course-row h3 {
-        color: #3498db;
-    }
-
-    .available-course-row .course-status {
-        background-color: rgba(52, 152, 219, 0.1);
-        color: #3498db;
-    }
-
-/* Style for Registered Courses - unchanged */
-.registered-course-row {
-    border-left: 6px solid #27ae60;
-    background-color: #e8f5e9;
-}
-
-    .registered-course-row h3 {
-        color: #27ae60;
-    }
-
-    .registered-course-row .course-status {
-        background-color: rgba(39, 174, 96, 0.15);
-        color: #27ae60;
-    }
-
-        /* Checkmark for Registered Courses - unchanged */
-        .registered-course-row .course-status::before {
-            content: '✓';
-            font-size: 1.2em;
-            line-height: 1;
-        }
-
-/* --- New Styles for Selection/Deselection --- */
-
-/* State when an available course is "selected" for registration */
-.course-row.selected-for-register {
-    border-left: 6px solid #f39c12; /* Orange for pending registration */
-    background-color: #fff9e6; /* Light yellow background */
-    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
-}
-
-    .course-row.selected-for-register .course-status {
-        background-color: rgba(243, 156, 18, 0.15);
-        color: #f39c12;
-    }
-
-        .course-row.selected-for-register .course-status::before {
-            content: '+'; /* Plus sign for "adding" */
-            font-size: 1.2em;
-            color: #f39c12;
-        }
-
-
-/* State when a registered course is "selected" for deregistration */
-.course-row.selected-for-deregister {
-    border-left: 6px solid #c0392b; /* Red for pending deregistration */
-    background-color: #fcebeb; /* Light red background */
-    box-shadow: 0 4px 15px rgba(192, 57, 43, 0.2);
-    /* Make the original checkmark disappear */
-    opacity: 0.7; /* Slightly faded */
-}
-
-    .course-row.selected-for-deregister .course-status {
-        background-color: rgba(192, 57, 43, 0.15);
-        color: #c0392b;
-    }
-
-        .course-row.selected-for-deregister .course-status::before {
-            content: '-'; /* Minus sign for "removing" */
-            font-size: 1.2em;
-            color: #c0392b;
-        }
-
-/* --- Save Changes Button --- */
-.save-changes-container {
-    text-align: center;
+/* --- Course List Grid --- */
+.course-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
     margin-top: 30px;
 }
 
-#saveChangesButton {
-    background-color: #2ecc71; /* Green save button */
-    color: white;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.2em;
+/* --- Course Card Items --- */
+.course-card-item {
+    margin: 1rem 0;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px var(--shadow-light);
+    overflow: hidden;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    /* Initially hidden/disabled */
-    opacity: 0;
-    transform: translateY(20px);
-    pointer-events: none; /* Make it unclickable when hidden */
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid var(--border-light); /* Default light border */
 }
 
-    #saveChangesButton.visible {
+    .course-card-item:hover {
+        box-shadow: 0 8px 20px var(--shadow-hover);
+    }
+
+.course-card-image-wrapper {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    background-color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.course-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.placeholder-image {
+    object-fit: contain;
+    background-color: #f5f5f5;
+    border: 1px dashed #ccc;
+    font-size: 0.8em;
+    color: #888;
+}
+
+.course-card-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.course-card-title {
+    font-size: 1.3em;
+    color: var(--text-dark);
+    margin: 0 0 10px 0;
+    line-height: 1.3;
+    min-height: 2.6em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.course-card-status {
+    font-weight: 600;
+    font-size: 0.85em;
+    padding: 6px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    align-self: flex-start;
+    margin-top: auto;
+}
+
+/* --- Status Specific Styles --- */
+.status-available {
+    background-color: rgba(23, 162, 184, 0.1); /* Light Info Blue */
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+}
+
+.status-registered {
+    background-color: rgba(40, 167, 69, 0.1); /* Light Green */
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+    .status-registered::before { /* Added checkmark for consistency */
+        content: '✓ ';
+    }
+
+/* --- Interactive States --- */
+
+/* Style for available course when selected for enrollment */
+.course-card-item.selected-for-enrollment { /* New class for this context */
+    border-color: var(--accent-color); /* Yellow border */
+    box-shadow: 0 0 0 3px var(--accent-color), 0 4px 12px var(--shadow-light);
+    background-color: #FFFBE6; /* Light yellow background */
+}
+
+    .course-card-item.selected-for-enrollment .course-card-status {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #E0A800; /* Darker yellow */
+    }
+
+        .course-card-item.selected-for-enrollment .course-card-status::before {
+            content: '+ ';
+        }
+
+/* Style for registered course when selected for de-enrollment */
+.course-card-item.selected-for-deenrollment { /* New class for this context */
+    border-color: var(--danger-color); /* Red border */
+    box-shadow: 0 0 0 3px var(--danger-color), 0 4px 12px var(--shadow-light);
+    background-color: #F8D7DA; /* Light red background */
+    opacity: 0.8;
+}
+
+    .course-card-item.selected-for-deenrollment .course-card-status {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: #A71D2A; /* Darker red */
+    }
+
+        .course-card-item.selected-for-deenrollment .course-card-status::before {
+            content: '- ';
+        }
+
+
+/* --- Save Changes Button --- */
+.save-changes-footer { /* Reusing class for consistency */
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+}
+
+.save-changes-btn {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    padding: 15px 35px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+}
+
+    .save-changes-btn.visible {
         opacity: 1;
         transform: translateY(0);
-        pointer-events: auto; /* Make it clickable when visible */
+        pointer-events: auto;
     }
 
-    #saveChangesButton:hover {
-        background-color: #27ae60;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
+    .save-changes-btn:hover:not(:disabled) {
+        background-color: #218838; /* Darker green on hover */
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     }
 
-    #saveChangesButton:disabled {
-        background-color: #cccccc;
+    .save-changes-btn:disabled {
+        background-color: #CFD8DC;
         cursor: not-allowed;
         box-shadow: none;
         transform: none;
+        opacity: 0.6;
     }
+
+/* --- No Courses Message (if applicable, add if you have this scenario) --- */
+/* You might not need this if all students always see courses to select/deselect.
+   If you do, use the same styling as MisCursos:
+.no-courses-message {
+    text-align: center;
+    padding: 60px 30px;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    margin-top: 40px;
+    color: #555;
+    font-size: 1.1em;
+}
+.no-courses-message a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: bold;
+}
+.no-courses-message a:hover {
+    text-decoration: underline;
+}
+*/
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .admin-page-container {
+        padding: 0 20px;
+    }
+
+    .admin-header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .page-main-title {
+        font-size: 2em;
+        text-align: left;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-page-container {
+        margin: 20px auto;
+    }
+
+    .page-main-title {
+        font-size: 1.8em;
+    }
+
+    .course-list-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .course-card-image-wrapper {
+        height: 160px;
+    }
+
+    .course-card-title {
+        font-size: 1.2em;
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-page-container {
+        padding: 0 15px;
+    }
+
+    .course-list-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .course-card-image-wrapper {
+        height: 140px;
+    }
+
+    .course-card-content {
+        padding: 15px;
+    }
+
+    .save-changes-btn {
+        padding: 12px 25px;
+        font-size: 1em;
+    }
+}

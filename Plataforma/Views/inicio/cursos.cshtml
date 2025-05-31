@@ -5,36 +5,60 @@
 @model Plataforma.Models.Inicio.SeleccionCursos
 
 <link rel="stylesheet" href="~/css/inicio/cursos.css" asp-append-version="true" />
+    <div class="page-container">
+        <div class="header-section">
+        <a href="@Url.Action("Index", "inicio")" id="returnToMainButton" class="back-button">Volver</a>
+    </div>
 
-<div class="return-button-container">
-    <a href="@Url.Action("Index", "inicio")" id="returnToMainButton">Volver</a>
+
+    <h2 class="page-main-title">Explorar Cursos</h2>
+
+    <div class="course-list-container">
+        @foreach (var curso in Model.Cursos)
+        {
+            <div class="course-card-item available-course-item" data-course-id="@curso.CursoId" data-original-state="available">
+                <div class="course-card-image-wrapper">
+                    @if (!string.IsNullOrEmpty(curso.ImageUrl))
+                    {
+                        <img src="@curso.ImageUrl" alt="Imagen del curso @curso.Nombre" class="course-card-image" />
+                    }
+                    else
+                    {
+                        <img src="~/images/default-course-placeholder.jpg" alt="No hay imagen disponible" class="course-card-image placeholder-image" />
+                    }
+                </div>
+                <div class="course-card-content">
+                    <h3 class="course-card-title">@curso.Nombre</h3>
+                    <span class="course-card-status status-available">DISPONIBLE</span>
+                </div>
+            </div>
+        }
+
+        @foreach (var curso in Model.CursosEstudiante)
+        {
+            <div class="course-card-item registered-course-item" data-course-id="@curso.CursoEstudianteId" data-original-state="registered">
+                <div class="course-card-image-wrapper">
+                            @if (!string.IsNullOrEmpty(curso.Curso.ImageUrl))
+                            {
+                                <img src="@curso.Curso.ImageUrl" alt="Imagen del curso @curso.Curso.Nombre" class="course-card-image" />
+                            }
+                            else
+                            {
+                                <img src="~/images/default-course-placeholder.jpg" alt="No hay imagen disponible" class="course-card-image placeholder-image" />
+                            }
+                        </div>
+                        <div class="course-card-content">
+                            <h3 class="course-card-title">@curso.Curso.Nombre</h3>
+                            <span class="course-card-status status-registered">INSCRITO</span>
+                        </div>
+            </div>
+        }
+    </div>
+
+    <div class="save-changes-footer">
+        <button id="saveChangesButton" class="save-changes-btn" disabled>Guardar Cambios</button>
+    </div>
 </div>
-
-
-<h2>Explorar Cursos</h2>
-
-<div class="course-list-container">
-    @foreach (var curso in Model.Cursos)
-    {
-        <div class="course-row available-course-row" data-course-id="@curso.CursoId" data-original-state="available">
-            <h3>@curso.Nombre</h3>
-            <span class="course-status">DISPONIBLE</span>
-        </div>
-    }
-
-    @foreach (var curso in Model.CursosEstudiante)
-    {
-        <div class="course-row registered-course-row" data-course-id="@curso.CursoEstudianteId" data-original-state="registered">
-            <h3>@curso.Curso.Nombre</h3>
-            <span class="course-status">REGISTRADO</span>
-        </div>
-    }
-</div>
-
-<div class="save-changes-container">
-    <button id="saveChangesButton" disabled>Guardar Cambios</button>
-</div>
-
 
 
 
