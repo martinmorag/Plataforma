@@ -12,10 +12,10 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Plataforma/Plataforma.csproj", "Plataforma/"]
-RUN dotnet restore "./Plataforma/Plataforma.csproj"
+COPY ["Plataforma.csproj", "."]
+RUN dotnet restore "./Plataforma.csproj"
 COPY . .
-WORKDIR "/src/Plataforma"
+WORKDIR "/src/."
 RUN dotnet build "./Plataforma.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Esta fase se usa para publicar el proyecto de servicio que se copiará en la fase final.

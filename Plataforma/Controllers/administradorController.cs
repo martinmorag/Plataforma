@@ -100,7 +100,7 @@ namespace Plataforma.Controllers
             }
 
             // 1. Handle De-assignment (remove courses the professor is no longer assigned to)
-            foreach (var cursoIdToDeassign in model.CursosSeleccionadosParaInscripcion)
+            foreach (var cursoIdToDeassign in model.CursosSeleccionadosParaDesinscripcion)
             {
                 var existingAssignment = await _context.CursoProfesores // Assuming _context.ProfesorCursos is your DbSet for ProfesorCursoDto
                                                        .FirstOrDefaultAsync(pc => pc.ProfesorId == profesorId && pc.CursoId == cursoIdToDeassign);
