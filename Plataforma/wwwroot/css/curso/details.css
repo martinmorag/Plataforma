@@ -45,6 +45,29 @@
     margin-bottom: 20px;
     background-color: black; /* To make video player look good */
 }
+.my-video-dimensions {
+    min-height: 350px;
+    max-height: 80vh;
+    width: 100%;
+}
+
+.video-js.vjs-no-seek .vjs-progress-control {
+    opacity: 0.7;
+}
+
+.video-js.vjs-no-seek .vjs-play-progress {
+    background-color: #4CAF50;
+}
+
+.video-js.vjs-no-seek .vjs-mouse-display {
+    display: none;
+}
+
+
+
+
+
+
 
 .tarea-text-content {
     background-color: #fff;

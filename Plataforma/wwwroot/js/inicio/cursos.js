@@ -176,7 +176,7 @@ saveChangesButton.addEventListener('click', async () => {
     const antiForgeryToken = getAntiForgeryToken();
 
     try {
-        const response = await fetch('/cursos/ManageCourses', { // Correct URL for your controller action
+        const response = await fetch('/ApiCursos/ManageCourses', { // Correct URL for your controller action
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

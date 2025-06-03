@@ -1,51 +1,52 @@
-﻿/* Use a consistent container for forms */
-.container-custom {
-    margin: 50px auto; /* Center the container with some top/bottom margin */
+﻿.container-custom {
+    margin: 2rem auto 50px; /* Center the container with some top/bottom margin */
     padding: 30px;
     background-color: #ffffff; /* White background for the form area */
 }
 
 /* --- Headings --- */
-.page-title { /* Changed from .crear-title for consistency */
+h1 {
     text-align: center;
     margin-bottom: 25px;
     font-weight: 600;
-    font-size: 2.2rem; /* Make it clearly a main title */
+}
+.change-password {
+    color: #5a6268;
+}
+h2 {
+    color: #5a6268; /* Slightly darker gray for sub-headings */
+    margin-top: 30px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e9ecef; /* Subtle line below sub-headings */
+    padding-bottom: 10px;
+    font-weight: 500;
 }
 
-/* --- Horizontal Rule (Separator) --- */
+/* --- Horizontal Rule --- */
 hr {
     border-top: 1px solid #dee2e6; /* Light gray separator */
     margin-bottom: 30px;
 }
 
-/* --- Form Styling --- */
-/* .app-form is a general class for forms now, replacing .crear-form */
-.app-form {
-    width: 100%; /* Occupy full width of its container */
-    /* Margin handled by .container-custom */
-}
-
-.form-group { /* Replaced .form-div for consistency */
+/* --- Form Group Styling --- */
+.form-group {
     margin-bottom: 20px; /* Space between form fields */
 }
 
-.control-label { /* Replaced .crear-form label */
+.control-label {
     font-weight: 500; /* Make labels a bit bolder */
     color: #495057; /* Slightly darker label color */
     margin-bottom: 5px;
     display: block; /* Ensure labels take full width */
 }
 
-/* Input Fields (text, email, password) */
-.form-control { /* Replaced specific input styles with a general class */
+.form-control {
     width: 100%;
     padding: 12px 15px; /* More padding for better input feel */
     border: 1px solid #ced4da; /* Standard border color */
     border-radius: 5px; /* Rounded input fields */
     font-size: 1rem;
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    box-sizing: border-box; /* Include padding/border in element's total width/height */
 }
 
     .form-control:focus {
@@ -55,47 +56,32 @@ hr {
     }
 
 /* --- Validation Messages --- */
-.text-danger-summary { /* Specific class for asp-validation-summary */
-    color: #dc3545; /* Standard red for validation summary */
-    font-size: 0.9em;
-    margin-bottom: 20px;
-    border: 1px solid #f5c6cb;
-    background-color: #f8d7da;
-    padding: 10px;
-    border-radius: 5px;
-}
-
-.text-danger { /* Standard red for individual field error messages */
-    color: #dc3545;
-    font-size: 0.875em;
+.text-danger {
+    color: #dc3545; /* Standard red for error messages */
+    font-size: 0.875em; /* Slightly smaller font for errors */
     margin-top: 5px;
     display: block;
 }
 
 /* --- Submit Button --- */
-.btn { /* General button style */
+.btn {
     display: inline-block;
     font-weight: 600;
     color: #fff;
+    background-color: #007bff;
+    border: 1px solid #007bff;
     padding: 12px 25px;
     font-size: 1.1rem;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    text-align: center;
-    border: none; /* No default border */
 }
 
-.btn-primary { /* Primary button specific styles */
-    background-color: #007bff;
-    border: 1px solid #007bff;
+.btn-primary:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    border-color: #0056b3;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
-
-    .btn-primary:hover {
-        background-color: #0056b3; /* Darker blue on hover */
-        border-color: #0056b3;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
 
 .btn:focus {
     outline: 0;
@@ -109,8 +95,12 @@ hr {
         padding: 20px;
     }
 
-    .page-title {
+    h1 {
         font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.4rem;
     }
 
     .btn {

@@ -265,226 +265,335 @@ async function loadClassDetailsFromTask(clickedLink, claseId) {
 
 
 
-window.initializeVideoPlayerForTarea = function (tareaIdFromViewModel, initialTimeFromViewModel, videoCompletedFromViewModel) {
-    const videoPlayerId = 'my-video';
-    const videoElement = document.getElementById(videoPlayerId);
+//window.initializeVideoPlayerForTarea = function (tareaIdFromViewModel, initialTimeFromViewModel, videoCompletedFromViewModel) {
+//    const videoPlayerId = 'my-video';
+//    const videoElement = document.getElementById(videoPlayerId);
 
-    // Ensure the video element exists before attempting to initialize
-    if (!videoElement) {
-        console.warn('Video element not found for Video.js initialization.');
-        return;
-    }
+//    // Ensure the video element exists before attempting to initialize
+//    if (!videoElement) {
+//        console.warn('Video element not found for Video.js initialization.');
+//        return;
+//    }
 
-    // If a player already exists for this ID, dispose of it first
-    if (videojs.getPlayer(videoPlayerId)) {
-        videojs.getPlayer(videoPlayerId).dispose();
-    }
-
-    const player = videojs(videoPlayerId);
-
-    let lastSavedTime = initialTimeFromViewModel;
-    let lastKnownDuration = 0;
-    let isSeeking = false;
-
-    player.on('loadedmetadata', function () {
-        lastKnownDuration = player.duration();
-        if (!videoCompletedFromViewModel && initialTimeFromViewModel > 0) {
-            player.currentTime(initialTimeFromViewModel);
-            // Optional: player.play(); // Auto-play from where they left off
-        }
-    });
-
-    player.on('seeking', function () { isSeeking = true; });
-    player.on('seeked', function () {
-        isSeeking = false;
-        const currentTime = player.currentTime();
-        if (currentTime > lastSavedTime + 2 && lastSavedTime > 0 && !videoCompletedFromViewModel) {
-            player.currentTime(lastSavedTime);
-            player.pause();
-            //alert('No puedes adelantar el video. Debes verlo secuencialmente.');
-        }
-        lastSavedTime = player.currentTime();
-    });
-
-    player.on('timeupdate', function () {
-        if (!isSeeking && !videoCompletedFromViewModel) {
-            const currentTime = player.currentTime();
-            if (currentTime > lastSavedTime + 1) {
-                lastSavedTime = currentTime;
-                sendVideoProgress(tareaIdFromViewModel, currentTime, lastKnownDuration);
-            }
-        }
-    });
-
-    player.on('ended', function () {
-        if (!videoCompletedFromViewModel) {
-            sendVideoCompleted(tareaIdFromViewModel, lastKnownDuration);
-            videoCompletedFromViewModel = true;
-            if (typeof loadTareaDetails === 'function') {
-                loadTareaDetails(tareaIdFromViewModel); // Re-load to update UI
-            }
-        }
-    });
-
-    // Helper functions (could be defined once globally or passed)
-    async function sendVideoProgress(tareaId, currentTime, videoDuration) {
-        try {
-            const response = await fetch('/api/Tarea/SaveVideoProgress', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value },
-                body: JSON.stringify({ tareaId: tareaId, currentTime: currentTime, videoDuration: videoDuration })
-            });
-            if (!response.ok) { console.error('Failed to save video progress:', response.statusText); }
-        } catch (error) { console.error('Network error while saving video progress:', error); }
-    }
-
-    async function sendVideoCompleted(tareaId, videoDuration) {
-        try {
-            const response = await fetch('/api/Tarea/MarkVideoTaskCompleted', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value },
-                body: JSON.stringify({ tareaId: tareaId, videoDuration: videoDuration })
-            });
-            if (!response.ok) { console.error('Failed to mark task completed:', response.statusText); }
-        } catch (error) { console.error('Network error while marking task completed:', error); }
-    }
-};
-
-
-
-
-// Video progress
-
-//const videoPlayerId = 'my-video';
-//const videoElement = document.getElementById(videoPlayerId);;
-
-//// --- Video.js Player Initialization and Progress Tracking ---
-//function initializeVideoPlayer(tareaId, initialTime, videoCompleted) {
-//    console.log("intiailized")
-//    // Destroy any existing player instance to prevent multiple players on the same ID
+//    // If a player already exists for this ID, dispose of it first
 //    if (videojs.getPlayer(videoPlayerId)) {
 //        videojs.getPlayer(videoPlayerId).dispose();
 //    }
 
 //    const player = videojs(videoPlayerId);
 
-//    let lastSavedTime = initialTime;
+//    let lastSavedTime = initialTimeFromViewModel;
 //    let lastKnownDuration = 0;
-//    let isSeeking = false; // Flag to manage seeking behavior
-//    let hasAttemptedSkip = false; // Flag to indicate if a forward skip was attempted
+//    let isSeeking = false;
 
-//    // Event listener for when the video metadata is loaded
 //    player.on('loadedmetadata', function () {
 //        lastKnownDuration = player.duration();
-//        // Only set current time if not already completed and initial time is available
-//        if (!videoCompleted && initialTime > 0) {
-//            player.currentTime(initialTime);
-//            player.play(); // Auto-play from where they left off
+//        if (!videoCompletedFromViewModel && initialTimeFromViewModel > 0) {
+//            player.currentTime(initialTimeFromViewModel);
+//            // Optional: player.play(); // Auto-play from where they left off
 //        }
 //    });
 
-//    // Event listeners for preventing skipping forward
-//    player.on('seeking', function () {
-//        isSeeking = true;
-//    });
-
+//    player.on('seeking', function () { isSeeking = true; });
 //    player.on('seeked', function () {
 //        isSeeking = false;
 //        const currentTime = player.currentTime();
-//        // If current time is significantly ahead of last saved time, and it's a forward skip
-//        // Consider a small buffer (e.g., 2 seconds) to account for minor discrepancies
-//        if (currentTime > lastSavedTime + 2 && lastSavedTime > 0 && !videoCompleted) {
-//            player.currentTime(lastSavedTime); // Rewind to last saved position
+//        if (currentTime > lastSavedTime + 2 && lastSavedTime > 0 && !videoCompletedFromViewModel) {
+//            player.currentTime(lastSavedTime);
 //            player.pause();
-//            alert('No puedes adelantar el video. Debes verlo secuencialmente.');
-//            hasAttemptedSkip = true; // Mark that a skip was attempted
+//            //alert('No puedes adelantar el video. Debes verlo secuencialmente.');
 //        }
-//        // Reset last saved time if a skip occurred and was corrected
 //        lastSavedTime = player.currentTime();
 //    });
 
-//    // Event listener for time updates (fired frequently)
 //    player.on('timeupdate', function () {
-//        // Only save progress if not seeking and not completed
-//        if (!isSeeking && !videoCompleted) {
+//        if (!isSeeking && !videoCompletedFromViewModel) {
 //            const currentTime = player.currentTime();
-//            // Only save if current time has truly advanced beyond last saved time
-//            if (currentTime > lastSavedTime + 1) { // Save every 1 second of progress
+//            if (currentTime > lastSavedTime + 1) {
 //                lastSavedTime = currentTime;
-//                sendVideoProgress(tareaId, currentTime, lastKnownDuration);
+//                sendVideoProgress(tareaIdFromViewModel, currentTime, lastKnownDuration);
 //            }
 //        }
 //    });
 
-//    // Event listener for video completion
 //    player.on('ended', function () {
-//        if (!videoCompleted) { // Ensure it's marked complete only once
-//            sendVideoCompleted(tareaId, lastKnownDuration);
-//            videoCompleted = true; // Update client-side status
-//            alert('¡Video completado! Tarea marcada como completada.');
-//            // Optionally, update the UI to show the task as completed
-//            document.getElementById('current-tarea-details').classList.add('task-completed');
-//            // You might want to refresh the class details to update the task status in the sidebar
-//            // (requires emitting an event or direct manipulation of the sidebar)
-//            // Example: A global event for sidebar update
-//            // window.dispatchEvent(new CustomEvent('taskCompleted', { detail: { tareaId: tareaId } }));
+//        if (!videoCompletedFromViewModel) {
+//            sendVideoCompleted(tareaIdFromViewModel, lastKnownDuration);
+//            videoCompletedFromViewModel = true;
+//            if (typeof loadTareaDetails === 'function') {
+//                loadTareaDetails(tareaIdFromViewModel); // Re-load to update UI
+//            }
 //        }
 //    });
-//}
 
-//// --- API Calls ---
-
-//// Function to send video progress to the backend
-//async function sendVideoProgress(tareaId, currentTime, videoDuration) {
-//    try {
-//        const response = await fetch('/api/Tarea/SaveVideoProgress', {
-//            method: 'POST',
-//            headers: {
-//                'Content-Type': 'application/json',
-//                'RequestVerificationToken': getAntiForgeryToken()
-//            },
-//            body: JSON.stringify({
-//                tareaId: tareaId,
-//                currentTime: currentTime,
-//                videoDuration: videoDuration
-//            })
-//        });
-//        if (!response.ok) {
-//            console.error('Failed to save video progress:', response.statusText);
-//            // Handle error (e.g., show a small non-intrusive message)
-//        }
-//    } catch (error) {
-//        console.error('Network error while saving video progress:', error);
+//    // Helper functions (could be defined once globally or passed)
+//    async function sendVideoProgress(tareaId, currentTime, videoDuration) {
+//        try {
+//            const response = await fetch('/api/Tarea/SaveVideoProgress', {
+//                method: 'POST',
+//                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value },
+//                body: JSON.stringify({ tareaId: tareaId, currentTime: currentTime, videoDuration: videoDuration })
+//            });
+//            if (!response.ok) { console.error('Failed to save video progress:', response.statusText); }
+//        } catch (error) { console.error('Network error while saving video progress:', error); }
 //    }
-//}
 
-//// Function to mark video task as completed
-//async function sendVideoCompleted(tareaId, videoDuration) {
-//    try {
-//        const response = await fetch('/api/Tarea/MarkVideoTaskCompleted', {
-//            method: 'POST',
-//            headers: {
-//                'Content-Type': 'application/json',
-//                'RequestVerificationToken': getAntiForgeryToken()
-//            },
-//            body: JSON.stringify({
-//                tareaId: tareaId,
-//                videoDuration: videoDuration
-//            })
-//        });
-//        if (!response.ok) {
-//            console.error('Failed to mark task completed:', response.statusText);
-//            // Handle error
-//        }
-//    } catch (error) {
-//        console.error('Network error while marking task completed:', error);
+//    async function sendVideoCompleted(tareaId, videoDuration) {
+//        try {
+//            const response = await fetch('/api/Tarea/MarkVideoTaskCompleted', {
+//                method: 'POST',
+//                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value },
+//                body: JSON.stringify({ tareaId: tareaId, videoDuration: videoDuration })
+//            });
+//            if (!response.ok) { console.error('Failed to mark task completed:', response.statusText); }
+//        } catch (error) { console.error('Network error while marking task completed:', error); }
 //    }
-//}
+//};
 
-// Initialize the player when the partial view is inserted into the DOM
-// For AJAX loaded content, you might need to call this explicitly after innerHTML assignment
-// For this specific setup, `initializeVideoPlayer()` will be called when the script is parsed,
-// and since it disposes existing players, it should work for repeated loads.
+
+window.initializeVideoPlayerForTarea = function (tareaIdFromViewModel, initialTimeFromViewModel, videoCompletedFromViewModel) {
+    // --- DEBUGGING: Confirm function execution ---
+    console.log("[INITIALIZATION] initializeVideoPlayerForTarea function started.");
+
+    const videoPlayerId = 'my-video';
+    const videoElement = document.getElementById(videoPlayerId);
+
+    if (!videoElement) {
+        console.warn('Video element not found for Video.js initialization. Aborting.');
+        return;
+    }
+
+    // Dispose of any existing player instance to prevent memory leaks or duplicate events
+    if (videojs.getPlayer(videoPlayerId)) {
+        console.log(`[INITIALIZATION] Disposing existing Video.js player for ${videoPlayerId}.`);
+        videojs.getPlayer(videoPlayerId).dispose();
+    }
+
+    const player = videojs(videoPlayerId);
+
+    // This variable tracks the furthest point watched sequentially by the user.
+    // It's crucial for allowing rewinds but preventing forward skips.
+    let furthestWatchedTime = initialTimeFromViewModel; // This is the "max progress" from server
+    let lastKnownDuration = 0;
+    let isSeeking = false; // Flag to indicate if player is currently in a seeking operation
+    const allowedForwardBuffer = 2; // Allow 2 seconds for minor discrepancies, network lag, etc.
+    const completionThresholdPercentage = 0.95; // Video must be watched to at least 95% to be considered complete
+
+    // Flag to prevent multiple alert pop-ups for a single illegal skip attempt
+    let hasAttemptedIllegalForwardSkip = false;
+
+    // --- Player Event Listeners ---
+
+    player.on('loadedmetadata', function () {
+        lastKnownDuration = player.duration();
+        console.log(`[loadedmetadata] Video Duration: ${lastKnownDuration.toFixed(2)}s, Initial Time (from ViewModel): ${initialTimeFromViewModel.toFixed(2)}s`);
+
+        if (!videoCompletedFromViewModel && initialTimeFromViewModel > 0) {
+            // Set the video's current time to the last saved progress.
+            // This allows resuming where the user left off.
+            player.currentTime(initialTimeFromViewModel);
+            console.log(`[loadedmetadata] Set current time to initial progress: ${initialTimeFromViewModel.toFixed(2)}s.`);
+            // You might choose to auto-play here, or wait for user interaction.
+            // player.play();
+        }
+    });
+
+    player.on('seeking', function () {
+        isSeeking = true;
+        console.log(`[seeking] User started seeking. CurrentPlayerTime: ${player.currentTime().toFixed(2)}s, FurthestWatchedTime: ${furthestWatchedTime.toFixed(2)}s`);
+    });
+
+    player.on('seeked', function () {
+        isSeeking = false;
+        const currentTime = player.currentTime(); // The time after the seek operation completes
+        console.log(`[seeked] User finished seeking. New CurrentPlayerTime: ${currentTime.toFixed(2)}s, FurthestWatchedTime: ${furthestWatchedTime.toFixed(2)}s`);
+
+        // Only enforce sequential watching if the video is not yet completed
+        if (!videoCompletedFromViewModel) {
+            // Check if the user sought *forward* significantly beyond the furthest watched point + buffer
+            if (currentTime > furthestWatchedTime + allowedForwardBuffer) {
+                console.warn(`[seeked] DETECTED ILLEGAL FORWARD SEEK! From ${furthestWatchedTime.toFixed(2)}s to ${currentTime.toFixed(2)}s. Resetting time.`);
+                player.currentTime(furthestWatchedTime); // Rewind to the furthest watched point
+                player.pause(); // Pause to indicate the action was disallowed
+
+                if (!hasAttemptedIllegalForwardSkip) {
+                    alert('No puedes adelantar el video. Debes verlo secuencialmente.');
+                    hasAttemptedIllegalForwardSkip = true; // Set flag to prevent multiple alerts
+                }
+            } else {
+                // This branch is hit for legitimate backward seeks or minor forward jumps within the buffer.
+                // IMPORTANT: furthestWatchedTime is *not* updated here. It will only update via 'timeupdate'
+                // when the user plays past the current furthestWatchedTime. This allows rewinding.
+                console.log(`[seeked] Allowed seek (backward or within buffer). CurrentPlayerTime: ${currentTime.toFixed(2)}s, FurthestWatchedTime: ${furthestWatchedTime.toFixed(2)}s.`);
+                hasAttemptedIllegalForwardSkip = false; // Reset the flag after a valid seek/action
+            }
+        }
+    });
+
+    player.on('timeupdate', function () {
+        // Only process time updates if not currently seeking and the video is not yet completed
+        if (!isSeeking && !videoCompletedFromViewModel) {
+            const currentTime = player.currentTime();
+
+            // Uncomment the following line for very verbose timeupdate logging if needed for deep debugging
+            // console.log(`[timeupdate] CurrentPlayerTime: ${currentTime.toFixed(2)}s, FurthestWatchedTime: ${furthestWatchedTime.toFixed(2)}s`);
+
+            // This is the core logic for *allowing* rewind while restricting forward progress.
+            // furthestWatchedTime only updates if the current time is truly *new* sequential progress.
+            if (currentTime > furthestWatchedTime) { // User is playing *forward* past their furthest point
+                // Check for sudden large jumps in currentTime that aren't explicit 'seeking' events.
+                // This catches fast-forwarding via play controls or internal player glitches.
+                if (currentTime > furthestWatchedTime + allowedForwardBuffer) {
+                    console.warn(`[timeupdate] DETECTED UNEXPECTED FORWARD JUMP! From ${furthestWatchedTime.toFixed(2)}s to ${currentTime.toFixed(2)}s. Resetting.`);
+                    player.currentTime(furthestWatchedTime); // Rewind to the furthest watched point
+                    player.pause(); // Pause playback
+
+                    if (!hasAttemptedIllegalForwardSkip) {
+                        alert('El video se reinició debido a un avance no permitido.');
+                        hasAttemptedIllegalForwardSkip = true; // Set flag to prevent multiple alerts
+                    }
+                } else {
+                    // This is legitimate sequential progress (moving forward smoothly)
+                    furthestWatchedTime = currentTime; // Update the furthest point watched
+                    hasAttemptedIllegalForwardSkip = false; // Reset flag after valid progression
+
+                    // Send progress to the server frequently, e.g., every 1-2 seconds of actual playback.
+                    // This reduces API calls compared to sending on every timeupdate.
+                    if (currentTime - (player.lastSentProgressTime || 0) >= 1) { // Send every 1 second of unique time
+                        sendVideoProgress(tareaIdFromViewModel, currentTime, lastKnownDuration);
+                        player.lastSentProgressTime = currentTime; // Store last time progress was sent
+                    }
+                }
+            }
+            // IMPORTANT: If currentTime <= furthestWatchedTime (meaning user rewound or time hasn't advanced),
+            // furthestWatchedTime is *not* updated. This is precisely what allows re-watching without losing
+            // the highest point reached.
+        }
+    });
+
+    //player.on('ended', function () {
+    //    console.log(`[ended] Video playback finished. CurrentPlayerTime: ${player.currentTime().toFixed(2)}s, FurthestWatchedTime: ${furthestWatchedTime.toFixed(2)}s, Video Duration: ${lastKnownDuration.toFixed(2)}s`);
+
+    //    // Client-side check to prevent marking as completed if the user simply skipped to the end.
+    //    // This acts as a first line of defense, but server-side validation is CRITICAL.
+    //    if (!videoCompletedFromViewModel && lastKnownDuration > 0) {
+    //        // Check if the furthest watched time is close enough to the end of the video
+    //        if (furthestWatchedTime >= lastKnownDuration * completionThresholdPercentage) {
+    //            console.log(`[ended] Video watched sufficiently. Marking as completed.`);
+    //            sendVideoCompleted(tareaIdFromViewModel, lastKnownDuration);
+    //            videoCompletedFromViewModel = true; // Update client-side status to reflect completion
+    //            player.removeClass('vjs-no-seek'); // Remove custom CSS class as restrictions are lifted
+
+    //            // Optionally, re-load Tarea details to reflect completion status in UI
+    //            if (typeof loadTareaDetails === 'function') {
+    //                loadTareaDetails(tareaIdFromViewModel);
+    //            }
+    //        } else {
+    //            console.warn(`[ended] Video ended but NOT sufficiently watched (watched up to ${furthestWatchedTime.toFixed(2)}s / ${lastKnownDuration.toFixed(2)}s required ${(lastKnownDuration * completionThresholdPercentage).toFixed(2)}s). NOT marking as completed.`);
+    //            alert('Para completar esta tarea de video, debes ver el video en su totalidad y de forma secuencial.');
+    //            // Optionally, guide the user back to the point where they need to resume
+    //            player.currentTime(furthestWatchedTime); // Go back to the furthest watched point
+    //            player.play(); // And resume playing to encourage completion
+    //        }
+    //    }
+    //});
+
+    // ... (inside your initializeVideoPlayerForTarea function) ...
+
+    player.on('ended', async function () { // <--- The 'async' MUST be right here
+        console.log(`[ended] Video playback finished. CurrentPlayerTime: ${player.currentTime().toFixed(2)}s, FurthestWatchedTime: ${furthestWatchedTime.toFixed(2)}s, Video Duration: ${lastKnownDuration.toFixed(2)}s`);
+
+        if (!videoCompletedFromViewModel && lastKnownDuration > 0) {
+            if (furthestWatchedTime >= lastKnownDuration * completionThresholdPercentage) {
+                console.log(`[ended] Video watched sufficiently. Attempting to mark as completed on server.`);
+
+                try {
+                    await sendVideoCompleted(tareaIdFromViewModel, lastKnownDuration); // <--- 'await' is valid here
+                    console.log("[ended] Server confirmed completion. Now reloading task details to reflect status...");
+                    videoCompletedFromViewModel = true;
+
+                    player.removeClass('vjs-no-seek');
+                    if (typeof loadTareaDetails === 'function') {
+                        loadTareaDetails(tareaIdFromViewModel);
+                    }
+                } catch (error) {
+                    console.error("[ended] Failed to mark video as completed on server, UI will not refresh.", error);
+                }
+
+            } else {
+                console.warn(`[ended] Video ended but NOT sufficiently watched...`);
+                alert('Para completar esta tarea de video, debes ver el video en su totalidad y de forma secuencial.');
+                player.currentTime(furthestWatchedTime);
+                player.play();
+            }
+        }
+    });
+
+    // ... (rest of your initializeVideoPlayerForTarea function) ...
+
+
+    if (!videoCompletedFromViewModel) {
+        player.addClass('vjs-no-seek');
+    }
+
+    // This listener handles removing the custom class when the video becomes completed.
+    // It's triggered if the video completes during the current session.
+    player.on('useractive', function () {
+        if (videoCompletedFromViewModel && player.hasClass('vjs-no-seek')) {
+            player.removeClass('vjs-no-seek');
+            console.log(`[useractive] Video is now completed, removing 'vjs-no-seek' class.`);
+        }
+    });
+
+
+    // --- Helper Functions for API Calls ---
+
+    // Function to send video progress to the server
+    async function sendVideoProgress(tareaId, currentTime, videoDuration) {
+        try {
+            const response = await fetch('/api/Tarea/SaveVideoProgress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                },
+                body: JSON.stringify({ tareaId: tareaId, currentTime: currentTime, videoDuration: videoDuration })
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Failed to save video progress:', response.status, response.statusText, errorText);
+            } else {
+                // console.log(`Progress saved: TareaId: ${tareaId}, Time: ${currentTime.toFixed(2)}s`); // Keep this commented for less spam
+            }
+        } catch (error) {
+            console.error('Network error while saving video progress:', error);
+        }
+    }
+
+    // Function to mark the video task as completed on the server
+    async function sendVideoCompleted(tareaId, videoDuration) {
+        try {
+            const response = await fetch('/api/Tarea/MarkVideoTaskCompleted', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                },
+                body: JSON.stringify({ tareaId: tareaId, videoDuration: videoDuration })
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Failed to mark task completed:', response.status, response.statusText, errorText);
+                alert('Hubo un error al intentar marcar la tarea como completada. Por favor, inténtalo de nuevo.');
+            } else {
+                console.log(`Task ${tareaId} marked as completed on server.`);
+            }
+        } catch (error) {
+            console.error('Network error while marking task completed:', error);
+            alert('Error de red al intentar marcar la tarea como completada. Verifica tu conexión.');
+        }
+    }
+};
 
 
 function getAntiForgeryToken() {

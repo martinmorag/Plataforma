@@ -1,10 +1,16 @@
-﻿.page-container {
-    max-width: 1200px; /* Adjust as needed */
+﻿/* General page container */
+.page-container {
+    max-width: 1200px;
     margin: 40px auto;
     padding: 20px;
     background-color: #f8f9fa;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box; /* Ensures padding is included in element's total width */
+}
+
+a:hover, a:active {
+    color: white; /* This rule seems misplaced for general 'a' tags, perhaps specific to list-item hover */
 }
 
 h1, h3 {
@@ -13,18 +19,22 @@ h1, h3 {
     text-align: center;
 }
 
-/* Flexbox layout for sidebar and main content */
+/* --- Flexbox layout for sidebar and main content --- */
 .content-layout {
     display: flex;
     gap: 30px; /* Space between columns */
+    flex-wrap: wrap; /* Allows columns to wrap to the next line on smaller screens */
 }
 
 .sidebar-column {
-    flex: 0 0 300px; /* Fixed width for sidebar, adjust as needed */
+    flex: 0 0 300px; /* Fixed width for sidebar on larger screens */
     background-color: #ffffff;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    /* For mobile: */
+    width: 100%; /* Will take full width when stacked */
+    box-sizing: border-box;
 }
 
 .main-content-column {
@@ -33,135 +43,276 @@ h1, h3 {
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    min-width: 0; /* Allows content to shrink beyond its intrinsic width if needed */
+    box-sizing: border-box;
 }
 
-/* Course List Styling */
+/* --- Course List Styling --- */
 .course-list {
-    list-style: none; /* Remove default list bullets */
+    list-style: none;
     padding: 0;
     margin: 0;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
-    overflow: hidden; /* Ensures borders/shadows are contained */
+    overflow: hidden;
 }
 
 .list-item {
-    display: block; /* Make the entire link clickable */
+    display: block;
     padding: 15px 20px;
     border-bottom: 1px solid #e9ecef;
-    color: white;
+    color: #343a40; /* Changed to dark grey for better readability, assuming it's not a link initially */
     text-decoration: none;
     transition: background-color 0.2s ease, color 0.2s ease;
     margin: 0;
+    cursor: pointer; /* Indicate it's clickable */
 }
 
     .list-item:last-child {
-        border-bottom: none; /* No border for the last item */
+        border-bottom: none;
     }
 
-    /*.list-item:hover:not(.disabled-item) {
-        background-color: #e2f0ff;*/ /* Lighter blue on hover */
-        /*color: #0056b3;
-    }*/
+    /* Hover and Active states for list items */
+    .list-item:hover {
+        background-color: #e2f0ff; /* Lighter blue on hover */
+        color: #0056b3;
+    }
 
     .list-item.active-item {
-        background-color: #007bff;  Primary blue for active item 
+        background-color: #007bff; /* Primary blue for active item */
         color: #ffffff;
         font-weight: bold;
     }
 
-        /*.list-item.active-item:hover {
-            background-color: #0056b3;*/ /* Darker blue on hover for active item */
-            /*color: #ffffff;
-        }*/
+        .list-item.active-item:hover { /* Override hover for active item */
+            background-color: #0056b3;
+            color: #ffffff;
+        }
 
     .list-item.disabled-item {
         background-color: #e9ecef;
         color: #6c757d;
         cursor: not-allowed;
+        /* Disable hover for disabled items */
+        pointer-events: none; /* Prevents all mouse events */
+        opacity: 0.8;
     }
 
 .task-count {
-    float: right;
+    float: right; /* Consider using flexbox for better alignment, but float works */
     font-size: 0.9em;
-    color: #6c757d; /* Muted color for task count */
+    color: #6c757d;
 }
 
 .active-item .task-count {
-    color: #ffffff; /* White for active item task count */
+    color: #ffffff;
 }
 
-/* Info Messages */
+/* --- Info Messages --- */
 .info-message {
     padding: 15px;
-    background-color: #e0f2f7; /* Light blue */
+    background-color: #e0f2f7;
     border: 1px solid #b3e0ed;
     border-radius: 5px;
     color: #006080;
     text-align: center;
     margin-top: 20px;
+    font-size: 0.95em; /* Adjust font size for better mobile fit */
 }
 
-/* Data Table Styling */
+/* --- Data Table Styling --- */
 .data-table {
     width: 100%;
-    border-collapse: collapse; /* Collapse borders for a cleaner look */
+    border-collapse: collapse;
     margin-top: 20px;
+    font-size: 0.9em; /* Slightly smaller font for tables */
 }
 
     .data-table th,
     .data-table td {
-        padding: 12px 15px;
+        padding: 10px 12px; /* Reduced padding for more compact table */
         text-align: left;
-        border-bottom: 1px solid #e9ecef; /* Light gray border */
+        border-bottom: 1px solid #e9ecef;
     }
 
     .data-table thead th {
-        background-color: #e9ecef; /* Light gray for header background */
+        background-color: #e9ecef;
         color: #495057;
         font-weight: bold;
         text-transform: uppercase;
-        font-size: 0.9em;
+        font-size: 0.8em; /* Even smaller header font */
     }
 
     .data-table tbody tr:hover {
-        background-color: #f2f2f2; /* Subtle hover effect for rows */
+        background-color: #f2f2f2;
     }
 
-/* Action Buttons */
+/* --- Action Buttons --- */
 .action-button {
     display: inline-block;
-    padding: 8px 15px;
+    padding: 7px 12px; /* Slightly reduced padding */
     border: none;
     border-radius: 5px;
     cursor: pointer;
     text-decoration: none;
-    font-size: 0.9em;
+    font-size: 0.85em; /* Smaller font for buttons */
     transition: background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap; /* Prevent button text from wrapping */
 }
 
 .view-button {
-    background-color: #17a2b8; /* Info blue */
+    background-color: #17a2b8;
     color: #ffffff;
 }
 
     .view-button:hover {
-        background-color: #138496; /* Darker info blue on hover */
+        background-color: #138496;
     }
 
-/* Iconography (assuming Font Awesome is linked globally) */
+/* Iconography */
 .action-button i {
     margin-right: 5px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* --- Responsive adjustments --- */
+@media (max-width: 992px) { /* Adjust breakpoint for larger tablets */
+    .page-container {
+        margin: 20px auto; /* Reduce vertical margin */
+        padding: 15px; /* Reduce overall padding */
+    }
+
+    h1, h3 {
+        margin-bottom: 20px; /* Reduce heading margin */
+        font-size: 1.8em; /* Smaller main heading */
+    }
+
     .content-layout {
-        flex-direction: column; /* Stack columns on smaller screens */
+        gap: 20px; /* Reduce gap between columns */
+    }
+
+    .sidebar-column {
+        flex: 0 0 250px; /* Make sidebar slightly narrower */
+        padding: 15px;
+    }
+
+    .main-content-column {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 768px) { /* Standard mobile breakpoint */
+    .page-container {
+        margin: 15px; /* More padding on the sides for smaller screens */
+        padding: 15px;
+        box-shadow: none; /* Reduce or remove shadow for a lighter feel on mobile */
+        border-radius: 0; /* Remove border-radius on small devices for edge-to-edge content */
+    }
+
+    h1 {
+        font-size: 1.6em; /* Even smaller main heading */
+    }
+
+    .content-layout {
+        flex-direction: column; /* Stack columns vertically */
+        gap: 15px; /* Smaller gap when stacked */
     }
 
     .sidebar-column {
         flex: auto; /* Allow sidebar to take full width */
-        margin-bottom: 20px;
+        width: 100%; /* Explicitly set full width */
+        margin-bottom: 0; /* No bottom margin, gap handles spacing */
+        padding: 15px;
+    }
+
+    .main-content-column {
+        padding: 15px;
+    }
+
+    /* Table Responsiveness */
+    .data-table {
+        /* Hide table headers and instead use data attributes for labels */
+        border: 0; /* Remove table borders for card-like appearance */
+    }
+
+        .data-table thead {
+            display: none; /* Hide the actual table header */
+        }
+
+        .data-table tr {
+            background-color: #fcfcfc; /* Light background for each row as a card */
+            border: 1px solid #ddd; /* Add a border to each row */
+            border-radius: 8px; /* Rounded corners for row "cards" */
+            margin-bottom: 10px; /* Space between row "cards" */
+            display: block; /* Make rows act like block-level elements */
+            padding: 15px; /* Padding inside each row "card" */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Subtle shadow for row "cards" */
+        }
+
+        .data-table td {
+            border-bottom: 1px dotted #e9ecef; /* Use dotted border for internal separators */
+            display: block; /* Make each cell a block element, stacking them */
+            text-align: right; /* Align value to the right */
+            padding-left: 50%; /* Space for pseudo-element label */
+            position: relative; /* For pseudo-element positioning */
+            font-size: 1em; /* Restore slightly larger font for data */
+        }
+
+            .data-table td::before { /* Add pseudo-element for mobile labels */
+                content: attr(data-label); /* Use data-label attribute for content */
+                position: absolute;
+                left: 10px; /* Position label on the left */
+                width: 45%; /* Give it some width */
+                padding-right: 10px;
+                white-space: nowrap; /* Prevent label from wrapping */
+                text-align: left; /* Align label to the left */
+                font-weight: bold;
+                color: #6c757d; /* Muted color for labels */
+            }
+        /* Hide the last border for the action button row */
+        .data-table tr td:last-child {
+            border-bottom: none;
+            text-align: center; /* Center action buttons */
+            padding-left: 10px; /* Reset padding for last cell */
+        }
+}
+
+@media (max-width: 480px) { /* Smaller phones */
+    .page-container {
+        margin: 10px;
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.4em;
+        margin-bottom: 15px;
+    }
+
+    h3 {
+        font-size: 1.2em;
+    }
+
+    .list-item {
+        padding: 12px 15px;
+        font-size: 0.95em;
+    }
+
+    .data-table tr {
+        padding: 10px; /* Reduce padding for smaller "cards" */
+    }
+
+    .data-table td {
+        padding: 8px 10px;
+        font-size: 0.95em;
+        padding-left: 45%; /* Adjust padding for label */
+    }
+
+        .data-table td::before {
+            width: 40%; /* Adjust label width */
+            left: 8px;
+        }
+
+    .action-button {
+        padding: 6px 10px;
+        font-size: 0.8em;
     }
 }

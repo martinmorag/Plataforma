@@ -325,6 +325,9 @@
 }
 
 @media (max-width: 576px) {
+    .sidebar-footer {
+        padding: 5px 25px 0;
+    }
     .course-header h1 {
         font-size: 2em;
     }

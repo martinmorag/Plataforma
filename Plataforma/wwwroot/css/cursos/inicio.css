@@ -1,4 +1,5 @@
 ﻿main {
+    margin: 2rem 0 0;
     display: flex;
 }
 
@@ -161,6 +162,21 @@
 
 /* Responsive adjustments */
 @media (max-width: 500px) {
+    main {
+        margin: 1rem auto 0;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .upload-tarea-container {
+        width: 85%;
+    }
+
+    .create-module-class {
+        width: 100%;
+        flex-direction: column;
+    }
     .radio-group {
         flex-direction: column; /* Stack cards vertically on very small screens */
         align-items: center; /* Center them when stacked */

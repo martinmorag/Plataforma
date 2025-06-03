@@ -168,7 +168,7 @@ a:hover {
 /* --- Interactive States --- */
 
 /* Base style for available courses */
-.available-course-item {
+.available-course-item, .assigned-course-item {
     border: 2px solid transparent; /* Default transparent border */
 }
 

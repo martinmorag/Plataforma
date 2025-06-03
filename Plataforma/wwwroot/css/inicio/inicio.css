@@ -257,6 +257,9 @@
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
+    .welcome-banner {
+        height: 100%;
+    }
     .inferior-sections-container {
         flex-direction: column; /* Stack sections vertically */
         gap: 30px;

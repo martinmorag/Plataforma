@@ -1,5 +1,4 @@
-﻿@* This view will be rendered by ProfesorViewController.MisCursosYTareas *@
-@using Plataforma.Models.Profesores
+﻿@using Plataforma.Models.Profesores
 
 @{
     ViewData["Title"] = "Mis Cursos y Tareas";
@@ -36,18 +35,16 @@
                 }
             </div>
         </div>
+
         <div class="main-content-column">
             <h3 id="tareasHeader">Tareas @(string.IsNullOrEmpty(selectedCursoNombre) ? "" : $"para: {selectedCursoNombre}")</h3>
-            <div id="tareasContent">
-                @if (!cursos.Any())
-                {
-                    <div class="info-message">Selecciona un curso para ver sus tareas.</div>
-                }
-                else if (!tareas.Any())
-                {
-                    <div class="info-message">No hay tareas para este curso.</div>
-                }
-                else
+            
+            <div id="noCourseSelectedMessage" class="info-message" style="@(string.IsNullOrEmpty(selectedCursoNombre) ? "" : "display: none;")">
+                Selecciona un curso para ver sus tareas.
+            </div>
+
+            <div id="tareasContentContainer" style="@(string.IsNullOrEmpty(selectedCursoNombre) && !tareas.Any() ? "display: none;" : "")">
+                @if (tareas.Any())
                 {
                     <table class="data-table">
                         <thead>
@@ -57,19 +54,19 @@
                                 <th>Fecha Límite</th>
                                 <th>Entregas</th>
                                 <th>Pendientes de Revisión</th>
-                                <th>Acciones</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var tarea in tareas)
                             {
                                 <tr>
-                                    <td>@tarea.Nombre</td>
-                                    <td>@tarea.ClaseNombre</td>
-                                    <td>@tarea.FechaLimite.ToShortDateString()</td>
-                                    <td>@tarea.TotalEntregas</td>
-                                    <td>@tarea.EntregasPendientes</td>
-                                    <td>
+                                    <td data-label="Nombre de la Tarea">@tarea.Nombre</td>
+                                    <td data-label="Clase">@tarea.ClaseNombre</td>
+                                    <td data-label="Fecha Límite">@tarea.FechaLimite.ToShortDateString()</td>
+                                    <td data-label="Entregas">@tarea.TotalEntregas</td>
+                                    <td data-label="Pendientes de Revisión">@tarea.EntregasPendientes</td>
+                                    <td data-label="">
                                         <a asp-controller="tareas" asp-action="VerEntregas" asp-route-tareaId="@tarea.TareaId" class="action-button view-button">
                                             <i class="fa-solid fa-list"></i> Ver Entregas
                                         </a>
@@ -78,6 +75,10 @@
                             }
                         </tbody>
                     </table>
+                }
+                else if (!string.IsNullOrEmpty(selectedCursoNombre)) // Only show "no tasks" message if a course IS selected
+                {
+                    <div class="info-message">No hay tareas para este curso.</div>
                 }
             </div>
         </div>

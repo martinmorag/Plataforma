@@ -22,25 +22,25 @@ courseCards.forEach(card => {
         const originalState = this.dataset.originalState; // 'available' or 'assigned'
 
         if (originalState === 'available') {
-            if (this.classList.contains('selected-for-assignment')) {
+            if (this.classList.contains('selected-for-register')) {
                 // Deselect
-                this.classList.remove('selected-for-assignment');
+                this.classList.remove('selected-for-register');
                 coursesToAssign.delete(courseId);
             } else {
                 // Select
-                this.classList.add('selected-for-assignment');
+                this.classList.add('selected-for-register');
                 coursesToAssign.add(courseId);
                 // If previously marked for de-assignment (e.g., if it was assigned and then de-assigned and then selected again)
                 coursesToDeassign.delete(courseId); // Ensure it's not in both lists
             }
         } else if (originalState === 'assigned') {
-            if (this.classList.contains('selected-for-deassignment')) {
+            if (this.classList.contains('selected-for-deregister')) {
                 // Deselect
-                this.classList.remove('selected-for-deassignment');
+                this.classList.remove('selected-for-deregister');
                 coursesToDeassign.delete(courseId);
             } else {
                 // Select
-                this.classList.add('selected-for-deassignment');
+                this.classList.add('selected-for-deregister');
                 coursesToDeassign.add(courseId);
                 // If previously marked for assignment
                 coursesToAssign.delete(courseId); // Ensure it's not in both lists

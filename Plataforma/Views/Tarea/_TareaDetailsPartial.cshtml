@@ -95,20 +95,23 @@
                     <p>@Model.SubmissionComentarios</p>
                 </div>
             }
-
-            @if (Model.SubmissionStatusText == "Reprobado" || Model.SubmissionStatusText == "Pendiente") // Allow re-submission if reprobado or still pending
-            {
-                <a href="#" class="btn btn-warning submit-task-btn" data-task-id="@Model.TareaId">Revisar y Entregar @(Model.SubmissionStatusText == "Reprobado" ? "Nuevamente" : "")</a>
-            }
+            @* @if (Model.SubmissionStatusText == "Reprobado" || Model.SubmissionStatusText == "Pendiente") // Allow re-submission if reprobado or still pending *@
+            @* { *@
+            @*     <a href="#" class="btn btn-warning submit-task-btn" data-task-id="@Model.TareaId">Revisar y Entregar @(Model.SubmissionStatusText == "Reprobado" ? "Nuevamente" : "")</a> *@
+            @* } *@
             @* else if (Model.SubmissionStatusText == "Aprobado" || Model.SubmissionStatusText == "EnRevision") *@
             @* { *@
             @*     <a href="#" class="btn btn-secondary view-submission-btn" data-task-id="@Model.TareaId">Ver Detalle de Entrega</a> *@
             @* } *@
         }
-        else // Not submitted yet
+        else if (Model.TipoContenido == "Documento")
         {
             <p class="alert alert-info">Aún no has entregado esta tarea.</p>
             <button type="button" class="btn btn-primary" onclick="showSubmissionForm('@Model.TareaId')">Entregar Tarea</button>
+        }
+        else if (Model.TipoContenido == "video")
+        {
+            <p class="alert alert-info">Ver video completo.</p>
         }
             @* Submission Form (hidden by default) *@
             <div id="submission-form-container-@Model.TareaId" class="mt-4" style="display:none;">
@@ -133,7 +136,6 @@
                 </form>
                 <div id="submission-message-@Model.TareaId" class="mt-2"></div>
             </div>
-        
     </div>
 </div>
 

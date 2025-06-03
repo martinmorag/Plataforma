@@ -10,7 +10,7 @@ using Plataforma.Models.Profesores;
 
 namespace Plataforma.Controllers
 {
-    [Authorize(Roles = "Profesor")]
+    [Authorize(Roles = "Profesor, Administrador")]
     public class ProfesoresController : Controller
     {
         private readonly PlataformaContext _context;

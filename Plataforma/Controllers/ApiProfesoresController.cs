@@ -33,9 +33,8 @@ namespace Plataforma.Controllers
             Guid profesorId = user.Id;
 
             var entrega = await _context.entregas
-                                        .Include(e => e.Archivo)
-                                        .Include(e => e.Tarea).ThenInclude(t => t.Clase)
-                                        .FirstOrDefaultAsync(e => e.EntregaId == entregaId);
+                                 .Include(e => e.Archivo)
+                                 .FirstOrDefaultAsync(e => e.EntregaId == entregaId);
 
             if (entrega == null || entrega.Archivo == null)
             {
@@ -56,8 +55,6 @@ namespace Plataforma.Controllers
 
             return File(fileBytes, contentType, fileName);
         }
-        // API Endpoint for Professor to Evaluate a Submission
-        // The route here will be /api/Profesores/EvaluarEntrega
         [HttpPost("EvaluarEntrega")]
         public async Task<IActionResult> EvaluarEntrega([FromBody] EvaluarEntregaDto evaluacionDto)
         {

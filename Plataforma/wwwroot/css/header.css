@@ -1,0 +1,311 @@
+﻿/* wwwroot/css/header.css */
+
+/* --- Variables for easier theme management --- */
+:root {
+    --primary-dark-blue: #2c3e50; /* Deep Charcoal Blue */
+    --secondary-dark-blue: #34495e; /* Slightly lighter Charcoal Blue */
+    --light-text: #ecf0f1; /* Off-white for main text */
+    --hover-light: #ffffff; /* Pure white on hover for crispness */
+    --shadow-subtle: rgba(0, 0, 0, 0.25);
+    /* Role-specific, subtle accents */
+    --administrador-accent: #f1c40f; /* Yellow accent */
+    --profesor-accent: #3498db; /* Muted vibrant blue */
+    --estudiante-accent: #2ecc71; /* Muted vibrant green */
+    --guest-accent: #95a5a6; /* Muted grey/silver */
+    /* Logout button specific hover colors (can be customized per role) */
+    --logout-hover-color-profesor: #fbc531; /* Slightly brighter yellow */
+    --logout-hover-color-estudiante: #ff763c; /* Slightly brighter orange */
+    --logout-hover-color-administrador: #f4d03f; /* Slightly brighter yellow for admin logout */
+    --logout-hover-color-guest: #bdc3c7; /* Lighter grey for guest logout */
+}
+
+/* --- Base Header Styles --- */
+.app-header {
+    background: linear-gradient(to right, var(--primary-dark-blue), var(--secondary-dark-blue));
+    color: var(--light-text);
+    padding: 16px 0;
+    box-shadow: 0 5px 20px var(--shadow-subtle);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    font-family: 'Poppins', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    height: 8vh; /* Set the desired height */
+    min-height: 60px; /* Ensure minimum height on mobile */
+    display: flex; /* Ensure flex behavior */
+    align-items: center; /* Vertically center content */
+}
+
+.header-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%; /* Take full width of parent */
+    height: 100%;
+}
+
+/* --- Logo and Role Indicator --- */
+.logo {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: var(--light-text);
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: color 0.3s ease, transform 0.2s ease;
+    display: flex; /* For aligning logo text and role indicator */
+    align-items: center;
+    gap: 8px; /* Space between logo and role indicator */
+}
+
+    .logo:hover {
+        color: white;
+    }
+
+.role-indicator {
+    font-size: 0.7em;
+    font-weight: 600;
+    margin-left: 0; /* Remove margin-left if using gap */
+    padding: 4px 10px;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--light-text);
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Role-specific accent text for role-indicator (if desired) */
+.administrador-theme-accent-text {
+    color: var(--administrador-accent);
+}
+
+.profesor-theme-accent-text {
+    color: var(--profesor-accent);
+}
+
+.estudiante-theme-accent-text {
+    color: var(--estudiante-accent);
+}
+
+.guest-theme-accent-text {
+    color: var(--guest-accent);
+}
+
+
+/* --- Navigation Links (Desktop) --- */
+.main-nav {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.nav-item {
+    margin-left: 40px;
+}
+
+.nav-link, .logout-button {
+    color: var(--light-text);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.1em;
+    padding: 10px 0;
+    position: relative;
+    transition: color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap; /* Prevent wrapping on desktop */
+}
+
+/* Role-specific accent colors for hover/active */
+.administrador-theme .nav-link:hover,
+.administrador-theme .logout-button:hover,
+.administrador-theme .nav-link::after,
+.administrador-theme .logout-button::after {
+    color: var(--administrador-accent);
+}
+
+.profesor-theme .nav-link:hover,
+.profesor-theme .logout-button:hover,
+.profesor-theme .nav-link::after,
+.profesor-theme .logout-button::after {
+    color: var(--profesor-accent);
+}
+
+.estudiante-theme .nav-link:hover,
+.estudiante-theme .logout-button:hover,
+.estudiante-theme .nav-link::after,
+.estudiante-theme .logout-button::after {
+    color: var(--estudiante-accent);
+}
+
+.guest-theme .nav-link:hover,
+.guest-theme .logout-button:hover,
+.guest-theme .nav-link::after,
+.guest-theme .logout-button::after {
+    color: var(--guest-accent);
+}
+
+a:active {
+    color: white;
+}
+
+/* --- Logout button specific styles --- */
+.logout-form {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    height: 100%; /* Ensure it aligns well vertically */
+    justify-content: center;
+}
+
+.logout-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    /* Styles are mostly inherited from .nav-link, additional overrides below */
+}
+
+/* Theme-specific colors for logout button hover (overrides .nav-link:hover) */
+.profesor-theme .logout-button:hover {
+    color: var(--logout-hover-color-profesor);
+}
+
+.estudiante-theme .logout-button:hover {
+    color: var(--logout-hover-color-estudiante);
+}
+
+.administrador-theme .logout-button:hover {
+    color: var(--logout-hover-color-administrador);
+}
+
+.guest-theme .logout-button:hover {
+    color: var(--logout-hover-color-guest);
+}
+
+
+/* --- Mobile Toggle Button (Hamburger) --- */
+.menu-toggle {
+    display: none; /* Hidden by default on desktop */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    position: relative;
+    z-index: 101; /* Ensure it's above the menu */
+}
+
+.icon-bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: var(--light-text);
+    margin: 5px 0;
+    transition: all 0.3s ease-in-out;
+    border-radius: 2px;
+}
+
+/* Hamburger icon animation when open */
+.menu-toggle.is-active .icon-bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.menu-toggle.is-active .icon-bar:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-toggle.is-active .icon-bar:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+/* --- Responsive / Mobile Styles --- */
+@media (max-width: 768px) {
+    .app-header {
+        height: auto; /* Allow header height to expand if menu is open */
+        padding: 10px 0; /* Slightly less vertical padding for mobile */
+    }
+
+    .header-container {
+        flex-wrap: wrap; /* Allow items to wrap */
+        padding: 0 20px; /* Reduced horizontal padding */
+        min-height: 60px; /* Ensure basic height even with wrapped items */
+    }
+
+    .logo {
+        font-size: 1.8em; /* Slightly larger on mobile for readability */
+        margin-right: auto; /* Push logo to the left, toggle to the right */
+    }
+
+    .role-indicator {
+        font-size: 0.65em;
+        margin-left: 8px; /* Keep margin-left if not using gap on logo */
+    }
+
+    .menu-toggle {
+        display: block; /* Show hamburger menu on mobile */
+    }
+
+    .main-nav {
+        order: 3; /* Push nav below logo and toggle */
+        flex-basis: 100%; /* Take full width */
+        height: 0; /* Initially hidden */
+        overflow: hidden;
+        transition: height 0.4s ease-in-out, background-color 0.4s ease-in-out; /* Smoother transition for height and background */
+        flex-direction: column; /* Stack nav items vertically */
+    }
+
+        .main-nav.is-open {
+            height: auto; /* Expand height when open */
+            max-height: 300px; /* Prevent excessively tall menus, add overflow-y: auto if more items */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Add shadow below open menu */
+        }
+
+    .nav-list {
+        flex-direction: column;
+        width: 100%;
+        padding: 0; /* Remove padding here, use on nav-link */
+    }
+
+    .nav-item {
+        margin: 0; /* Remove horizontal margin */
+        width: 100%;
+        text-align: center; /* Center text within item */
+    }
+
+    .nav-link, .logout-button {
+        padding: 15px 20px; /* Larger touch area for mobile */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* More visible separator */
+        font-size: 1.05em;
+        justify-content: center; /* Center icon and text */
+        gap: 12px; /* A bit more space between icon and text */
+    }
+
+        .nav-link::after, .logout-button::after {
+            display: none; /* Hide underline effect on mobile */
+        }
+
+    .nav-item:last-child .nav-link,
+    .nav-item:last-child .logout-button {
+        border-bottom: none; /* No border for the last item */
+    }
+
+    /* Adjust logout button for mobile */
+    .logout-button {
+        padding: 15px 20px; /* Match nav-link padding */
+    }
+
+    /* Hide role indicator on mobile if it takes too much space, or adjust its size */
+    .logo .role-indicator {
+        font-size: 0.6em; /* Slightly smaller for mobile */
+        padding: 3px 8px;
+    }
+}

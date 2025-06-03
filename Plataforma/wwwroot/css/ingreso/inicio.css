@@ -1,109 +1,247 @@
 ﻿/* General body styling */
 body {
-    background-color: #f4f4f4; /* Light grey background */
-    margin: 0;
-    padding: 0;
-    min-height: 100vh; /* Ensure the page covers the entire viewport height */
     overflow: hidden;
 }
-
+/* Main container for login page */
 main {
     display: flex;
-    height: 92vh;
-    overflow: hidden;
+    height: 92vh; /* Use full viewport height */
+    overflow: hidden; /* Hide overflow content initially */
     width: 100%;
+    flex-direction: row; /* Default desktop layout: image and form side-by-side */
 }
-.logo-image {
-    padding: 1rem;
-}
+
+/* Image section (desktop only) */
 .image {
     height: 100%;
-    width: 70%;
-    background-image: url('../../images/instituto.webp'); /* Replace 'your-image.jpg' with your image URL */
-    background-size: cover; /* Cover the entire background */
-    background-position: center; /* Center the image */
-    background-repeat: no-repeat; /* Prevent the image from repeating */
+    width: 70%; /* Takes 70% of the width on desktop */
+    background-image: url('../../images/instituto.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
 /* Login container */
 .login-container {
-    margin: 0 auto;
-    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background for the form */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    padding: 20px;
-    width: 30%; /* Adjust width as needed */
+    margin: 0; /* Remove auto margin from desktop */
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 30px 40px; /* More generous padding */
+    width: 30%; /* Takes 30% of the width on desktop */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    flex-grow: 1; /* Allow it to grow and fill available space */
+    position: relative; /* For password toggle positioning */
+    overflow-y: auto; /* Allow vertical scroll if form content overflows */
 }
+
+.logo-image {
+    padding: 1rem 0; /* Adjust padding for logo */
+    max-width: 90%; /* Control logo size */
+    height: auto;
+    align-self: center; /* Center the logo horizontally */
+}
+
 .login-form-wrapper {
     width: 100%;
+    flex-grow: 1; /* Allows form wrapper to take available space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertically center the form content */
 }
+
 /* Login form heading */
 .login-container h2 {
     text-align: center;
-    color: #333; /* Dark grey color for the heading */
-    margin-bottom: 20px;
+    color: #333;
+    margin-bottom: 25px; /* Increase margin for better spacing */
+    font-size: 2em; /* Larger heading */
 }
 
 /* Form group (label + input) */
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px; /* Increase margin for better spacing */
 }
 
-    /* Label styling */
     .form-group label {
         display: block;
-        margin-bottom: 5px;
-        color: #555; /* Medium grey color for labels */
+        margin-bottom: 8px; /* Slightly more space below label */
+        color: #555;
+        font-weight: 500; /* Make labels a bit bolder */
     }
 
-    /* Input field styling */
     .form-group input {
-        padding: 8px;
-        border: 1px solid #ddd; /* Light grey border */
-        border-radius: 4px;
-        box-sizing: border-box; /* Include padding and border in element's total width */
+        width: 100%; /* Ensure inputs take full width */
+        padding: 12px; /* More padding for better touch targets */
+        border: 1px solid #ddd;
+        border-radius: 6px; /* Slightly more rounded corners */
+        box-sizing: border-box;
+        font-size: 1.1em; /* Larger font size for inputs */
     }
 
 /* Button styling */
 .btn-primary {
-    background-color: #007bff; /* Blue color for the button */
+    background-color: #007bff;
     color: white;
-    padding: 10px 15px;
+    padding: 12px 15px; /* More padding for button */
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     width: 100%;
+    font-size: 1.1em; /* Larger font size for button text */
+    font-weight: 600; /* Bolder button text */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
 }
 
     .btn-primary:hover {
-        background-color: #0056b3; /* Darker blue on hover */
+        background-color: #0056b3;
     }
 
 /* Remember me checkbox and label */
 .form-check {
     display: flex;
     align-items: center;
-    padding-left: 1rem;
-}
-.form-check label  {
-    margin: 0 0 0 .5rem;
+    padding-left: 0; /* Remove padding from .form-check as it's better handled on checkbox itself */
+    margin-bottom: 20px; /* Add margin below the checkbox group */
 }
 
-.form-check-input {
-    margin-right: 5px;
+    .form-check label {
+        margin: 0 0 0 .5rem;
+        color: #555;
+        font-size: 1em;
+    }
+
+    .form-check input[type="checkbox"] { /* Target checkbox specifically */
+        width: 18px; /* Make checkbox larger */
+        height: 18px;
+        margin-right: 8px; /* Space between checkbox and label */
+    }
+
+/* Password toggle icon */
+#togglePassword {
+    position: absolute;
+    right: 15px; /* Adjust right position */
+    top: 68%; /* Position relative to the input line */
+    transform: translateY(-50%); /* Center vertically */
+    cursor: pointer;
+    color: #888; /* Softer color for the icon */
+    font-size: 1.1em; /* Larger icon */
+    z-index: 10; /* Ensure it's above the input */
+}
+
+/* Position relative for the form-group containing password input */
+.form-group.position-relative {
+    position: relative;
+}
+
+/* Validation error styling */
+.text-danger {
+    color: #dc3545;
+    font-size: 0.85em; /* Slightly larger font */
+    margin-top: 5px; /* Space above error message */
+    display: block; /* Ensure it takes its own line */
+}
+
+
+@media (max-width: 768px) {
+    main
+
+{
+    flex-direction: column; /* Stack image and login container vertically */
+    height: auto; /* Allow height to adjust to content */
+    min-height: 100vh; /* Ensure it still covers the full height */
+    overflow-y: auto; /* Allow scrolling if content is long */
+}
+
+.image {
+    width: 100%; /* Image takes full width */
+    height: 250px; /* Fixed height for the image on smaller screens */
+    /* You might want a different, less prominent image or no image at all for mobile */
+}
+
+.login-container {
+    width: 100%; /* Login container takes full width */
+    max-width: 450px; /* Limit max width for readability on larger tablets */
+    margin: 20px auto; /* Center the container with some vertical margin */
+    padding: 25px; /* Adjust padding */
+    box-shadow: none; /* Reduce or remove shadow for a cleaner mobile look */
+    background-color: #fff; /* Solid white background */
+    border-radius: 8px; /* Add some rounded corners */
+}
+
+.logo-image {
+    max-width: 90%; /* Adjust logo size for smaller screens */
+    padding: 0.5rem 0;
+}
+
+.login-form-wrapper {
+    padding: 0; /* Remove wrapper padding if any */
+}
+
+.login-container h2 {
+    font-size: 1.8em; /* Smaller heading for mobile */
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+    .form-group input {
+        padding: 10px;
+        font-size: 1em;
+    }
+
+.btn-primary {
+    padding: 10px 15px;
+    font-size: 1em;
 }
 
 #togglePassword {
-    position: absolute;
-    right: 10px;
-    top: 70%;
-    transform: translateY(-50%);
-    cursor: pointer;
+    right: 20px; /* Adjust icon position relative to smaller padding */
 }
-/* Validation error styling */
-.text-danger {
-    color: #dc3545; /* Red color for error messages */
-    font-size: 0.8em;
+
+}
+
+/* Media query for smaller phones (e.g., up to 480px) */
+@media (max-width: 480px) {
+    .login-container {
+        margin: 0; /* Remove margin to take full width of viewport */
+        padding: 15px; /* Reduce padding even further */
+        border-radius: 0; /* No rounded corners, full edge-to-edge */
+        box-shadow: none; /* Ensure no shadow */
+    }
+
+    .image {
+        display: none; /* Slightly smaller image on very small phones */
+    }
+
+    .logo-image {
+        max-width: 90%; /* Even smaller logo */
+    }
+
+    .login-container h2 {
+        font-size: 1.6em;
+        margin-bottom: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+        .form-group input {
+            font-size: 0.95em;
+        }
+
+    .btn-primary {
+        font-size: 0.95em;
+    }
+
+    #togglePassword {
+        right: 15px;
+        font-size: 1em;
+        top: 70%;
+    }
 }

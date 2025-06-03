@@ -266,6 +266,9 @@ table {
         align-items: flex-start;
         padding: 15px;
     }
+    .section-title {
+        margin: 0 0 1rem 0;
+    }
 
     /* Specific Bootstrap button overrides (if needed, otherwise rely on Bootstrap's defaults) */
     .btn-success {

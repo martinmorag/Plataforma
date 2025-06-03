@@ -1,44 +1,52 @@
-﻿/* Use a consistent container for forms */
-.container-custom {
+﻿.container-custom {
     margin: 50px auto; /* Center the container with some top/bottom margin */
     padding: 30px;
     background-color: #ffffff; /* White background for the form area */
 }
 
 /* --- Headings --- */
-.page-title { /* Changed from .crear-title for consistency */
+.page-title { /* Added class for consistency */
     text-align: center;
     margin-bottom: 25px;
     font-weight: 600;
     font-size: 2.2rem; /* Make it clearly a main title */
 }
 
-/* --- Horizontal Rule (Separator) --- */
+h2 {
+    color: #5a6268; /* Slightly darker gray for sub-headings */
+    margin-top: 30px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e9ecef; /* Subtle line below sub-headings */
+    padding-bottom: 10px;
+    font-weight: 500;
+}
+.change-password {
+    color: #5a6268; /* Slightly darker gray for sub-headings */
+}
+/* --- Horizontal Rule --- */
 hr {
     border-top: 1px solid #dee2e6; /* Light gray separator */
     margin-bottom: 30px;
 }
 
 /* --- Form Styling --- */
-/* .app-form is a general class for forms now, replacing .crear-form */
-.app-form {
+.app-form { /* Added class for consistency */
     width: 100%; /* Occupy full width of its container */
     /* Margin handled by .container-custom */
 }
 
-.form-group { /* Replaced .form-div for consistency */
+.form-group {
     margin-bottom: 20px; /* Space between form fields */
 }
 
-.control-label { /* Replaced .crear-form label */
+.control-label {
     font-weight: 500; /* Make labels a bit bolder */
     color: #495057; /* Slightly darker label color */
     margin-bottom: 5px;
     display: block; /* Ensure labels take full width */
 }
 
-/* Input Fields (text, email, password) */
-.form-control { /* Replaced specific input styles with a general class */
+.form-control {
     width: 100%;
     padding: 12px 15px; /* More padding for better input feel */
     border: 1px solid #ced4da; /* Standard border color */
@@ -65,15 +73,15 @@ hr {
     border-radius: 5px;
 }
 
-.text-danger { /* Standard red for individual field error messages */
-    color: #dc3545;
+.text-danger {
+    color: #dc3545; /* Standard red for individual field error messages */
     font-size: 0.875em;
     margin-top: 5px;
     display: block;
 }
 
 /* --- Submit Button --- */
-.btn { /* General button style */
+.btn {
     display: inline-block;
     font-weight: 600;
     color: #fff;
@@ -86,7 +94,7 @@ hr {
     border: none; /* No default border */
 }
 
-.btn-primary { /* Primary button specific styles */
+.btn-primary {
     background-color: #007bff;
     border: 1px solid #007bff;
 }

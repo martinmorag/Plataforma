@@ -92,10 +92,10 @@ namespace Plataforma.Data
                 .HasForeignKey(a => a.ClaseId) // ClaseId is the foreign key in Tarea
                 .OnDelete(DeleteBehavior.Restrict); // Prevent accidental deletion of Clase if Tareas exist
 
-            // --- Entrega (Submission) Relationships ---
+            //// --- Entrega (Submission) Relationships ---
             builder.Entity<Entrega>()
                 .HasOne(e => e.Tarea) // A submission is for one assignment
-                .WithMany()               // An assignment can have many submissions
+                .WithMany(t => t.Entregas)              // An assignment can have many submissions
                 .HasForeignKey(e => e.TareaId)
                 .OnDelete(DeleteBehavior.Cascade); // If an assignment is deleted, its submissions are also deleted
 

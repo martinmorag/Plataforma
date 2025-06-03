@@ -23,7 +23,7 @@ namespace Plataforma.Controllers
         {
             _context = context;
             _httpClient = httpClientFactory.CreateClient();
-            _configuration = configuration; // Add this
+            _configuration = configuration; 
             _environment = environment;
             _userManager = userManager;
         }
@@ -50,7 +50,7 @@ namespace Plataforma.Controllers
         }
         [HttpGet]
         [Route("profesor/tareas/ver")] // Example route
-        public async Task<IActionResult> MisCursosYTareas()
+        public async Task<IActionResult> MisCursosYTareas(Guid? cursoId = null)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -67,7 +67,7 @@ namespace Plataforma.Controllers
                                        {
                                            CursoId = cp.Curso.CursoId,
                                            NombreCurso = cp.Curso.Nombre,
-                                           TotalClases = cp.Curso.Modulos.SelectMany(m => m.Clases).Count(),
+                                           TotalClases = cp.Curso.Modulos.SelectMany(m => m.Clases).Count(), // Consider if this is needed in the UI
                                            TotalTareas = cp.Curso.Modulos.SelectMany(m => m.Clases).SelectMany(cl => cl.Tareas).Count()
                                        })
                                        .ToListAsync();
@@ -75,35 +75,146 @@ namespace Plataforma.Controllers
             // Pass courses to the view
             ViewBag.Cursos = cursos;
 
-            // Optionally, pre-load tasks for the first course
-            if (cursos.Any())
+            // --- Start of Task Loading Logic ---
+            List<ProfesorTareaViewModel> tareas = new List<ProfesorTareaViewModel>();
+            string selectedCursoNombre = null; // Default: no course selected, tasks hidden
+
+            // If a specific course ID is provided in the URL, try to pre-select it and load its tasks
+            if (cursoId.HasValue)
             {
-                var firstCursoId = cursos.First().CursoId;
-                var tareas = await _context.tareas
-                                           .Include(t => t.Clase)
-                                               .ThenInclude(cl => cl.Modulo)
-                                                   .ThenInclude(m => m.Curso)
-                                           .Where(t => t.Clase.Modulo.CursoId == firstCursoId)
-                                           .Select(t => new ProfesorTareaViewModel
-                                           {
-                                               TareaId = t.TareaId,
-                                               Nombre = t.Nombre,
-                                               FechaLimite = t.FechaVencimiento,
-                                               ClaseNombre = t.Clase.Nombre,
-                                               TotalEntregas = t.Entregas.Count(),
-                                               EntregasPendientes = t.Entregas.Count(e => e.Estado == Entrega.EstadoEntrega.EnRevision || e.Estado == Entrega.EstadoEntrega.EnProgreso)
-                                           })
-                                           .ToListAsync();
-                ViewBag.Tareas = tareas;
-                ViewBag.SelectedCursoNombre = cursos.First().NombreCurso;
+                var selectedCourse = cursos.FirstOrDefault(c => c.CursoId == cursoId.Value);
+                if (selectedCourse != null)
+                {
+                    selectedCursoNombre = selectedCourse.NombreCurso;
+
+                    var tareasQuery = _context.tareas
+                        .Where(t => t.Clase.Modulo.CursoId == cursoId.Value &&
+                                    t.Clase.Modulo.Curso.CursoProfesores.Any(cp => cp.ProfesorId == user.Id)); // Corrected navigation
+                                                                                                               // ... rest of the select and ToListAsync()
+
+                    tareas = await _context.tareas
+                        .Where(t => t.Clase.Modulo.CursoId == cursoId &&
+                                    t.Clase.Modulo.Curso.CursoProfesores.Any(cp => cp.ProfesorId == user.Id)) // Corrected navigation
+                        .Select(t => new ProfesorTareaViewModel
+                        {
+                            TareaId = t.TareaId,
+                            Nombre = t.Nombre,
+                            ClaseNombre = t.Clase.Nombre,
+                            FechaLimite = t.FechaVencimiento,
+                            TotalEntregas = _context.entregas.Count(e => e.TareaId == t.TareaId),
+                            EntregasPendientes = _context.entregas.Count(e => e.TareaId == t.TareaId &&
+                                                                               (e.Estado == Entrega.EstadoEntrega.EnRevision ||
+                                                                                e.Estado == Entrega.EstadoEntrega.EnProgreso))
+                        })
+                        .ToListAsync();
+                }
+                // If cursoId was provided but not found for this professor, selectedCursoNombre remains null,
+                // and tareas remains empty, leading to the "select a course" message.
             }
-            else
-            {
-                ViewBag.Tareas = new List<ProfesorTareaViewModel>();
-                ViewBag.SelectedCursoNombre = "Ninguno";
-            }
+            // --- End of Task Loading Logic ---
+
+            ViewBag.Tareas = tareas; // This will be empty if no cursoId was provided or found
+            ViewBag.SelectedCursoNombre = selectedCursoNombre; // This will be null if no course is initially selected
 
             return View("~/Views/profesor/tareas/ver.cshtml");
+            //var user = await _userManager.GetUserAsync(User);
+            //if (user == null)
+            //{
+            //    return Redirect("/Identity/Account/Login"); // Redirect to login if not authenticated
+            //}
+
+            //Guid profesorId = user.Id;
+
+            //// Get courses assigned to the current professor
+            //var cursos = await _context.CursoProfesores
+            //                           .Where(cp => cp.ProfesorId == profesorId)
+            //                           .Select(cp => new Models.Profesores.ProfesorCursoDto
+            //                           {
+            //                               CursoId = cp.Curso.CursoId,
+            //                               NombreCurso = cp.Curso.Nombre,
+            //                               TotalClases = cp.Curso.Modulos.SelectMany(m => m.Clases).Count(),
+            //                               TotalTareas = cp.Curso.Modulos.SelectMany(m => m.Clases).SelectMany(cl => cl.Tareas).Count()
+            //                           })
+            //                           .ToListAsync();
+
+            //// Pass courses to the view
+            //ViewBag.Cursos = cursos;
+
+            //// Optionally, pre-load tasks for the first course
+            //if (cursos.Any())
+            //{
+            //    var firstCursoId = cursos.First().CursoId;
+            //    // First, get the tasks with their relevant navigation properties
+            //    // We'll perform the counts separately or within the select if EF Core can handle it
+            //    var tareasQuery = _context.tareas
+            //       .Include(t => t.Clase)
+            //           .ThenInclude(cl => cl.Modulo)
+            //               .ThenInclude(m => m.Curso)
+            //       .Where(t => t.Clase.Modulo.CursoId == firstCursoId);
+
+            //    // Now, select into your ViewModel and calculate counts
+            //    // EF Core should be able to translate this more reliably
+            //    var tareas = await tareasQuery
+            //        .Select(t => new ProfesorTareaViewModel
+            //        {
+            //            TareaId = t.TareaId,
+            //            Nombre = t.Nombre,
+            //            FechaLimite = t.FechaVencimiento,
+            //            ClaseNombre = t.Clase.Nombre,
+            //            // Explicitly count related entities using a subquery
+            //            TotalEntregas = _context.entregas.Count(e => e.TareaId == t.TareaId),
+            //            EntregasPendientes = _context.entregas.Count(e => e.TareaId == t.TareaId &&
+            //                                                                (e.Estado == Entrega.EstadoEntrega.EnRevision ||
+            //                                                                e.Estado == Entrega.EstadoEntrega.EnProgreso))
+            //        })
+            //        .ToListAsync();
+            //    ViewBag.Tareas = tareas;
+            //    ViewBag.SelectedCursoNombre = cursos.First().NombreCurso;
+            //}
+            //else
+            //{
+            //    ViewBag.Tareas = new List<ProfesorTareaViewModel>();
+            //    ViewBag.SelectedCursoNombre = "Ninguno";
+            //}
+
+            //return View("~/Views/profesor/tareas/ver.cshtml");
+        }
+        [HttpGet]
+        [Route("profesor/tareas/GetTareasByCurso")] // A new, dedicated API route
+        public async Task<IActionResult> GetTareasByCurso(Guid cursoId) // No longer optional, as it's required for this API
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized(); // Return 401 if not authenticated
+            }
+
+            // Ensure the course belongs to the current professor through the CursoProfesores join table
+            var courseBelongsToProfessor = await _context.CursoProfesores
+                .AnyAsync(cp => cp.CursoId == cursoId && cp.ProfesorId == user.Id);
+
+            if (!courseBelongsToProfessor)
+            {
+                return Forbid(); // Or NotFound(), depending on desired behavior if professor doesn't own course
+            }
+
+            var tareas = await _context.tareas
+                .Where(t => t.Clase.Modulo.CursoId == cursoId &&
+                            t.Clase.Modulo.Curso.CursoProfesores.Any(cp => cp.ProfesorId == user.Id)) // Corrected navigation
+                .Select(t => new ProfesorTareaViewModel
+                {
+                    TareaId = t.TareaId,
+                    Nombre = t.Nombre,
+                    ClaseNombre = t.Clase.Nombre,
+                    FechaLimite = t.FechaVencimiento,
+                    TotalEntregas = _context.entregas.Count(e => e.TareaId == t.TareaId),
+                    EntregasPendientes = _context.entregas.Count(e => e.TareaId == t.TareaId &&
+                                                                       (e.Estado == Entrega.EstadoEntrega.EnRevision ||
+                                                                        e.Estado == Entrega.EstadoEntrega.EnProgreso))
+                })
+                .ToListAsync();
+
+            return Ok(tareas); // This is the key: return JSON data
         }
         [HttpGet]
         [Route("profesor/tareas/entregas")] // Example route
@@ -267,8 +378,7 @@ namespace Plataforma.Controllers
             await _context.SaveChangesAsync();
 
             // Redirect to a suitable action, e.g., the details of the new assignment or the class assignments list
-            return RedirectToAction("cursos", "Index");
-            // Or return RedirectToAction("Index", "Clase", new { id = nuevaAsignacion.ClaseId });
+            return RedirectToAction("cursos", "Inicio");
         }
     }
 }

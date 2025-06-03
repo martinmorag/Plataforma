@@ -1,4 +1,5 @@
-﻿main {
+﻿/* Base Styles (Your existing styles) */
+main {
     width: 100%;
 }
 
@@ -98,28 +99,27 @@ h1 {
 .status-approved {
     background-color: #28a745;
 }
-/* Green */
+
 .status-in-review {
     background-color: #ffc107;
     color: #343a40;
 }
-/* Yellow, adjust text color for readability */
+
 .status-in-progress {
     background-color: #007bff;
 }
-/* Blue */
+
 .status-redo {
     background-color: #6f42c1;
 }
-/* Purple/Indigo for "Rehacer" */
+
 .status-rejected {
     background-color: #dc3545;
 }
-/* Red */
+
 .status-unknown {
     background-color: #6c757d;
 }
-/* Gray */
 
 /* Type Badges */
 .type-badge {
@@ -135,16 +135,14 @@ h1 {
 .file-type {
     background-color: #007bff;
 }
-/* Blue */
+
 .video-type {
     background-color: #17a2b8;
 }
-/* Teal */
+
 .unknown-type {
     background-color: #6c757d;
 }
-/* Gray */
-
 
 /* Action Buttons (consistent with MisCursosYTareas) */
 .action-button {
@@ -161,13 +159,14 @@ h1 {
     transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
 a:hover {
     color: white;
 }
 
-    .action-button i {
-        margin-right: 8px;
-    }
+.action-button i {
+    margin-right: 8px;
+}
 
 .download-button {
     background-color: #28a745; /* Green for download */
@@ -189,33 +188,33 @@ a:hover {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
 
-/* --- Custom Modal Styling --- */
+/* --- Custom Modal Styling (already responsive) --- */
 .modal-overlay {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-content-custom {
     background-color: #fefefe;
-    margin: auto; /* Will be centered by flexbox parents */
+    margin: auto;
     padding: 30px;
     border: 1px solid #888;
-    width: 90%; /* Adjust width */
-    max-width: 500px; /* Max width for larger screens */
+    width: 90%;
+    max-width: 500px;
     border-radius: 10px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-    position: relative; /* For absolute positioning of close button */
-    opacity: 0; /* For animation */
-    transform: translateY(-50px); /* For animation */
+    position: relative;
+    opacity: 0;
+    transform: translateY(-50px);
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
@@ -259,7 +258,7 @@ a:hover {
     }
 
 .modal-body-custom {
-    padding: 0; /* Resetting padding if any from parent */
+    padding: 0;
     margin-bottom: 20px;
 }
 
@@ -281,7 +280,7 @@ a:hover {
     border: 1px solid #ced4da;
     border-radius: 5px;
     font-size: 1em;
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -319,15 +318,15 @@ a:hover {
 
 .modal-footer-custom {
     display: flex;
-    justify-content: flex-end; /* Align buttons to the right */
-    gap: 15px; /* Space between buttons */
+    justify-content: flex-end;
+    gap: 15px;
     border-top: 1px solid #eee;
     padding-top: 20px;
     margin-top: 20px;
 }
 
 .primary-button {
-    background-color: #007bff; /* Blue */
+    background-color: #007bff;
     color: #ffffff;
 }
 
@@ -338,7 +337,7 @@ a:hover {
     }
 
 .secondary-button {
-    background-color: #6c757d; /* Gray */
+    background-color: #6c757d;
     color: #ffffff;
 }
 
@@ -348,7 +347,103 @@ a:hover {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
 
-/* Responsive adjustments for modal */
+/* --- Mobile Specific Styles for Data Table --- */
+@media screen and (max-width: 768px) {
+    .page-container {
+        margin: 20px 10px; /* Smaller margins on mobile */
+        padding: 15px; /* Smaller padding */
+    }
+
+    h1 {
+        font-size: 1.8em; /* Smaller heading */
+        margin-bottom: 20px;
+    }
+
+    .back-button {
+        width: 100%; /* Make back button full width */
+        justify-content: center; /* Center content */
+        margin-bottom: 20px;
+        padding: 12px 15px;
+    }
+
+    /* Hide table headers on smaller screens */
+    .data-table thead {
+        display: none;
+    }
+
+    .data-table,
+    .data-table tbody,
+    .data-table tr,
+    .data-table td {
+        display: block; /* Make table elements behave like block-level elements */
+        width: 100%; /* Take full width */
+    }
+
+        .data-table tr {
+            margin-bottom: 15px; /* Add space between "rows" (now cards) */
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden; /* Ensure rounded corners clip content */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow for card effect */
+        }
+
+        .data-table td {
+            border-bottom: 1px solid #f5f5f5; /* Lighter border between data points */
+            text-align: right; /* Align value to the right */
+            padding: 10px 15px; /* Adjust padding */
+            position: relative; /* For data-label pseudo-element */
+        }
+
+            /* Use data attributes to display the original header as a label */
+            .data-table td::before {
+                content: attr(data-label); /* Display the content of the data-label attribute */
+                position: absolute;
+                left: 15px; /* Align label to the left */
+                font-weight: 600;
+                text-transform: uppercase;
+                color: #495057;
+                font-size: 0.85em;
+            }
+
+            /* Action Buttons within the table cells */
+            .data-table td:last-child { /* The "Acciones" column */
+                text-align: center; /* Center the buttons */
+                padding-top: 15px;
+                padding-bottom: 15px;
+                display: flex; /* Use flexbox for button layout */
+                flex-wrap: wrap; /* Allow buttons to wrap to next line */
+                justify-content: center; /* Center buttons horizontally */
+                gap: 10px; /* Space between buttons */
+                border-bottom: none; /* No border for the last cell */
+            }
+
+                .data-table td:last-child::before {
+                    content: ""; /* Hide the "Acciones" label, as buttons are self-explanatory */
+                    display: none;
+                }
+
+    .action-button {
+        flex-grow: 1; /* Allow buttons to grow and fill space */
+        margin: 0; /* Reset margin from desktop style */
+        padding: 10px 12px; /* Adjust padding */
+        font-size: 0.9em;
+        text-align: center;
+        max-width: 180px; /* Control max width for individual buttons */
+    }
+
+    .download-button,
+    .evaluate-button {
+        width: calc(50% - 5px); /* Two buttons per row, with a gap */
+    }
+
+    /* Smaller font sizes for badges if they get too big */
+    .status-badge, .type-badge {
+        font-size: 0.8em;
+        padding: 4px 8px;
+    }
+}
+
+/* Responsive adjustments for modal (already done in your original CSS, good job!) */
 @media (max-width: 576px) {
     .modal-content-custom {
         width: 95%;
@@ -360,8 +455,8 @@ a:hover {
         gap: 10px;
     }
 
-    .action-button {
-        width: 100%; /* Full width buttons on small screens */
+    .action-button { /* Applies to modal buttons as well */
+        width: 100%;
         margin-left: 0;
     }
 }

@@ -1,125 +1,145 @@
-﻿//const cursosList = document.getElementById('cursosList');
-//const cursosMessage = document.getElementById('cursosMessage');
-//const tareasHeader = document.getElementById('tareasHeader');
-//const tareasContent = document.getElementById('tareasContent');
-//const tareasMessage = document.getElementById('tareasMessage');
+﻿const courseListItems = document.querySelectorAll('#cursosList .list-item');
+const tareasHeader = document.getElementById('tareasHeader');
+const tareasContentContainer = document.getElementById('tareasContentContainer');
+const noCourseSelectedMessage = document.getElementById('noCourseSelectedMessage');
 
-//// --- Function to load courses ---
-//async function loadCursos() {
-//    cursosList.innerHTML = '<div class="list-group-item disabled text-muted"><i class="fa-solid fa-spinner fa-spin-pulse"></i> Cargando cursos...</div>';
-//    cursosMessage.innerHTML = '';
-//    tareasContent.innerHTML = '<div class="alert alert-info">Selecciona un curso para ver sus tareas.</div>';
-//    tareasHeader.textContent = 'Tareas';
+let currentActiveCursoId = null; // Variable to keep track of the currently active course ID
 
-//    try {
-//        const response = await fetch('/api/Profesores/MisCursos'); // New API endpoint
-//        if (!response.ok) {
-//            const errorData = await response.json();
-//            throw new Error(errorData.message || 'Error al cargar los cursos.');
-//        }
-//        const cursos = await response.json();
+// Cache to store fetched tasks
+// Key: cursoId (string)
+// Value: Array of ProfesorTareaViewModel objects
+const tasksCache = {};
 
-//        cursosList.innerHTML = ''; // Clear loading message
+// Function to load tasks for a given course ID
+async function loadTasksForCourse(cursoId, cursoNombre) {
+    // Show loading state or hide previous content
+    tareasContentContainer.style.display = 'none';
+    noCourseSelectedMessage.style.display = 'none';
+    tareasHeader.textContent = `Cargando tareas para: ${cursoNombre}...`; // Indicate loading
 
-//        if (cursos.length === 0) {
-//            cursosMessage.innerHTML = '<div class="alert alert-warning">No hay cursos asignados a este profesor.</div>';
-//        } else {
-//            cursos.forEach(curso => {
-//                const link = document.createElement('a');
-//                link.href = '#';
-//                link.classList.add('list-group-item', 'list-group-item-action');
-//                link.textContent = `${curso.nombreCurso} (${curso.totalTareas} Tareas)`;
-//                link.dataset.cursoId = curso.cursoId;
-//                link.dataset.cursoNombre = curso.nombreCurso;
+    // --- Check cache first ---
+    if (tasksCache[cursoId]) {
+        console.log(`Cargando tareas para ${cursoNombre} desde caché.`);
+        renderTasks(tasksCache[cursoId], cursoNombre);
+        currentActiveCursoId = cursoId;
+        return; // Exit, data already loaded from cache
+    }
+    // --- End cache check ---
 
-//                link.addEventListener('click', function (event) {
-//                    event.preventDefault();
-//                    // Remove 'active' class from all other links
-//                    cursosList.querySelectorAll('.list-group-item').forEach(item => item.classList.remove('active'));
-//                    // Add 'active' class to the clicked link
-//                    this.classList.add('active');
-//                    loadTareasForCurso(this.dataset.cursoId, this.dataset.cursoNombre);
-//                });
-//                cursosList.appendChild(link);
-//            });
-//        }
-//    } catch (error) {
-//        console.error('Error loading courses:', error);
-//        cursosMessage.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
-//    }
-//}
+    try {
+        console.log(`Solicitando tareas para ${cursoNombre} desde el servidor.`);
+        const response = await fetch(`/profesor/tareas/GetTareasByCurso?cursoId=${cursoId}`);
 
-//// --- Function to load tasks for a specific course ---
-//async function loadTareasForCurso(cursoId, cursoNombre) {
-//    tareasHeader.textContent = `Tareas para: ${cursoNombre}`;
-//    tareasContent.innerHTML = '<div class="text-center p-3"><i class="fa-solid fa-spinner fa-spin-pulse"></i> Cargando tareas...</div>';
-//    tareasMessage.innerHTML = '';
+        if (!response.ok) {
+            if (response.status === 401) {
+                alert('Su sesión ha expirado. Por favor, inicie sesión de nuevo.');
+                window.location.href = '/Identity/Account/Login';
+            } else if (response.status === 403) {
+                alert('No tiene permisos para ver las tareas de este curso.');
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-//    try {
-//        const response = await fetch(`/api/Profesores/Cursos/${cursoId}/Tareas`); // New API endpoint
-//        if (!response.ok) {
-//            const errorData = await response.json();
-//            throw new Error(errorData.message || 'Error al cargar las tareas.');
-//        }
-//        const tareas = await response.json();
+        const tareas = await response.json();
+        tasksCache[cursoId] = tareas; // Store fetched data in cache
 
-//        if (tareas.length === 0) {
-//            tareasContent.innerHTML = '<div class="alert alert-info">No hay tareas para este curso.</div>';
-//        } else {
-//            let tareasTableHtml = `
-//                            <table class="table table-striped mt-3">
-//                                <thead>
-//                                    <tr>
-//                                        <th>Nombre de la Tarea</th>
-//                                        <th>Clase</th> @* Added Clase column back *
-//                                        <th>Fecha Límite</th>
-//                                        <th>Entregas</th>
-//                                        <th>Pendientes de Revisión</th>
-//                                        <th>Acciones</th>
-//                                    </tr>
-//                                </thead>
-//                                <tbody>
-//                        `;
-//            tareas.forEach(tarea => {
-//                tareasTableHtml += `
-//                                <tr>
-//                                    <td>${tarea.nombre}</td>
-//                                    <td>${tarea.claseNombre}</td> @* Display class name *
-//                                    <td>${new Date(tarea.fechaLimite).toLocaleDateString()}</td>
-//                                    <td>${tarea.totalEntregas}</td>
-//                                    <td>${tarea.entregasPendientes}</td>
-//                                    <td>
-//                                        <a href="/Profesores/VerEntregas?tareaId=${tarea.tareaId}" class="btn btn-info btn-sm">
-//                                            <i class="fa-solid fa-list"></i> Ver Entregas
-//                                        </a>
-//                                    </td>
-//                                </tr>
-//                            `;
-//            });
-//            tareasTableHtml += `</tbody></table>`;
-//            tareasContent.innerHTML = tareasTableHtml;
-//        }
-//    } catch (error) {
-//        console.error('Error loading tasks:', error);
-//        tareasMessage.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
-//    }
-//}
+        renderTasks(tareas, cursoNombre); // Render the fetched data
+        currentActiveCursoId = cursoId; // Set the newly active course ID
+    } catch (error) {
+        console.error('Error loading tasks:', error);
+        tareasHeader.textContent = `Error al cargar tareas para: ${cursoNombre}`;
+        tareasContentContainer.innerHTML = '<div class="info-message error-message">Hubo un error al cargar las tareas. Intente de nuevo.</div>';
+        tareasContentContainer.style.display = 'block';
+        currentActiveCursoId = null; // Reset if loading fails
+    }
+}
 
-//// Load courses when the page loads
-//loadCursos();
+// New helper function to render tasks (moved out of loadTasksForCourse)
+function renderTasks(tareas, cursoNombre) {
+    tareasHeader.textContent = `Tareas para: ${cursoNombre}`;
+    tareasContentContainer.innerHTML = ''; // Clear previous content
+
+    if (tareas.length === 0) {
+        tareasContentContainer.innerHTML = '<div class="info-message">No hay tareas para este curso.</div>';
+    } else {
+        let tableHtml = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre de la Tarea</th>
+                            <th>Clase</th>
+                            <th>Fecha Límite</th>
+                            <th>Entregas</th>
+                            <th>Pendientes de Revisión</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+        tareas.forEach(tarea => {
+            tableHtml += `
+                    <tr>
+                        <td data-label="Nombre de la Tarea">${tarea.nombre}</td>
+                        <td data-label="Clase">${tarea.claseNombre}</td>
+                        <td data-label="Fecha Límite">${new Date(tarea.fechaLimite).toLocaleDateString()}</td>
+                        <td data-label="Entregas">${tarea.totalEntregas}</td>
+                        <td data-label="Pendientes de Revisión">${tarea.entregasPendientes}</td>
+                        <td data-label="">
+                            <a href="/profesor/tareas/entregas?tareaId=${tarea.tareaId}" class="action-button view-button">
+                                <i class="fa-solid fa-list"></i> Ver Entregas
+                            </a>
+                        </td>
+                    </tr>`;
+        });
+        tableHtml += `</tbody></table>`;
+        tareasContentContainer.innerHTML = tableHtml;
+    }
+    tareasContentContainer.style.display = 'block'; // Show the content
+}
 
 
+// Function to hide tasks
+function hideTasks() {
+    tareasContentContainer.style.display = 'none';
+    noCourseSelectedMessage.style.display = 'block'; // Show "select a course" message
+    tareasHeader.textContent = 'Tareas'; // Reset header
+    currentActiveCursoId = null; // Clear active course
+    // Remove active class from all course items
+    courseListItems.forEach(li => li.classList.remove('active-item'));
+}
 
-//document.addEventListener('DOMContentLoaded', function () {
-//    const cursosList = document.getElementById('cursosList');
+// Add click listeners to course list items
+courseListItems.forEach(item => {
+    item.addEventListener('click', function () {
+        const clickedCursoId = this.dataset.cursoId;
+        const clickedCursoNombre = this.dataset.cursoNombre;
 
-//    cursosList.querySelectorAll('.list-item').forEach(link => {
-//        link.addEventListener('click', function (event) {
-//            event.preventDefault();
-//            const cursoId = this.dataset.cursoId;
-//            // This will trigger a full page reload to the controller
-//            // with the selected cursoId as a query parameter.
-//            window.location.href = `/Profesor/MisCursosYTareas?selectedCursoId=${cursoId}`;
-//        });
-//    });
-//});
+        if (!clickedCursoId || !clickedCursoNombre) {
+            console.error("Course ID or Name not found for clicked item.");
+            return; // Exit if data attributes are missing
+        }
+
+        // Check if the clicked course is already the active one
+        if (clickedCursoId === currentActiveCursoId) {
+            // It's the active course, so hide it
+            hideTasks();
+        } else {
+            // It's a new course, load its tasks
+            // First, remove 'active-item' from all
+            courseListItems.forEach(li => li.classList.remove('active-item'));
+            // Add 'active-item' to the clicked one
+            this.classList.add('active-item');
+            loadTasksForCourse(clickedCursoId, clickedCursoNombre);
+        }
+    });
+});
+
+// Initial state check: if a course is pre-selected (via URL/ViewBag), load its tasks
+const activeCourseInitial = document.querySelector('#cursosList .list-item.active-item');
+if (activeCourseInitial) {
+    const cursoId = activeCourseInitial.dataset.cursoId;
+    const cursoNombre = activeCourseInitial.dataset.cursoNombre;
+    loadTasksForCourse(cursoId, cursoNombre);
+} else {
+    // If no course is active initially, ensure the "select a course" message is visible
+    hideTasks(); // Use the new hideTasks function
+}
