@@ -1,0 +1,36 @@
+﻿/* site.css */
+body {
+    overflow: hidden;
+}
+main {
+    width: 100%;
+}
+.header-container-cfp {
+    position: relative; /* Allows for absolute positioning of children */
+    text-align: center; /* Centers the title if it's not absolutely positioned */
+}
+
+.header-image-cfp {
+    width: 100%; /* Makes the image span the full width */
+    max-height: 92vh; /* Adjust this value to your desired maximum height */
+    object-fit: cover; /* Ensures the image covers the area without distortion (can crop) */
+    display: block;
+}
+
+.main-title-cfp {
+    position: absolute; /* Positions the title relative to its parent container */
+    top: 50%; /* Moves the top edge of the title to the vertical center */
+    left: 50%; /* Moves the left edge of the title to the horizontal center */
+    transform: translate(-50%, -50%); /* Adjusts for the title's own width and height to truly center it */
+    color: white; /* Example color, choose one that contrasts well with your image */
+    font-size: 3em; /* Example font size, adjust as needed */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Adds a subtle shadow for better readability */
+    z-index: 2; /* Ensures the title appears above the image */
+}
+
+/* You might want to add media queries for smaller screens to adjust font size */
+@media (max-width: 768px) {
+    .main-title-cfp {
+        font-size: 2em;
+    }
+}
