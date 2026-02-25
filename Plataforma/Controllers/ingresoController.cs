@@ -17,7 +17,7 @@ namespace Plataforma.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            return View(new LoginModel()); // Pass a new LoginModel to the Index view so the form works
+            return View(new LoginModel()); 
         }
         [AllowAnonymous]
         [HttpPost]
@@ -26,35 +26,36 @@ namespace Plataforma.Controllers
             {
             if (ModelState.IsValid)
             {
-                var normalizedEmail = _userManager.NormalizeEmail(model.Email);
-                var user = await _userManager.FindByEmailAsync(normalizedEmail);
+                var user = await _userManager.FindByEmailAsync(model.Email);
 
                 if (user != null)
                 {
-                    var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+                    var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: true);
 
                     if (result.Succeeded)
                     {
-                        if (await _userManager.IsInRoleAsync(user, "Administrador"))
+                        await _signInManager.SignInAsync(user, model.RememberMe);
+
+                        var roles = await _userManager.GetRolesAsync(user);
+
+                        if (roles.Contains("Administrador"))
                             return RedirectToAction("panel", "administrador");
-                        if (await _userManager.IsInRoleAsync(user, "Estudiante"))
+                        if (roles.Contains("Estudiante"))
                             return RedirectToAction("Index", "inicio");
-                        if (await _userManager.IsInRoleAsync(user, "Profesor"))
+                        if (roles.Contains("Profesor"))
                             return RedirectToAction("Inicio", "cursos");
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Inicio de sesión inválido.");
-                        Console.WriteLine("failed");
-                        return View("Index", model); // Or View("Index", model) if your login form is on the Index page.
+                        return View("Index", model); 
                         
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Ningún usuario encontrado con ese email.");
-                    Console.WriteLine("failed too");
-                    return View("Index", model); // Or View("Index", model) if your login form is on the Index page.
+                    ModelState.AddModelError(string.Empty, "Email o contraseña incorrectos."); // to not reveal that there is not a user with that email
+                    return View("Index", model); 
                 }
             }
             return View("Index", model); // Or View("Index", model) if your login form is on the Index page.
