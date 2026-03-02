@@ -13,7 +13,7 @@ namespace Plataforma.Models
 
         [Required]
         [StringLength(200)]
-        public string Titulo { get; set; }
+        public string Nombre { get; set; }
         public int Order { get; set; }
 
         // Foreign Key: Connects Module to Course

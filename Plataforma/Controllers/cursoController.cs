@@ -79,7 +79,7 @@ namespace Plataforma.Controllers
                 Modulos = curso.Modulos.Select(m => new ModuloViewModel
                 {
                     ModuloId = m.ModuloId,
-                    Nombre = m.Titulo,
+                    Nombre = m.Nombre,
                     Order = m.Order,
                     IsCompleted = false, // Will be set after populating classes
 

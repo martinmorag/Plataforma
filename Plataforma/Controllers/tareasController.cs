@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Plataforma.Data;
 using Plataforma.Models;
 using Plataforma.Models.Profesores;
+using Plataforma.Servicios;
 using System.Net.Http;
 using Xabe.FFmpeg;
 
@@ -18,14 +19,16 @@ namespace Plataforma.Controllers
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _environment;
         private readonly UserManager<UsuarioIdentidad> _userManager;
+        private readonly S3Service _s3Service;
 
-        public tareasController(PlataformaContext context, IHttpClientFactory httpClientFactory, IConfiguration configuration, IWebHostEnvironment environment, UserManager<UsuarioIdentidad> userManager) // Modify this
+        public tareasController(PlataformaContext context, IHttpClientFactory httpClientFactory, IConfiguration configuration, IWebHostEnvironment environment, UserManager<UsuarioIdentidad> userManager, S3Service s3service) // Modify this
         {
             _context = context;
             _httpClient = httpClientFactory.CreateClient();
             _configuration = configuration; 
             _environment = environment;
             _userManager = userManager;
+            _s3Service = s3service;
         }
         [HttpGet("profesor/tareas/crear")]
         public IActionResult crear(Guid claseId, string contentType)
@@ -37,7 +40,6 @@ namespace Plataforma.Controllers
                 return NotFound();
             }
 
-            // Prepare the data to be passed to the view
             var tarea = new Tarea
             {
                 Clase = clase,
@@ -45,8 +47,42 @@ namespace Plataforma.Controllers
                 ClaseId = claseId
             };
 
-            // Pass the data to the view
             return View("~/Views/profesor/tareas/crear.cshtml", tarea);
+        }
+        [HttpGet]
+        [Route("profesor/tareas/editar")]
+        public async Task<IActionResult> editar(Guid tareaId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Redirect("/Identity/Account/Login");
+
+            var tarea = await _context.tareas
+                .Include(t => t.Archivo)
+                .Include(t => t.Clase)
+                    .ThenInclude(c => c.Modulo)
+                .FirstOrDefaultAsync(t =>
+                    t.TareaId == tareaId &&
+                    t.Clase.Modulo.Curso.CursoProfesores
+                     .Any(cp => cp.ProfesorId == user.Id));
+
+            if (tarea == null)
+                return NotFound();
+
+            var vm = new EditarTareaViewModel
+            {
+                TareaId = tarea.TareaId,
+                ClaseId = tarea.ClaseId,
+                CursoId = tarea.Clase.Modulo.CursoId,
+                ClaseNombre = tarea.Clase.Nombre,
+                Nombre = tarea.Nombre,
+                Descripcion = tarea.Descripcion,
+                FechaVencimiento = tarea.FechaVencimiento,
+                TipoEntregaEsperado = tarea.TipoEntregaEsperado,
+                ArchivoNombre = tarea.Archivo?.FileName
+            };
+
+            return View("~/Views/profesor/tareas/editar.cshtml", vm);
         }
         [HttpGet]
         [Route("profesor/tareas/ver")] // Example route
@@ -269,37 +305,22 @@ namespace Plataforma.Controllers
             return View("~/Views/profesor/tareas/entregas.cshtml", entregas);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken] // Always add this for POST actions that modify data
-        public async Task<IActionResult> Create(Tarea asignacionModel, IFormFile? archivoAsignacion) // Renamed 'model' to 'asignacionModel' and 'Archivo' to 'archivoAsignacion' for clarity
+        [ValidateAntiForgeryToken] 
+        public async Task<IActionResult> Create(Tarea asignacionModel, IFormFile? archivoAsignacion) 
         {
-            // First, validate basic model properties received from the form
-            // Ensure ClaseId is valid and exists
             if (!ModelState.IsValid || asignacionModel.ClaseId == Guid.Empty)
             {
-                // Re-fetch Clase for the view if model state is invalid
                 asignacionModel.Clase = await _context.clases.FindAsync(asignacionModel.ClaseId);
-                return View("Crear", asignacionModel);
+                return View("~/Views/profesor/tareas/crear.cshtml", asignacionModel);
             }
-
-            // Optional: Validate TipoEntregaEsperado if you have a predefined list (e.g., enum values)
-            // if (!new string[] { "pdf", "video", "image", "any" }.Contains(asignacionModel.TipoEntregaEsperado.ToLower()))
-            // {
-            //     ModelState.AddModelError(nameof(asignacionModel.TipoEntregaEsperado), "Tipo de entrega esperado no válido.");
-            //     asignacionModel.Clase = await _context.Clases.FindAsync(asignacionModel.ClaseId);
-            //     return View("Crear", asignacionModel);
-            // }
 
             Archivo? archivoGuardado = null;
 
-            // Handle the upload of the assignment's own file (instructions, template, etc.)
             if (archivoAsignacion != null && archivoAsignacion.Length > 0)
             {
-                // --- File Type Validation for the ASSIGNMENT'S FILE ---
                 var isPdf = archivoAsignacion.ContentType == "application/pdf";
                 var isVideo = archivoAsignacion.ContentType.StartsWith("video/");
 
-                // You might allow other types for the assignment's own file, or be more restrictive.
-                // This validation is for the teacher's uploaded file.
                 if (!isPdf && !isVideo && !archivoAsignacion.ContentType.StartsWith("image/")) // Example: allow PDF, video, image
                 {
                     ModelState.AddModelError("archivoAsignacion", "Solo se permiten archivos PDF, videos o para la asignación.");
@@ -307,57 +328,25 @@ namespace Plataforma.Controllers
                     return View("Crear", asignacionModel);
                 }
 
-                var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "asignaciones"); // Dedicated folder for assignment files
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
+                string s3Key = await _s3Service.UploadFileAsync(
+                                    archivoAsignacion,
+                                    "asignaciones"
+                                );
 
-                var uniqueFileName = $"{Guid.NewGuid()}_{archivoAsignacion.FileName}";
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                var fileUrl = $"/uploads/asignaciones/{uniqueFileName}"; // Relative URL for database
-
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await archivoAsignacion.CopyToAsync(fileStream);
-                }
-
-                // Create a new Archivo record for the uploaded file
                 archivoGuardado = new Archivo
                 {
                     ArchivoId = Guid.NewGuid(),
-                    ArchivoUrl = fileUrl,
+                    ArchivoUrl = s3Key,
                     FileName = archivoAsignacion.FileName,
                     ContentType = archivoAsignacion.ContentType,
                     SizeInBytes = archivoAsignacion.Length,
-                    FechaSubida = DateTime.UtcNow // Store in UTC
+                    FechaSubida = DateTime.UtcNow
                 };
-                
-                // If it's a video, attempt to get duration (this is complex and usually involves external libraries/services)
-                if (isVideo)
-                {
-                    try
-                    {
-                        var mediaInfo = await FFmpeg.GetMediaInfo(filePath);
-                        var videoStream = mediaInfo.VideoStreams.FirstOrDefault();
-
-                        if (videoStream != null)
-                        {
-                            archivoGuardado.DuracionVideo = videoStream.Duration; // Assign directly as TimeSpan
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error calculating video duration with FFMpegCore for {filePath}: {ex.Message}");
-                        archivoGuardado.DuracionVideo = null;
-                    }
-                }
 
                 _context.archivos.Add(archivoGuardado);
                 await _context.SaveChangesAsync(); // Save Archivo first to get its ID
             }
 
-            // Create the Asignacion record
             var nuevaAsignacion = new Tarea
             {
                 TareaId = Guid.NewGuid(),
@@ -368,7 +357,6 @@ namespace Plataforma.Controllers
                 TipoEntregaEsperado = asignacionModel.TipoEntregaEsperado // Set the expected submission type
             };
 
-            // Link the saved Archivo to the Asignacion if a file was uploaded
             if (archivoGuardado != null)
             {
                 nuevaAsignacion.ArchivoId = archivoGuardado.ArchivoId;
@@ -377,8 +365,99 @@ namespace Plataforma.Controllers
             _context.tareas.Add(nuevaAsignacion);
             await _context.SaveChangesAsync();
 
-            // Redirect to a suitable action, e.g., the details of the new assignment or the class assignments list
             return RedirectToAction("cursos", "Inicio");
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("profesor/tareas/editar")]
+        public async Task<IActionResult> Editar(EditarTareaViewModel model, IFormFile? nuevoArchivo)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Redirect("/Identity/Account/Login");
+
+            var tarea = await _context.tareas
+                .Include(t => t.Archivo)
+                .Include(t => t.Clase)
+                .FirstOrDefaultAsync(t => t.TareaId == model.TareaId &&
+                                          t.Clase.Modulo.Curso.CursoProfesores
+                                           .Any(cp => cp.ProfesorId == user.Id));
+
+            if (tarea == null)
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return View("~/Views/profesor/tareas/editar.cshtml", model);
+
+            tarea.Nombre = model.Nombre;
+            tarea.Descripcion = model.Descripcion;
+            tarea.FechaVencimiento = model.FechaVencimiento.ToUniversalTime();
+            tarea.TipoEntregaEsperado = model.TipoEntregaEsperado;
+
+            if (nuevoArchivo != null && nuevoArchivo.Length > 0)
+            {
+                if (tarea.Archivo != null)
+                {
+                    await _s3Service.DeleteFileAsync(tarea.Archivo.ArchivoUrl);
+                    _context.archivos.Remove(tarea.Archivo);
+                }
+
+                string newKey = await _s3Service.UploadFileAsync(
+                    nuevoArchivo,
+                    "asignaciones"
+                );
+
+                var nuevoArchivoDb = new Archivo
+                {
+                    ArchivoId = Guid.NewGuid(),
+                    ArchivoUrl = newKey,
+                    FileName = nuevoArchivo.FileName,
+                    ContentType = nuevoArchivo.ContentType,
+                    SizeInBytes = nuevoArchivo.Length,
+                    FechaSubida = DateTime.UtcNow
+                };
+
+                _context.archivos.Add(nuevoArchivoDb);
+                await _context.SaveChangesAsync();
+
+                tarea.ArchivoId = nuevoArchivoDb.ArchivoId;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("MisCursosYTareas",
+                new { cursoId = model.CursoId });
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Eliminar(Guid tareaId)
+        {
+            var tarea = await _context.tareas
+                .Include(t => t.Archivo)
+                .FirstOrDefaultAsync(t => t.TareaId == tareaId);
+
+            if (tarea == null)
+                return NotFound();
+
+            if (tarea.Archivo != null)
+            {
+                try
+                {
+                    await _s3Service.DeleteFileAsync(tarea.Archivo.ArchivoUrl);
+
+                    _context.archivos.Remove(tarea.Archivo);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"S3 delete error: {ex.Message}");
+                }
+            }
+
+            _context.tareas.Remove(tarea);
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("MisCursosYTareas", new { cursoId = tarea.Clase.Modulo.CursoId });
         }
     }
 }

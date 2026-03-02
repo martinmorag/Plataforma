@@ -87,6 +87,20 @@ function renderTasks(tareas, cursoNombre) {
                             <a href="/profesor/tareas/entregas?tareaId=${tarea.tareaId}" class="action-button view-button">
                                 <i class="fa-solid fa-list"></i> Ver Entregas
                             </a>
+                            <a href="/profesor/tareas/editar?tareaId=${tarea.tareaId}" 
+                               class="action-button edit-button">
+                                <i class="fa-solid fa-pen"></i> Editar
+                            </a>
+
+                            <form method="post" action="/tareas/eliminar?tareaId=${tarea.tareaId}" 
+                                  class="delete-form" style="display:inline;">
+                                <input name="__RequestVerificationToken" 
+                                       type="hidden" 
+                                       value="${document.querySelector('input[name="__RequestVerificationToken"]').value}" />
+                                <button type="button" class="action-button delete-button delete-btn">
+                                    <i class="fa-solid fa-trash"></i> Eliminar
+                                </button>
+                            </form>
                         </td>
                     </tr>`;
         });
@@ -143,3 +157,32 @@ if (activeCourseInitial) {
     // If no course is active initially, ensure the "select a course" message is visible
     hideTasks(); // Use the new hideTasks function
 }
+
+
+// delete tarea
+document.addEventListener("click", function (e) {
+
+    if (e.target.closest(".delete-btn")) {
+
+        const button = e.target.closest(".delete-btn");
+        const form = button.closest("form");
+
+        Swal.fire({
+            title: '¿Eliminar tarea?',
+            text: "Esta acción no se puede deshacer.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+
+    }
+
+});

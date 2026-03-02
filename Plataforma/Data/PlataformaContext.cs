@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
 using Plataforma.Models;
-using System.Reflection;
-using System.Security.Claims;
 
 namespace Plataforma.Data
 {
@@ -23,39 +20,28 @@ namespace Plataforma.Data
         public DbSet<Tarea> tareas { get; set; }
         public DbSet<Entrega> entregas { get; set; }
         public DbSet<Archivo> archivos { get; set; }
-        public DbSet<ProfesorCursoDto> CursoEstudiantes { get; set; }  
+        public DbSet<CursoEstudiante> CursoEstudiantes { get; set; }  
         public DbSet<CursoProfesor> CursoProfesores { get; set; } 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
             builder.Entity<UsuarioIdentidad>()
-            .HasDiscriminator<string>("Discriminator")
-            .HasValue<UsuarioIdentidad>("UsuarioIdentidad")
-            .HasValue<Administrador>("Administrador")
-            .HasValue<Estudiante>("Estudiante")
-            .HasValue<Profesor>("Profesor");
-
-            // Adds estudiante discriminator when adding estudiantes
-            builder.Entity<UsuarioIdentidad>()
                 .HasDiscriminator<string>("Discriminator")
-                .HasValue<UsuarioIdentidad>("UsuarioIdentidad") // Valor para usuarios genéricos
-                .HasValue<Estudiante>("Estudiante");
-            // Adds profesor discriminator when adding profesores
-            builder.Entity<UsuarioIdentidad>()
-                .HasDiscriminator<string>("Discriminator")
-                .HasValue<UsuarioIdentidad>("UsuarioIdentidad") // Valor para usuarios genéricos
+                .HasValue<UsuarioIdentidad>("UsuarioIdentidad")
+                .HasValue<Administrador>("Administrador")
+                .HasValue<Estudiante>("Estudiante")
                 .HasValue<Profesor>("Profesor");
 
-            builder.Entity<ProfesorCursoDto>()
+            builder.Entity<CursoEstudiante>()
                 .HasKey(ce => new { ce.CursoId, ce.EstudianteId }); // Composite key
 
-            builder.Entity<ProfesorCursoDto>()
+            builder.Entity<CursoEstudiante>()
                 .HasOne(ce => ce.Curso)
                 .WithMany(c => c.CursoEstudiantes)
                 .HasForeignKey(ce => ce.CursoId);
 
-            builder.Entity<ProfesorCursoDto>()
+            builder.Entity<CursoEstudiante>()
                 .HasOne(ce => ce.Estudiante)
                 .WithMany(s => s.CursoEstudiantes)
                 .HasForeignKey(ce => ce.EstudianteId);

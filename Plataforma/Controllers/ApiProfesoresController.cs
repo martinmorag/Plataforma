@@ -7,7 +7,7 @@ using Plataforma.Models.Profesores;
 
 namespace Plataforma.Controllers
 {
-    [Route("api/[controller]")] // This means all API actions in this controller will start with /api/Profesores
+    [Route("api/[controller]")] 
     [ApiController]
     public class ApiProfesoresController : ControllerBase
     {

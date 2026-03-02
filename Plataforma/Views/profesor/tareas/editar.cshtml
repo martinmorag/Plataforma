@@ -1,0 +1,106 @@
+﻿@model Plataforma.Models.Profesores.EditarTareaViewModel
+
+@{
+    ViewData["Title"] = "Editar Tarea";
+    Layout = "_Layout";
+}
+
+<link rel="stylesheet" href="~/css/tareas/crear.css" asp-append-version="true" />
+
+<div class="form-container">
+    <h2 class="form-title">
+        Editar Tarea para
+        <span class="class-name">@Model.ClaseNombre</span>
+    </h2>
+
+    <div class="form-card">
+        <h4 class="card-header">Detalles de la Tarea</h4>
+        <hr class="divider" />
+
+        <form asp-controller="tareas"
+              asp-action="Editar"
+              method="post"
+              enctype="multipart/form-data">
+
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+            <input type="hidden" asp-for="TareaId" />
+            <input type="hidden" asp-for="ClaseId" />
+
+            <div class="form-group">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-input" />
+                <span asp-validation-for="Nombre" class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Descripcion" class="form-label"></label>
+                <textarea asp-for="Descripcion"
+                          class="form-textarea"
+                          rows="3"></textarea>
+                <span asp-validation-for="Descripcion" class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="FechaVencimiento" class="form-label"></label>
+                <input asp-for="FechaVencimiento"
+                       type="datetime-local"
+                       class="form-input"
+                       value="@Model.FechaVencimiento.ToString("yyyy-MM-ddTHH:mm")" />
+                <span asp-validation-for="FechaVencimiento" class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TipoEntregaEsperado" class="form-label"></label>
+                <select asp-for="TipoEntregaEsperado" class="form-input">
+                    <option value="file">Documento</option>
+                    <option value="video">Video</option>
+                </select>
+                <span asp-validation-for="TipoEntregaEsperado" class="validation-error"></span>
+            </div>
+
+            @if (Model.ArchivoNombre != null)
+            {
+                <div class="form-group">
+                    <label class="form-label">Archivo Actual</label>
+                    <div style="margin-bottom:10px;">
+                        <strong>@Model.ArchivoNombre</strong>
+                    </div>
+                </div>
+            }
+
+            <div class="form-group">
+                <label class="form-label">
+                    Reemplazar archivo (opcional)
+                </label>
+                <input type="file"
+                       name="nuevoArchivo"
+                       class="form-input"
+                       accept=".pdf,video/*,image/*" />
+                <span class="validation-error">
+                    @ViewData.ModelState["nuevoArchivo"]?.Errors.FirstOrDefault()?.ErrorMessage
+                </span>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="submit-button">
+                    Guardar Cambios
+                </button>
+
+                <a asp-action="MisCursosYTareas"
+                       asp-route-cursoId="@Model.CursoId"
+                       class="return-link">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -79,11 +79,11 @@ namespace Plataforma.Controllers
                 return Json(new { success = false, message = "No autorizado para modificar este curso." }); // Return JSON for AJAX
             }
 
-            curso.Disponible = isAvailable;
+            curso.Habilitado = isAvailable;
             await _context.SaveChangesAsync();
 
             // Still return JSON, don't redirect
-            return Json(new { success = true, newStatus = curso.Disponible });
+            return Json(new { success = true, newStatus = curso.Habilitado });
         }
         [HttpPost]
         [ValidateAntiForgeryToken]

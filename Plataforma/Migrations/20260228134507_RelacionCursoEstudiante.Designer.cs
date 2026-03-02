@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Plataforma.Data;
@@ -11,9 +12,11 @@ using Plataforma.Data;
 namespace Plataforma.Migrations
 {
     [DbContext(typeof(PlataformaContext))]
-    partial class PlataformaContextModelSnapshot : ModelSnapshot
+    [Migration("20260228134507_RelacionCursoEstudiante")]
+    partial class RelacionCursoEstudiante
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -217,7 +220,7 @@ namespace Plataforma.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("Habilitado")
+                    b.Property<bool>("Disponible")
                         .HasColumnType("boolean");
 
                     b.Property<string>("ImageUrl")
@@ -313,13 +316,13 @@ namespace Plataforma.Migrations
                     b.Property<Guid>("CursoId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Nombre")
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Titulo")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
 
                     b.HasKey("ModuloId");
 

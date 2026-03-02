@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Plataforma.Data;
 using Plataforma.Models;
 using Plataforma.Models.Administracion;
+using Plataforma.Servicios;
 
 namespace Plataforma.Controllers
 {
@@ -13,10 +14,13 @@ namespace Plataforma.Controllers
     {
         private readonly UserManager<UsuarioIdentidad> _userManager;
         private readonly PlataformaContext _context;
-        public administradorController(UserManager<UsuarioIdentidad> userManager, PlataformaContext context)
+        private readonly S3Service _s3Service;
+        public administradorController(UserManager<UsuarioIdentidad> userManager, PlataformaContext context, S3Service s3Service)
         {
             _userManager = userManager;
             _context = context;
+            _s3Service = s3Service;
+
         }
         public async Task<IActionResult> panel()
         {
@@ -49,6 +53,48 @@ namespace Plataforma.Controllers
 
             // Pasar el ViewModel combinado a la vista
             return View("panel/Index", viewModel);
+        }
+        [Route("administrador/cursos")]
+        public async Task<IActionResult> Index()
+        {
+            var cursos = await _context.cursos
+                .Include(c => c.CursoEstudiantes)
+                .Include(c => c.CursoProfesores)
+                    .ThenInclude(cp => cp.Profesor)
+                .Include(c => c.Modulos)
+                    .ThenInclude(m => m.Clases)
+                .ToListAsync();
+
+            var model = cursos.Select(c => new CursoAdminIndexViewModel
+            {
+                CursoId = c.CursoId,
+                Nombre = c.Nombre,
+                Habilitado = c.Habilitado,
+                ImageUrl = c.ImageUrl,
+                CantidadEstudiantes = c.CursoEstudiantes.Count,
+
+                Profesores = c.CursoProfesores
+                    .Select(cp => cp.Profesor.Nombre)
+                    .ToList(),
+
+                Modulos = c.Modulos.Select(m => new ModuloAdminViewModel
+                {
+                    Nombre = m.Nombre,
+                    Clases = m.Clases
+                        .Select(cl => cl.Nombre)
+                        .ToList()
+                }).ToList()
+
+            }).ToList();
+
+            return View("~/Views/administrador/cursos/Index.cshtml", model);
+        }
+        // Crear un curso
+        [HttpGet]
+        [Route("adminisrtador/cursos/crear")]
+        public IActionResult CrearCurso()
+        {
+            return View("~/Views/administrador/cursos/crear.cshtml");
         }
         // Gestionar profesores y cursos
         [HttpGet("administrador/profesores/cursos")]
@@ -85,6 +131,48 @@ namespace Plataforma.Controllers
             ViewData["ProfesorName"] = profesor.Nombre + " " + profesor.Apellido;
 
             return View("~/Views/administrador/profesores/cursos.cshtml", viewModel);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("admin/cursos/crear")]
+        public async Task<IActionResult> CrearCurso(
+            CrearCursoViewModel model,
+            IFormFile? imagenCurso)
+        {
+            if (!ModelState.IsValid)
+                return View("~/Views/admin/cursos/crear.cshtml", model);
+
+            bool exists = await _context.cursos
+                .AnyAsync(c => c.Nombre == model.Nombre);
+
+            if (exists)
+            {
+                ModelState.AddModelError("Nombre", "Ya existe un curso con ese nombre.");
+                return View("~/Views/admin/cursos/crear.cshtml", model);
+            }
+
+            string? imageKey = null;
+
+            if (imagenCurso != null && imagenCurso.Length > 0)
+            {
+                imageKey = await _s3Service.UploadFileAsync(
+                    imagenCurso,
+                    "cursos"
+                );
+            }
+
+            var curso = new Curso
+            {
+                CursoId = Guid.NewGuid(),
+                Nombre = model.Nombre,
+                Habilitado = model.Disponible,
+                ImageUrl = imageKey
+            };
+
+            _context.cursos.Add(curso);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("ListaCursos"); 
         }
         [HttpPost]
         [ValidateAntiForgeryToken]

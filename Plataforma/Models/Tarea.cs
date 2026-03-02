@@ -42,6 +42,6 @@ namespace Plataforma.Models
                 }
             }
         }
-        public ICollection<Entrega> Entregas { get; set; }
+        public ICollection<Entrega>? Entregas { get; set; }
     }
 }

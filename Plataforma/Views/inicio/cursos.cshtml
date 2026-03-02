@@ -36,7 +36,7 @@
 
         @foreach (var curso in Model.CursosEstudiante)
         {
-            <div class="course-card-item registered-course-item" data-course-id="@curso.CursoEstudianteId" data-original-state="registered">
+            <div class="course-card-item registered-course-item" data-course-id="@curso.CursoId" data-original-state="registered">
                 <div class="course-card-image-wrapper">
                             @if (!string.IsNullOrEmpty(curso.Curso.ImageUrl))
                             {

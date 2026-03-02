@@ -12,13 +12,13 @@ namespace Plataforma.Models
         [Required]
         [StringLength(200)]
         public string Nombre { get; set; }
-        public bool Disponible { get; set; }
+        public bool Habilitado { get; set; }
         public string ImageUrl { get; set; }
         // Navigation property: A course can have many modules
         public ICollection<Modulo> Modulos { get; set; } = new List<Modulo>();
 
         // Navigation property: Many-to-many with Estudiante through CursoEstudiante
-        public ICollection<ProfesorCursoDto> CursoEstudiantes { get; set; } = new List<ProfesorCursoDto>();
+        public ICollection<CursoEstudiante> CursoEstudiantes { get; set; } = new List<CursoEstudiante>();
 
         // Navigation property: Many-to-many with Profesor through CursoProfesor
         public ICollection<CursoProfesor> CursoProfesores { get; set; } = new List<CursoProfesor>();

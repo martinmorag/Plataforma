@@ -1,12 +1,13 @@
+using Amazon.S3;
+using DotNetEnv;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Plataforma.Data;
 using Plataforma.Models;
-using Xabe.FFmpeg.Downloader;
-using Xabe.FFmpeg;
 using Plataforma.Servicios;
-using DotNetEnv;
+using Xabe.FFmpeg;
+using Xabe.FFmpeg.Downloader;
 
 DotNetEnv.Env.Load();
 
@@ -28,6 +29,9 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 builder.Services.AddSession();
 builder.Services.AddSingleton(System.TimeProvider.System);
+builder.Services.AddSingleton<CloudFrontService>();
+builder.Services.AddAWSService<IAmazonS3>();
+builder.Services.AddScoped<S3Service>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<PlataformaContext>(options =>
     options.UseNpgsql(

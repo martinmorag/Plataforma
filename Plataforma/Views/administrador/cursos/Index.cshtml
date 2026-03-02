@@ -1,0 +1,73 @@
+﻿@model List<Plataforma.Models.Administracion.CursoAdminIndexViewModel>
+
+@{
+    ViewData["Title"] = "Administrar Cursos";
+    Layout = "_Layout";
+}
+
+<h2 class="mb-4">Gestión de Cursos</h2>
+
+@foreach (var curso in Model)
+{
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center">
+                <h4>@curso.Nombre</h4>
+                <span class="badge bg-@(curso.Habilitado ? "success" : "secondary")">
+                    @(curso.Habilitado ? "Habilitado" : "No habilitado")
+                </span>
+            </div>
+
+            <hr />
+
+            <p><strong>Estudiantes inscritos:</strong> @curso.CantidadEstudiantes</p>
+
+            <p><strong>Profesores:</strong></p>
+            @if (curso.Profesores.Any())
+            {
+                <ul>
+                    @foreach (var profesor in curso.Profesores)
+                    {
+                        <li>@profesor</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="text-muted">No asignados</p>
+            }
+
+            <p><strong>Módulos y Clases:</strong></p>
+
+            @if (curso.Modulos.Any())
+            {
+                @foreach (var modulo in curso.Modulos)
+                {
+                    <div class="ms-3 mb-2">
+                        <strong>📘 @modulo.Nombre</strong>
+
+                        @if (modulo.Clases.Any())
+                        {
+                            <ul>
+                                @foreach (var clase in modulo.Clases)
+                                {
+                                    <li>@clase</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="text-muted ms-3">Sin clases</p>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-muted">Sin módulos</p>
+            }
+
+        </div>
+    </div>
+}

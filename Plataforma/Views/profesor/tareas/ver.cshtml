@@ -70,6 +70,25 @@
                                         <a asp-controller="tareas" asp-action="VerEntregas" asp-route-tareaId="@tarea.TareaId" class="action-button view-button">
                                             <i class="fa-solid fa-list"></i> Ver Entregas
                                         </a>
+                                        <a asp-controller="tareas"
+                                               asp-action="Editar"
+                                               asp-route-tareaId="@tarea.TareaId"
+                                               class="action-button edit-button">
+                                            <i class="fa-solid fa-pen"></i> Editar
+                                        </a>
+                                        <form asp-controller="tareas"
+                                              asp-action="Eliminar"
+                                              asp-route-tareaId="@tarea.TareaId"
+                                              method="post"
+                                              style="display:inline;"
+                                              class="delete-form">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="button" class="action-button delete-button delete-btn">
+                                                <i class="fa-solid fa-trash"></i> Eliminar
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             }

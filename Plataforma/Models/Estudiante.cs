@@ -2,6 +2,6 @@
 {
     public class Estudiante : UsuarioIdentidad
     {
-        public ICollection<ProfesorCursoDto> CursoEstudiantes { get; set; } = new List<ProfesorCursoDto>();
+        public ICollection<CursoEstudiante> CursoEstudiantes { get; set; } = new List<CursoEstudiante>();
     }
 }

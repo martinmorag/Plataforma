@@ -46,7 +46,9 @@ namespace Plataforma.Controllers
                     }
 
                     var cursoEstudiante = await _context.CursoEstudiantes
-                                                        .FirstOrDefaultAsync(ce => ce.EstudianteId == user.Id && ce.CursoEstudianteId == courseGuid);
+                                            .FirstOrDefaultAsync(ce =>
+                                                ce.EstudianteId == user.Id &&
+                                                ce.CursoId == courseGuid);
                     // FIX: Changed from CursoEstudianteId to CursoId
 
                     if (cursoEstudiante != null)
@@ -79,9 +81,8 @@ namespace Plataforma.Controllers
                         // Assuming CursoEstudiante needs a unique ID too, if it's not handled by EF automatically
                         // If CursoEstudianteId is a Guid primary key for the join table itself
                         // you might need to generate it. If it's identity, EF handles it.
-                        _context.CursoEstudiantes.Add(new Models.ProfesorCursoDto
+                        _context.CursoEstudiantes.Add(new Models.CursoEstudiante
                         {
-                            CursoEstudianteId = Guid.NewGuid(), // Only if this is the PK and needs explicit GUID
                             EstudianteId = user.Id,
                             CursoId = courseGuid
                             // Any other properties like FechaInscripcion = DateTime.UtcNow etc.
