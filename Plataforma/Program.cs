@@ -56,6 +56,7 @@ builder.Services.AddIdentity<UsuarioIdentidad, IdentityRole<Guid>>(options => //
     options.User.RequireUniqueEmail = true;
     options.SignIn.RequireConfirmedEmail = false; // Or true, if you implement email confirmation
 })
+.AddErrorDescriber<EspañolIdentityErrorDescriber>()
 .AddEntityFrameworkStores<PlataformaContext>()
 .AddDefaultTokenProviders();
 

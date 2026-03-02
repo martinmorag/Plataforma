@@ -5,8 +5,8 @@ using Plataforma.Models.Administracion;
 using Plataforma.Models;
 using Plataforma.Data;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Plataforma.Models.Profesores;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
 
 namespace Plataforma.Controllers
 {
@@ -37,7 +37,7 @@ namespace Plataforma.Controllers
                     UserName = model.RegistroProfesor.Email
                 };
 
-                var result = await _userManager.CreateAsync(usuario, model.RegistroProfesor.Password);
+                var result = await _userManager.CreateAsync(usuario);
 
                 if (result.Succeeded)
                 {
@@ -56,8 +56,22 @@ namespace Plataforma.Controllers
                     var roleAssignmentResult = await _userManager.AddToRoleAsync(usuario, "Profesor");
                     if (roleAssignmentResult.Succeeded)
                     {
+                        var token = await _userManager.GeneratePasswordResetTokenAsync(usuario);
+                        var encodedToken = WebEncoders.Base64UrlEncode(
+                        Encoding.UTF8.GetBytes(token));
+                        var setupLink = Url.Action(
+                            "ResetearContraseña",
+                            "Cuenta",
+                            new
+                            {
+                                userId = usuario.Id,
+                                token = encodedToken
+                            },
+                            Request.Scheme);
+                        TempData["SetupProfesoresLink"] = setupLink;
+
                         await _context.SaveChangesAsync();
-                        return RedirectToAction("panel", "administrador"); // Redirige al panel
+                        return RedirectToAction("panel", "administrador"); 
                     }
                     else
                     {
@@ -105,29 +119,6 @@ namespace Plataforma.Controllers
                 usuario.Email = model.ProfesorAEditar.Email;
                 usuario.UserName = model.ProfesorAEditar.Email;
 
-                // Intenta cambiar la contraseña si se proporcionaron nuevos valores
-                if (!string.IsNullOrEmpty(model.NuevaPassword))
-                {
-                    if (model.NuevaPassword == model.ConfirmarNuevaPassword)
-                    {
-                        var token = await _userManager.GeneratePasswordResetTokenAsync(usuario);
-                        var changePasswordResult = await _userManager.ResetPasswordAsync(usuario, token, model.NuevaPassword);
-                        if (!changePasswordResult.Succeeded)
-                        {
-                            foreach (var error in changePasswordResult.Errors)
-                            {
-                                ModelState.AddModelError(string.Empty, "Error al cambiar la contraseña: " + error.Description);
-                            }
-                            return View("~/Views/administrador/profesores/editar.cshtml", model);
-                        }
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "La nueva contraseña y la confirmación no coinciden.");
-                        return View("~/Views/administrador/profesores/editar.cshtml", model);
-                    }
-                }
-
                 var updateResult = await _userManager.UpdateAsync(usuario);
                 if (updateResult.Succeeded)
                 {
@@ -159,6 +150,32 @@ namespace Plataforma.Controllers
                 }
             }
             return View("~/Views/administrador/profesores/editar.cshtml", model);
+        }
+        public async Task<IActionResult> GenerarResetearContraseña(Guid id)
+        {
+            var usuario = await _userManager.FindByIdAsync(id.ToString());
+
+            if (usuario == null)
+                return NotFound();
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(usuario);
+
+            var encodedToken = WebEncoders.Base64UrlEncode(
+                Encoding.UTF8.GetBytes(token));
+
+            var resetLink = Url.Action(
+                "ResetearContraseña",
+                "Cuenta",
+                new
+                {
+                    userId = usuario.Id,
+                    token = encodedToken
+                },
+                Request.Scheme);
+
+            TempData["ResetLink"] = resetLink;
+
+            return RedirectToAction("panel", "administrador");
         }
         [HttpPost]
         [ValidateAntiForgeryToken]

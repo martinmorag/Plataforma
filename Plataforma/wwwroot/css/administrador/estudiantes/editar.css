@@ -88,6 +88,43 @@ hr {
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
 }
 
+/* ===== Reset Password Button ===== */
+
+.btn-reset-password {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px 18px;
+    border-radius: 10px;
+
+    background: linear-gradient(135deg, #ffb347, #ff8c42);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+
+    border: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(255, 140, 66, 0.25);
+}
+
+/* Hover effect (NO white background) */
+.btn-reset-password:hover {
+    background: linear-gradient(135deg, #ffa733, #ff7420);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(255, 140, 66, 0.35);
+    text-decoration: none;
+}
+
+.btn-reset-password:active {
+    box-shadow: 0 2px 6px rgba(255, 140, 66, 0.25);
+}
+
+.btn-reset-password:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.35);
+}
+
 /* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
     .container-custom {

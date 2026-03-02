@@ -16,7 +16,9 @@
                 @* <li class="nav-item"> *@
                 @*     <a class="nav-link" asp-area="" asp-controller="ProfesorView" asp-action="MisAlumnos">Mis Alumnos</a> *@
                 @* </li> *@
-                @* Add more profesor-specific links here *@
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="administrador" asp-action="panel">Panel</a>
+                </li>
                 <li class="nav-item">
                     <form asp-controller="ingreso" asp-action="logout" method="post" class="logout-form">
                         <button type="submit" class="nav-link logout-button">
