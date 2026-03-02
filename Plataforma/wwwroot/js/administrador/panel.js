@@ -161,3 +161,22 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+function copyLink() {
+    const input = document.getElementById("setupLink");
+    input.select();
+    input.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(input.value);
+}
+function copyLinkProfesores() {
+    const input = document.getElementById("setupProfesoresLink");
+    input.select();
+    input.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(input.value);
+}
+function copyLinkReset() {
+    const input = document.getElementById("resetLink");
+    input.select();
+    input.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(input.value);
+}

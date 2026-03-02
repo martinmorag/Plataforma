@@ -29,10 +29,6 @@ namespace Plataforma.Controllers
             var modulos = await _context.modulos.ToListAsync();
             var clases = await _context.clases.ToListAsync();
 
-            Console.WriteLine($"Cursos: {_context.cursos.Count()}");
-            Console.WriteLine($"Modulos: {_context.modulos.Count()}");
-            Console.WriteLine($"Clases: {_context.clases.Count()}");
-
             ViewBag.Cursos = cursos;
             ViewBag.Modulos = modulos;
             ViewBag.Clases = clases;

@@ -9,11 +9,6 @@
         // Editar estudiante
         public Plataforma.Models.Estudiante? EstudianteAEditar { get; set; }
 
-        // Propiedades para la nueva contraseña en la edición
-        public string? NuevaPassword { get; set; }
-
-        public string? ConfirmarNuevaPassword { get; set; }
-
 
         // Editar profesor
         public Plataforma.Models.Profesor? ProfesorAEditar { get; set; }

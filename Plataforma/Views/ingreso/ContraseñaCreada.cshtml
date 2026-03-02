@@ -1,0 +1,32 @@
+@{
+    ViewData["Title"] = "Contraseña creada";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card shadow-lg border-0">
+                <div class="card-body text-center p-5">
+
+                    <h2 class="text-success mb-3">
+                        ✅ ¡Contraseña creada correctamente!
+                    </h2>
+
+                    <p class="mb-4">
+                        Tu cuenta ya está lista para usarse.
+                        Ahora podés iniciar sesión con tu correo electrónico y la contraseña que acabás de crear.
+                    </p>
+
+                    <a asp-controller="ingreso"
+                       asp-action="Index"
+                       class="btn btn-primary btn-lg">
+                        Ir a iniciar sesión
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

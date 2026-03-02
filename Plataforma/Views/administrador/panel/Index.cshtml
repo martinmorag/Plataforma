@@ -9,6 +9,73 @@
 <div class="admin-panel-container">
     <h1>@ViewData["Title"]</h1>
 
+    @if (TempData["SetupLink"] != null)
+    {
+        <div class="alert alert-success">
+            <strong>Estudiante creado correctamente.</strong><br />
+
+            Link para crear contraseña:
+
+            <div class="input-group mt-2">
+                <input id="setupLink"
+                    type="text"
+                    class="form-control"
+                    value="@TempData["SetupLink"]"
+                    readonly />
+
+                <button class="btn btn-outline-secondary"
+                        type="button"
+                        onclick="copyLink()">
+                    Copiar
+                </button>
+            </div>
+        </div>
+    }
+    @if (TempData["SetupProfesoresLink"] != null)
+    {
+        <div class="alert alert-success">
+            <strong>Profesor creado correctamente.</strong><br />
+
+            Link para crear contraseña:
+
+            <div class="input-group mt-2">
+                <input id="setupProfesoresLink"
+                    type="text"
+                    class="form-control"
+                    value="@TempData["SetupProfesoresLink"]"
+                    readonly />
+
+                <button class="btn btn-outline-secondary"
+                        type="button"
+                        onclick="copyLinkProfesores()">
+                    Copiar
+                </button>
+            </div>
+        </div>
+    }
+    @if (TempData["ResetLink"] != null)
+    {
+        <div class="alert alert-info">
+            <strong>Enlace de restablecimiento:</strong><br />
+
+            <div class="input-group mt-2">
+                <input id="resetLink"
+                    type="text"
+                    class="form-control"
+                    value="@TempData["ResetLink"]"
+                    readonly />
+                
+                <button class="btn btn-outline-secondary"
+                        type="button"
+                        onclick="copyLinkReset()">
+                    Copiar
+                </button>
+            </div>
+
+            <small class="mt-2">Copiá este enlace y envialo al estudiante o profesor.</small>
+        </div>
+    }
+
     <section class="user-list-section">
         <div class="section-header student-header">
             <h2 class="section-title">Lista de Estudiantes</h2>
