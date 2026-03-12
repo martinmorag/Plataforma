@@ -80,6 +80,10 @@
         <div class="section-header student-header">
             <h2 class="section-title">Lista de Estudiantes</h2>
             <div class="header-actions">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="studentSearch" placeholder="Buscar estudiante..." />
+                </div>
                 <a asp-controller="administrador" asp-action="agregar_estudiante" class="btn btn-success add-new-btn">
                     <i class="fa-solid fa-plus"></i> Agregar Estudiante
                 </a>
@@ -131,6 +135,10 @@
         <div class="section-header professor-header">
             <h2 class="section-title">Lista de Profesores</h2>
             <div class="header-actions">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="professorSearch" placeholder="Buscar profesor..." />
+                </div>
                 <a asp-controller="administrador" asp-action="agregar_profesor" class="btn btn-success add-new-btn">
                     <i class="fa-solid fa-plus"></i> Agregar Profesor
                 </a>

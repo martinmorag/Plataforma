@@ -60,6 +60,7 @@
 //});
 
 
+
 document.addEventListener('DOMContentLoaded', function () {
     // Event listener for opening delete modals (Students)
     const studentDeleteModal = document.getElementById('confirmDeleteModalEstudiante');
@@ -159,6 +160,46 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.setAttribute('aria-expanded', 'false');
             }
         });
+    });
+
+
+    document.getElementById("studentSearch").addEventListener("keyup", function () {
+
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#student-table-container tbody tr");
+
+        rows.forEach(function (row) {
+
+            let text = row.textContent.toLowerCase();
+
+            if (text.includes(filter)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+
+        });
+
+    });
+
+
+    document.getElementById("professorSearch").addEventListener("keyup", function () {
+
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#professor-table-container tbody tr");
+
+        rows.forEach(function (row) {
+
+            let text = row.textContent.toLowerCase();
+
+            if (text.includes(filter)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+
+        });
+
     });
 });
 
