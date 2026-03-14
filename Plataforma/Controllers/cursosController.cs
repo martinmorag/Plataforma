@@ -17,30 +17,55 @@ namespace Plataforma.Controllers
     {
         private readonly UserManager<UsuarioIdentidad> _userManager;
         private readonly PlataformaContext _context;
-        public cursosController(UserManager<UsuarioIdentidad> userManager, PlataformaContext context)
+        private readonly CloudFrontService _cloudFrontService;
+        public cursosController(UserManager<UsuarioIdentidad> userManager, PlataformaContext context, CloudFrontService cloudFrontService)
         {
             _userManager = userManager;
             _context = context;
+            _cloudFrontService = cloudFrontService;
         }
         [Route("profesor/cursos")]
         public async Task<IActionResult> Index()
         {
-            var cursos = await _context.cursos.ToListAsync();
-            var modulos = await _context.modulos.ToListAsync();
-            var clases = await _context.clases.ToListAsync();
+            var user = await _userManager.GetUserAsync(User);
 
-            ViewBag.Cursos = cursos;
-            ViewBag.Modulos = modulos;
-            ViewBag.Clases = clases;
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "ingreso");
+            }
 
-            return View("~/Views/profesor/cursos/Index.cshtml");
+            var profesorCursos = await _context.cursos
+                .Where(c => c.CursoProfesores
+                    .Any(cp => cp.ProfesorId == user.Id))
+                .Include(c => c.Modulos)
+                    .ThenInclude(m => m.Clases)
+                .OrderBy(c => c.Nombre)
+                .AsNoTracking()
+                .ToListAsync();
+
+            foreach (var curso in profesorCursos)
+            {
+                if (!string.IsNullOrEmpty(curso.ImageUrl))
+                {
+                    curso.ImageUrl = _cloudFrontService.GenerateSignedUrl(curso.ImageUrl);
+                }
+            }
+
+            return View("~/Views/profesor/cursos/Index.cshtml", new ProfesorCursosViewModel
+            {
+                Cursos = profesorCursos
+            });
         }
         [Route("profesor")]
         public async Task<IActionResult> Inicio()
         {
             var user = await _userManager.GetUserAsync(User);
 
-            // Load courses associated with the current professor
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "ingreso");
+            }
+
             var profesorCourses = await _context.CursoProfesores
                                             .Where(cp => cp.ProfesorId == user.Id)
                                             .Include(cp => cp.Curso) // Eagerly load the Curso details
@@ -55,9 +80,9 @@ namespace Plataforma.Controllers
         public async Task<IActionResult> ToggleCourseAvailability(Guid cursoId, bool isAvailable)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) // Check if user is logged in
+            if (!User.Identity.IsAuthenticated)
             {
-                return Json(new { success = false, message = "Usuario no autenticado." });
+                return RedirectToAction("Index", "ingreso");
             }
 
             var curso = await _context.cursos.FindAsync(cursoId);

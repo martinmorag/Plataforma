@@ -30,7 +30,6 @@
                     <th>Estudiante</th>
                     <th>Estado</th>
                     <th>Fecha Entrega</th>
-                    <th>Comentarios Estudiante</th>
                     <th>Tipo de Entrega</th>
                     <th>Acciones</th>
                 </tr>
@@ -42,11 +41,11 @@
                         <td>@entrega.EstudianteNombre</td>
                         <td>
                             <span class="status-badge @GetStatusClass(entrega.Estado)">
-                                @(entrega.Estado?.ToString() ?? "Desconocido")
+                                @GetStatusText(entrega.Estado)
                             </span>
                         </td>
-                        <td>@(entrega.FechaEntrega?.ToShortDateString() ?? "N/A")</td>
-                        <td>@(string.IsNullOrEmpty(entrega.ComentariosEstudiante) ? "Sin comentarios" : entrega.ComentariosEstudiante)</td>
+                        <td>@(entrega.FechaEntrega?.ToShortDateString() ?? "No entregado")</td>
+                        @* <td>@(string.IsNullOrEmpty(entrega.ComentariosEstudiante) ? "Sin comentarios" : entrega.ComentariosEstudiante)</td> *@
                         <td>
                             @if (!string.IsNullOrEmpty(entrega.ArchivoUrl))
                             {
@@ -54,24 +53,24 @@
                             }
                             else
                             {
-                                <span class="type-badge unknown-type">N/A</span>
+                                <span class="type-badge unknown-type">Video</span>
                             }
                         </td>
                         <td>
                             @if (!string.IsNullOrEmpty(entrega.ArchivoUrl))
                             {
-                                <a href="#" class="action-button download-button"
-                                   data-entrega-id="@entrega.EntregaId"
-                                   data-file-name="@(entrega.ArchivoNombreOriginal ?? "archivo")">
-                                    <i class="fa-solid fa-download"></i> @(entrega.ArchivoNombreOriginal ?? "Archivo")
+                                <a href="/api/ApiProfesores/AccessSubmittedFile/@entrega.EntregaId"
+                                       class="action-button" target="_blank">
+                                       @(entrega.ArchivoNombreOriginal ?? "Archivo")
                                 </a>
+
+                                <button type="button" class="action-button evaluate-button"
+                                        data-entrega-id="@entrega.EntregaId"
+                                        data-current-status="@(entrega.Estado?.ToString() ?? "")"
+                                        data-current-comments="@entrega.ComentariosProfesor">
+                                    <i class="fa-solid fa-pencil"></i> Evaluar
+                                </button>
                             }
-                            <button type="button" class="action-button evaluate-button"
-                                    data-entrega-id="@entrega.EntregaId"
-                                    data-current-status="@(entrega.Estado?.ToString() ?? "")"
-                                    data-current-comments="@entrega.ComentariosProfesor">
-                                <i class="fa-solid fa-pencil"></i> Evaluar
-                            </button>
                         </td>
                     </tr>
                 }
@@ -93,10 +92,9 @@
                     <div class="form-group">
                         <label for="modalStatus" class="form-label">Estado</label>
                         <select class="form-select-custom" id="modalStatus" name="Estado">
-                            @foreach (var status in Enum.GetValues(typeof(Entrega.EstadoEntrega)))
-                            {
-                                <option value="@status">@status</option>
-                            }
+                            <option value="@Entrega.EstadoEntrega.Aprobado">Aprobado</option>
+                            <option value="@Entrega.EstadoEntrega.Reprobado">Reprobado</option>
+                            <option value="@Entrega.EstadoEntrega.Rehacer">Rehacer</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -131,9 +129,21 @@
             Entrega.EstadoEntrega.Aprobado => "status-approved",
             Entrega.EstadoEntrega.EnRevision => "status-in-review",
             Entrega.EstadoEntrega.EnProgreso => "status-in-progress",
-            Entrega.EstadoEntrega.Rehacer => "status-redo", // New status
+            Entrega.EstadoEntrega.Rehacer => "status-redo", 
             Entrega.EstadoEntrega.Reprobado => "status-rejected",
             _ => "status-unknown"
+        };
+    }
+    public string GetStatusText(Entrega.EstadoEntrega? estado)
+    {
+        return estado switch
+        {
+            Entrega.EstadoEntrega.Aprobado => "Aprobado",
+            Entrega.EstadoEntrega.EnRevision => "En Revisión",
+            Entrega.EstadoEntrega.EnProgreso => "En Progreso",
+            Entrega.EstadoEntrega.Rehacer => "Rehacer",
+            Entrega.EstadoEntrega.Reprobado => "Reprobado",
+            _ => "Desconocido"
         };
     }
 }

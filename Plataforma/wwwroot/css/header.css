@@ -2,18 +2,18 @@
 
 /* --- Variables for easier theme management --- */
 :root {
-    --primary-dark-blue: #2c3e50; /* Deep Charcoal Blue */
-    --secondary-dark-blue: #34495e; /* Slightly lighter Charcoal Blue */
+    --primary-dark-blue: #1f2937;
+    --secondary-dark-blue: #374151;
     --light-text: #ecf0f1; /* Off-white for main text */
     --hover-light: #ffffff; /* Pure white on hover for crispness */
     --shadow-subtle: rgba(0, 0, 0, 0.25);
     /* Role-specific, subtle accents */
     --administrador-accent: #f1c40f; /* Yellow accent */
-    --profesor-accent: #3498db; /* Muted vibrant blue */
-    --estudiante-accent: #2ecc71; /* Muted vibrant green */
+    --profesor-accent: #8E90F5; /* Muted vibrant blue */
+    --estudiante-accent: #10b981; /* Muted vibrant green */
     --guest-accent: #95a5a6; /* Muted grey/silver */
     /* Logout button specific hover colors (can be customized per role) */
-    --logout-hover-color-profesor: #fbc531; /* Slightly brighter yellow */
+    --logout-hover-color-profesor: #6366f1; /* Slightly brighter yellow */
     --logout-hover-color-estudiante: #ff763c; /* Slightly brighter orange */
     --logout-hover-color-administrador: #f4d03f; /* Slightly brighter yellow for admin logout */
     --logout-hover-color-guest: #bdc3c7; /* Lighter grey for guest logout */
@@ -126,34 +126,49 @@
     white-space: nowrap; /* Prevent wrapping on desktop */
 }
 
-/* Role-specific accent colors for hover/active */
+
+
 .administrador-theme .nav-link:hover,
-.administrador-theme .logout-button:hover,
-.administrador-theme .nav-link::after,
-.administrador-theme .logout-button::after {
+.administrador-theme .logout-button:hover {
     color: var(--administrador-accent);
 }
 
 .profesor-theme .nav-link:hover,
-.profesor-theme .logout-button:hover,
-.profesor-theme .nav-link::after,
-.profesor-theme .logout-button::after {
+.profesor-theme .logout-button:hover {
     color: var(--profesor-accent);
 }
 
 .estudiante-theme .nav-link:hover,
-.estudiante-theme .logout-button:hover,
-.estudiante-theme .nav-link::after,
-.estudiante-theme .logout-button::after {
+.estudiante-theme .logout-button:hover {
     color: var(--estudiante-accent);
 }
 
 .guest-theme .nav-link:hover,
-.guest-theme .logout-button:hover,
-.guest-theme .nav-link::after,
-.guest-theme .logout-button::after {
+.guest-theme .logout-button:hover {
     color: var(--guest-accent);
 }
+
+
+.administrador-theme .nav-link:active,
+.administrador-theme .logout-button:active {
+    color: var(--administrador-accent);
+}
+
+.profesor-theme .nav-link:active,
+.profesor-theme .logout-button:active {
+    color: var(--profesor-accent);
+}
+
+.estudiante-theme .nav-link:active,
+.estudiante-theme .logout-button:active {
+    color: var(--estudiante-accent);
+}
+
+.guest-theme .nav-link:active,
+.guest-theme .logout-button:active {
+    color: var(--guest-accent);
+}
+
 
 a:active {
     color: white;

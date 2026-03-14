@@ -163,6 +163,9 @@ h1 {
 a:hover {
     color: white;
 }
+.action-button:hover {
+    color: #0252CA;
+}
 
 .action-button i {
     margin-right: 8px;

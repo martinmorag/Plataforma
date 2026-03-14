@@ -1,7 +1,7 @@
-﻿@model Plataforma.Models.Administracion.CursoAdminIndexViewModel;
+﻿@model Plataforma.Models.Administracion.CrearCursoViewModel
 
 @{
-    ViewData["Title"] = "Crear Curso";
+    ViewData["Title"] = "Editar Curso";
     Layout = "_Layout";
 }
 
@@ -10,12 +10,14 @@
 <div class="create-course-wrapper">
 
     <div class="create-course-card">
+
         <div class="card-header">
-            <h2>Crear Nuevo Curso</h2>
-            <p>Configura la información básica del curso.</p>
+            <h2>Editar Curso</h2>
+            <p>Modifica la información del curso.</p>
         </div>
 
-        <form asp-action="CrearCurso"
+        <form asp-action="EditarCurso"
+              asp-route-id="@ViewBag.CursoId"
               method="post"
               enctype="multipart/form-data"
               class="course-form">
@@ -24,14 +26,31 @@
 
             <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
 
+            <!-- Nombre -->
             <div class="form-group">
                 <label asp-for="Nombre"></label>
-                <input asp-for="Nombre" class="form-control-custom" />
+                <input asp-for="Nombre"
+                       class="form-control-custom"
+                       placeholder="Nombre del curso" />
                 <span asp-validation-for="Nombre" class="field-validation"></span>
             </div>
 
+            <!-- Imagen actual -->
+            @if (ViewBag.ImageUrl != null)
+            {
+                <div class="form-group">
+                    <label>Imagen Actual</label>
+                    <div class="image-preview-wrapper">
+                        <img src="@ViewBag.ImageUrl"
+                             alt="Imagen Curso"
+                             class="image-preview" />
+                    </div>
+                </div>
+            }
+
+            <!-- Reemplazar imagen -->
             <div class="form-group">
-                <label>Imagen del Curso (opcional)</label>
+                <label>Reemplazar Imagen (opcional)</label>
                 <div class="file-input-wrapper">
                     <input type="file" name="imagenCurso" accept="image/*" />
                 </div>
@@ -39,25 +58,27 @@
 
             <div class="form-group switch-group">
                 <label class="switch">
-                    <input asp-for="Habilitado" type="checkbox" checked />
+                    <input asp-for="Disponible" type="checkbox" />
                     <span class="slider"></span>
                 </label>
                 <span class="switch-label">Curso Disponible</span>
             </div>
 
             <div class="form-actions">
-                <a asp-controller="administrador" asp-action="Index" class="btn-secondary">
+                <a asp-controller="administrador"
+                       asp-action="Index"
+                       class="btn-secondary">
                     Cancelar
                 </a>
 
                 <button type="submit" class="btn-primary">
-                    Crear Curso
+                    Guardar Cambios
                 </button>
             </div>
 
         </form>
-    </div>
 
+    </div>
 </div>
 
 @section Scripts {

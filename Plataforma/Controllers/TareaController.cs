@@ -10,30 +10,34 @@ using System.Threading;
 
 namespace Plataforma.Controllers
 {
-    [ApiController] // Keep this
+    [ApiController]
     [Route("api/[controller]")]
     public class TareaController : Controller
     {
         private readonly PlataformaContext _context;
         private readonly UserManager<UsuarioIdentidad> _userManager;
         private readonly IWebHostEnvironment _environment;
-        private readonly IEmailSender _emailSender; // Inject the email sender
+        private readonly IEmailSender _emailSender;
+        private readonly S3Service _s3Service;
+        private readonly CloudFrontService _cloudFrontService;
 
-        public TareaController(PlataformaContext context, UserManager<UsuarioIdentidad> userManager, IWebHostEnvironment environment, IEmailSender emailSender)
+        public TareaController(PlataformaContext context, UserManager<UsuarioIdentidad> userManager, IWebHostEnvironment environment, IEmailSender emailSender, S3Service s3Service, CloudFrontService cloudFrontService)
         {
             _context = context;
             _userManager = userManager;
             _environment = environment;
             _emailSender = emailSender;
+            _s3Service = s3Service;
+            _cloudFrontService = cloudFrontService;
         }
 
         [HttpGet("GetTareaDetails")]
-        public async Task<IActionResult> GetTareaDetails(Guid tareaId) // 'id' will be the TareaId
+        public async Task<IActionResult> GetTareaDetails(Guid tareaId)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return Unauthorized();
+                return RedirectToAction("Index", "ingreso");
             }
 
             var estudianteId = user.Id;
@@ -71,16 +75,22 @@ namespace Plataforma.Controllers
                 Descripcion = tarea.Descripcion,
                 FechaLimite = tarea.FechaVencimiento,
                 TipoContenido = tarea.TipoEntregaEsperado,
-                ContenidoUrl = tarea.Archivo?.ArchivoUrl,
-
+                ContenidoUrl = tarea.Archivo != null
+                    ? _cloudFrontService.GenerateSignedUrl(tarea.Archivo.ArchivoUrl)
+                    : null,
                 HasSubmitted = submission != null,
-                SubmissionStatusText = submission?.Estado.ToString() ?? "Pendiente",
+                SubmissionStatusText = submission?.Estado?.GetDisplayName() ?? "Pendiente",
                 IsSubmittedApproved = submission?.Estado == Entrega.EstadoEntrega.Aprobado, // Using new enum name, adjust if yours is different
-                SubmittedFileUrl = submission?.Archivo?.ArchivoUrl,
+                SubmittedFileUrl = submission?.Archivo != null
+                    ? _cloudFrontService.GenerateSignedUrl(submission.Archivo.ArchivoUrl)
+                    : null,
                 SubmissionComentarios = submission?.ComentariosProfesor,
                 SubmissionFecha = submission?.FechaEntrega,
                 ClaseId = tarea?.ClaseId
             };
+
+            bool isDeadlinePassed = tarea?.FechaVencimiento < DateTime.UtcNow;
+            ViewBag.IsBlockedByDeadline = isDeadlinePassed;
 
             // Pass video progress data to the View (via ViewBag or by extending TareaDetailsViewModel)
             ViewBag.InitialVideoTime = progresoVideo?.TotalSeconds ?? 0;
@@ -96,7 +106,20 @@ namespace Plataforma.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return Unauthorized();
+                return RedirectToAction("Index", "ingreso");
+            }
+
+            var tarea = await _context.tareas
+                .FirstOrDefaultAsync(t => t.TareaId == progressDto.TareaId);
+
+            if (tarea == null)
+            {
+                return NotFound();
+            }
+
+            if (tarea.FechaVencimiento < DateTime.UtcNow)
+            {
+                return BadRequest("La fecha límite para ver este video ha vencido.");
             }
 
             var estudianteId = user.Id;
@@ -141,18 +164,32 @@ namespace Plataforma.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return Unauthorized();
+                return RedirectToAction("Index", "ingreso");
             }
 
             var estudianteId = user.Id;
 
-            var entrega = await _context.entregas.Include(t => t.Tarea)
-                                            .ThenInclude(c => c.Clase)
-                                                .ThenInclude(c => c.Modulo) // Then includes the Modulo related to the Clase
-                                                    .ThenInclude(m => m.Curso) // Then includes the Curso related to the Modulo
-                                                        .ThenInclude(curso => curso.CursoProfesores) // Then includes the join entity CursoProfesores
-                                                            .ThenInclude(cp => cp.Profesor)
-                                            .FirstOrDefaultAsync(e => e.TareaId == completionDto.TareaId && e.EstudianteId == estudianteId);
+            var tarea = await _context.tareas
+                            .Include(t => t.Clase)
+                                .ThenInclude(c => c.Modulo)
+                                    .ThenInclude(m => m.Curso)
+                                        .ThenInclude(curso => curso.CursoProfesores)
+                                            .ThenInclude(cp => cp.Profesor)
+                            .FirstOrDefaultAsync(t => t.TareaId == completionDto.TareaId);
+
+            if (tarea == null)
+            {
+                return NotFound("Tarea no encontrada.");
+            }
+
+            if (tarea.FechaVencimiento < DateTime.UtcNow)
+            {
+                return BadRequest("La fecha límite para completar esta actividad ha vencido.");
+            }
+
+            // Now search for existing submission
+            var entrega = await _context.entregas
+                .FirstOrDefaultAsync(e => e.TareaId == completionDto.TareaId && e.EstudianteId == estudianteId);
 
             if (entrega == null)
             {
@@ -192,22 +229,66 @@ namespace Plataforma.Controllers
             string submissionDate = DateTime.Now.ToString();
 
             string subject = $"Nueva Entrega: {taskName} ({className} - {courseName})";
+
             string messageBody = $@"
-            <html>
-            <body>
-                <p>Hola,</p>
-                <p>Se ha completado de ver un video para la tarea <strong>{taskName}</strong>.</p>
-                <ul>
-                    <li><strong>Estudiante:</strong> {studentName}</li>
-                    <li><strong>Tarea:</strong> {taskName}</li>
-                    <li><strong>Clase:</strong> {className}</li>
-                    <li><strong>Curso:</strong> {courseName}</li>
-                    <li><strong>Fecha de Entrega:</strong> {submissionDate}</li>
-                </ul>
-               
-                <p>Atentamente,<br/>El equipo de la Plataforma Educativa</p>
-            </body>
-            </html>";
+                <html>
+                <body style='margin:0;padding:0;background-color:#f4f6f8;font-family:Arial, Helvetica, sans-serif;'>
+
+                <table align='center' width='600' style='background:white;border-radius:8px;padding:30px;margin-top:30px;box-shadow:0 2px 6px rgba(0,0,0,0.05);'>
+
+                <tr>
+                <td>
+
+                <h2 style='color:#2c3e50;margin-bottom:10px;'>Nueva Actividad Completada</h2>
+
+                <p style='font-size:14px;color:#555;'>Hola,</p>
+
+                <p style='font-size:14px;color:#555;line-height:1.6;'>
+                Se ha completado la visualización de un video correspondiente a la tarea
+                <strong>{taskName}</strong>.
+                </p>
+
+                <table width='100%' style='margin-top:20px;border-collapse:collapse;font-size:14px;'>
+
+                <tr>
+                <td style='padding:8px;border-bottom:1px solid #eee;'><strong>Estudiante</strong></td>
+                <td style='padding:8px;border-bottom:1px solid #eee;'>{studentName}</td>
+                </tr>
+
+                <tr>
+                <td style='padding:8px;border-bottom:1px solid #eee;'><strong>Tarea</strong></td>
+                <td style='padding:8px;border-bottom:1px solid #eee;'>{taskName}</td>
+                </tr>
+
+                <tr>
+                <td style='padding:8px;border-bottom:1px solid #eee;'><strong>Clase</strong></td>
+                <td style='padding:8px;border-bottom:1px solid #eee;'>{className}</td>
+                </tr>
+
+                <tr>
+                <td style='padding:8px;border-bottom:1px solid #eee;'><strong>Curso</strong></td>
+                <td style='padding:8px;border-bottom:1px solid #eee;'>{courseName}</td>
+                </tr>
+
+                <tr>
+                <td style='padding:8px;'><strong>Fecha de Entrega</strong></td>
+                <td style='padding:8px;'>{submissionDate}</td>
+                </tr>
+
+                </table>
+
+                <p style='margin-top:30px;font-size:14px;color:#555;'>
+                Atentamente,<br>
+                <strong>Equipo de la Plataforma Educativa</strong>
+                </p>
+
+                </td>
+                </tr>
+
+                </table>
+
+                </body>
+                </html>";
 
             // Get all professors associated with the course
             var professors = entrega.Tarea.Clase.Modulo.Curso.CursoProfesores.Select(cp => cp.Profesor).ToList();
@@ -223,7 +304,6 @@ namespace Plataforma.Controllers
                     }
                     catch (Exception ex)
                     {
-                        // --- MORE DETAILED ERROR MESSAGE ---
                         Console.Error.WriteLine("------------------------------------------------------------------------------------------------------------------------------------------------------");
                         Console.Error.WriteLine($"ERROR: Failed to send email to professor '{professor.Email}' for TareaId: {entrega.Tarea.TareaId}, EntregaId: {entrega.EntregaId}.");
                         Console.Error.WriteLine($"Exception Type: {ex.GetType().Name}");
@@ -254,9 +334,9 @@ namespace Plataforma.Controllers
         public async Task<IActionResult> SubmitAssignment([FromForm] SubmissionFormViewModel model)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            if (!User.Identity.IsAuthenticated)
             {
-                return Unauthorized("User not authenticated.");
+                return RedirectToAction("Index", "ingreso");
             }
 
             if (!ModelState.IsValid)
@@ -278,16 +358,20 @@ namespace Plataforma.Controllers
                 return NotFound("Tarea not found.");
             }
 
-            // Check if a file is required and provided
+            if (tarea.FechaVencimiento < DateTime.UtcNow)
+            {
+                return BadRequest("La fecha límite de entrega ya ha vencido.");
+            }
+
             if (model.SubmittedFile == null)
             {
-                return BadRequest("A file submission is required for this task.");
+                return BadRequest("Una entrega ya ha sido hecha para esta tarea.");
             }
 
             // Check if the submitted file is a PDF (or other allowed types)
             if (model.SubmittedFile != null)
             {
-                var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".txt" }; // Define allowed types
+                var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".txt" }; 
                 var fileExtension = Path.GetExtension(model.SubmittedFile.FileName).ToLowerInvariant();
                 if (!allowedExtensions.Contains(fileExtension))
                 {
@@ -303,39 +387,34 @@ namespace Plataforma.Controllers
 
 
             // --- File Upload Logic ---
-            string filePath = null;
             Guid? fileId = null;
             if (model.SubmittedFile != null)
             {
                 try
                 {
-                    // Define the path to save files (e.g., wwwroot/submissions)
-                    var uploadsFolder = Path.Combine(_environment.WebRootPath, "entregas");
-                    if (!Directory.Exists(uploadsFolder))
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                    }
+                    var file = model.SubmittedFile;
 
-                    // Generate a unique file name to prevent collisions
-                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.SubmittedFile.FileName);
-                    filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    var safeName = file.FileName.Replace(" ", "_");
 
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await model.SubmittedFile.CopyToAsync(fileStream);
-                    }
+                    string s3Key = await _s3Service.UploadFileAsync(
+                        file,
+                        "entregas",
+                        safeName
+                    );
 
-                    // Save file metadata to the Archivo table
                     var archivo = new Archivo
                     {
                         ArchivoId = Guid.NewGuid(),
-                        FileName = model.SubmittedFile.FileName,
-                        ArchivoUrl = "/entregas/" + uniqueFileName, // Store relative path
-                        ContentType = model.SubmittedFile.ContentType,
-                        SizeInBytes = model.SubmittedFile.Length
+                        ArchivoUrl = s3Key, 
+                        FileName = safeName,
+                        ContentType = file.ContentType,
+                        SizeInBytes = file.Length,
+                        FechaSubida = DateTime.UtcNow
                     };
+
                     _context.archivos.Add(archivo);
-                    await _context.SaveChangesAsync(); // Save Archivo first to get its ID
+                    await _context.SaveChangesAsync();
+
                     fileId = archivo.ArchivoId;
 
                 }
@@ -345,9 +424,7 @@ namespace Plataforma.Controllers
                     Console.WriteLine($"Error uploading file: {ex.Message}");
                     return StatusCode(500, "Error uploading file.");
                 }
-            }
-            // --- End File Upload Logic ---
-
+            }   
 
             // Check if an existing submission exists for this task and student
             var existingSubmission = await _context.entregas
@@ -373,7 +450,7 @@ namespace Plataforma.Controllers
             {
                 entregaid = existingSubmission.EntregaId;
                 existingSubmission.FechaEntrega = DateTime.Now;
-                existingSubmission.Estado = Entrega.EstadoEntrega.EnProgreso; // Reset to pending if re-submitting
+                existingSubmission.Estado = Entrega.EstadoEntrega.EnRevision; // Reset to pending if re-submitting
                 existingSubmission.ArchivoId = fileId; // Update linked file
                 // Optional: Remove old file if it was replaced
                 // if (existingSubmission.ArchivoId != null && existingSubmission.ArchivoId != fileId) { /* Delete old file logic */ }
@@ -388,24 +465,75 @@ namespace Plataforma.Controllers
             string submissionDate = DateTime.Now.ToString();
 
             string subject = $"Nueva Entrega: {taskName} ({className} - {courseName})";
+
             string messageBody = $@"
-            <html>
-            <body>
-                <p>Hola,</p>
-                <p>Se ha realizado una nueva entrega para la tarea <strong>{taskName}</strong>.</p>
-                <ul>
-                    <li><strong>Estudiante:</strong> {studentName}</li>
-                    <li><strong>Tarea:</strong> {taskName}</li>
-                    <li><strong>Clase:</strong> {className}</li>
-                    <li><strong>Curso:</strong> {courseName}</li>
-                    <li><strong>Fecha de Entrega:</strong> {submissionDate}</li>
-                </ul>
-                <p>Puedes revisar la entrega en la plataforma:</p>
-                <p><a href='{Url.Action("VerEntregas", "tareas", new { tareaId = tarea.TareaId }, Request.Scheme)}'>Revisar Entrega</a></p>
-                
-                <p>Atentamente,<br/>El equipo de la Plataforma Educativa</p>
-            </body>
-            </html>";
+                <html>
+                <body style='margin:0;padding:0;background-color:#f4f6f8;font-family:Arial, Helvetica, sans-serif;'>
+
+                <table align='center' width='600' style='background:white;border-radius:8px;padding:30px;margin-top:30px;box-shadow:0 2px 6px rgba(0,0,0,0.05);'>
+
+                <tr>
+                <td>
+
+                <h2 style='color:#2c3e50;margin-bottom:10px;'>Nueva Entrega Recibida</h2>
+
+                <p style='font-size:14px;color:#555;'>Hola,</p>
+
+                <p style='font-size:14px;color:#555;line-height:1.6;'>
+                Se ha recibido una nueva entrega correspondiente a la tarea 
+                <strong>{taskName}</strong>.
+                </p>
+
+                <table width='100%' style='margin-top:20px;border-collapse:collapse;font-size:14px;'>
+
+                <tr>
+                <td style='padding:8px;border-bottom:1px solid #eee;'><strong>Estudiante</strong></td>
+                <td style='padding:8px;border-bottom:1px solid #eee;'>{studentName}</td>
+                </tr>
+
+                <tr>
+                <td style='padding:8px;border-bottom:1px solid #eee;'><strong>Tarea</strong></td>
+                <td style='padding:8px;border-bottom:1px solid #eee;'>{taskName}</td>
+                </tr>
+
+                <tr>
+                <td style='padding:8px;border-bottom:1px solid #eee;'><strong>Clase</strong></td>
+                <td style='padding:8px;border-bottom:1px solid #eee;'>{className}</td>
+                </tr>
+
+                <tr>
+                <td style='padding:8px;border-bottom:1px solid #eee;'><strong>Curso</strong></td>
+                <td style='padding:8px;border-bottom:1px solid #eee;'>{courseName}</td>
+                </tr>
+
+                <tr>
+                <td style='padding:8px;'><strong>Fecha de Entrega</strong></td>
+                <td style='padding:8px;'>{submissionDate}</td>
+                </tr>
+
+                </table>
+
+                <div style='text-align:center;margin-top:30px;'>
+
+                <a href='{Url.Action("VerEntregas", "tareas", new { tareaId = tarea.TareaId }, Request.Scheme)}'
+                style='background-color:#2e86de;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;font-size:14px;font-weight:bold;display:inline-block;'>
+                Revisar Entrega
+                </a>
+
+                </div>
+
+                <p style='margin-top:30px;font-size:14px;color:#555;'>
+                Atentamente,<br>
+                <strong>Equipo de la Plataforma Educativa</strong>
+                </p>
+
+                </td>
+                </tr>
+
+                </table>
+
+                </body>
+                </html>";
 
             // Get all professors associated with the course
             var professors = tarea.Clase.Modulo.Curso.CursoProfesores.Select(cp => cp.Profesor).ToList();

@@ -8,5 +8,6 @@
         public string ClaseNombre { get; set; }
         public int TotalEntregas { get; set; }
         public int EntregasPendientes { get; set; }
+        public string TipoContenido { get; set; }
     }
 }

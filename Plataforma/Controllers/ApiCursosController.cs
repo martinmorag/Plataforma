@@ -21,10 +21,9 @@ namespace Plataforma.Controllers
         public async Task<IActionResult> ManageCourses([FromBody] CourseChangesModel changes)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            if (!User.Identity.IsAuthenticated)
             {
-                // Return a 401 Unauthorized status if the user is not logged in
-                return Unauthorized(new { message = "Usuario no autenticado." });
+                return RedirectToAction("Index", "ingreso");
             }
 
             if (changes == null)

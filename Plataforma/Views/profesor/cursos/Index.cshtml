@@ -1,12 +1,8 @@
 ﻿@{
-    var cursos = ViewBag.Cursos as List<Plataforma.Models.Curso>;
-    var modulos = ViewBag.Modulos as List<Plataforma.Models.Modulo>;
-    var clases = ViewBag.Clases as List<Plataforma.Models.Clase>;
-
     ViewData["Title"] = "Cursos";
     Layout = "_Layout";
 }
-@model Plataforma.Models.Modulo
+@model Plataforma.Models.Profesores.ProfesorCursosViewModel
 
 <link rel="stylesheet" href="~/css/cursos/inicio.css" asp-append-version="true" />
 
@@ -17,35 +13,64 @@
         <label for="courseSelect" class="upload-tarea-label">Elige el curso:</label>
         <select id="courseSelect" class="upload-tarea-select">
             <option value="">Seleccione un curso</option>
+            @foreach (var curso in Model.Cursos)
+            {
+                <option value="@curso.CursoId">
+                    @curso.Nombre
+                </option>
+            }
         </select>
     </div>
     <div class="form-group" id="moduloSelectGroup" style="display: none;">
         <label for="moduloSelect" class="upload-tarea-label">Elige el módulo:</label>
         <select id="moduloSelect" class="upload-tarea-select">
             <option value="">Seleccione un módulo</option>
+            @foreach (var curso in Model.Cursos)
+            {
+                foreach (var modulo in curso.Modulos)
+                {
+                    <option value="@modulo.ModuloId"
+                            data-curso-id="@curso.CursoId">
+                        @modulo.Nombre
+                    </option>
+                }
+            }
         </select>
     </div>
     <div class="form-group" id="claseSelectGroup" style="display: none;">
         <label for="claseSelect" class="upload-tarea-label">Elige la clase:</label>
         <select id="claseSelect" class="upload-tarea-select">
             <option value="">Seleccione una clase</option>
+            @foreach (var curso in Model.Cursos)
+            {
+                foreach (var modulo in curso.Modulos)
+                {
+                    foreach (var clase in modulo.Clases)
+                    {
+                        <option value="@clase.ClaseId"
+                                data-modulo-id="@modulo.ModuloId">
+                            @clase.Nombre
+                        </option>
+                    }
+                }
+            }
         </select>
     </div>
     <div class="form-group">
         <label class="upload-tarea-label">Tipo de Contenido:</label>
         <div class="radio-group">
-            <div class="radio-card">
-                <input type="radio" id="fileOption" name="contentType" value="file" class="upload-tarea-radio">
-                <label for="fileOption" class="upload-tarea-radio-label">
-                    <i class="fas fa-file"></i> <span>Archivo</span>
-                </label>
-            </div>
-            <div class="radio-card">
-                <input type="radio" id="videoOption" name="contentType" value="video" class="upload-tarea-radio">
-                <label for="videoOption" class="upload-tarea-radio-label">
-                    <i class="fas fa-video"></i> <span>Video</span>
-                </label>
-            </div>
+            <label class="radio-card">
+                <input type="radio" name="contentType" value="Documento">
+                <span>
+                    <i class="fas fa-file"></i> Archivo
+                </span>
+            </label>
+            <label class="radio-card">
+                <input type="radio" name="contentType" value="video">
+                <span>
+                    <i class="fas fa-video"></i> Video
+                </span>
+            </label>
         </div>
     </div>
     <div class="form-group" id="claseIdGroup" style="display: none;">
@@ -64,7 +89,7 @@
         <h3 class="upload-tarea-title">Crear Módulo</h3>
     <div class="form-group">
         <label for="cursoIdModulo" class="upload-tarea-label">Seleccione el Curso:</label>
-        <select asp-for="CursoId" class="upload-tarea-select" asp-items="@(new SelectList(cursos, "CursoId", "Nombre"))">
+            <select asp-for="CursoId" class="upload-tarea-select" asp-items="@(new SelectList(Model.Cursos, "CursoId", "Nombre"))">
             <option value="">Seleccione un curso</option>
         </select>
     </div>
@@ -82,7 +107,7 @@
     <h3 class="upload-tarea-title">Crear Clase</h3>
     <div class="form-group">
         <label for="cursoIdForClase" class="upload-tarea-label">Seleccione el Curso:</label>
-        <select asp-for="CursoId" id="cursoIdForClase" class="upload-tarea-select" asp-items="@(new SelectList(cursos, "CursoId", "Nombre"))">
+            <select asp-for="CursoId" id="cursoIdForClase" class="upload-tarea-select" asp-items="@(new SelectList(Model.Cursos, "CursoId", "Nombre"))">
             <option value="">Seleccione un curso</option>
         </select>
     </div>
@@ -90,13 +115,16 @@
         <label for="moduloIdForClase" class="upload-tarea-label">Seleccione el Módulo:</label>
             <select id="moduloIdForClase" name="ModuloId"  class="upload-tarea-select" required>
             <option value="">Seleccione un módulo</option>
-            @if (modulos != null)
-            {
-                foreach (var modulo in modulos)
+                @foreach (var curso in Model.Cursos)
                 {
-                    <option value="@modulo.ModuloId" data-curso-id="@modulo.CursoId">@modulo.Nombre</option>
+                    foreach (var modulo in curso.Modulos)
+                    {
+                        <option value="@modulo.ModuloId"
+                                data-curso-id="@curso.CursoId">
+                            @modulo.Nombre
+                        </option>
+                    }
                 }
-            }
         </select>
     </div>
     <div class="form-group">
@@ -107,27 +135,6 @@
     <div id="crearClaseStatus" class="upload-tarea-status"></div>
 </form>
 </div>
-
-
-
-
-
-@using Newtonsoft.Json
-@{
-    var settings = new JsonSerializerSettings
-    {
-        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-    };
-
-    var cursosJson = JsonConvert.SerializeObject(ViewBag.Cursos, settings);
-    var modulosJson = JsonConvert.SerializeObject(ViewBag.Modulos, settings);
-    var clasesJson = JsonConvert.SerializeObject(ViewBag.Clases, settings);
-}
-<script>
-    const cursos = @Html.Raw(cursosJson);
-    const modulos = @Html.Raw(modulosJson);
-    const clases = @Html.Raw(clasesJson);
-</script>
 
 
 <script src="~/js/cursos/inicio.js" asp-append-version="true"></script>

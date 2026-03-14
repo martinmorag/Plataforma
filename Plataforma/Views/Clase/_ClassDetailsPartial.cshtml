@@ -23,7 +23,7 @@
                                 {
                                     <i class="fa-solid fa-check-circle completed-icon"></i>
                                 }
-                                else if (tarea.SubmissionStatusText == "EnRevision")
+                                else if (tarea.SubmissionStatusText == "En Revision")
                                 {
                                     <i class="fa-solid fa-hourglass-half in-review-icon"></i>
                                 }
@@ -37,14 +37,23 @@
                                 }
                             </span>
                             <h4>@tarea.Nombre</h4>
-                            <span class="task-due-date">Fecha Límite: @tarea.FechaLimite.ToShortDateString()</span>
+                            <span class="task-due-date">
+                                Fecha Límite: @tarea.FechaLimite.ToShortDateString()
+
+                                @if (tarea.FechaLimite < DateTime.UtcNow)
+                                {
+                                    <span class="badge badge-danger ms-2">
+                                        Vencida
+                                    </span>
+                                }
+                            </span>
                         </div>
                         @if (!string.IsNullOrEmpty(tarea.Descripcion))
                         {
                             <p class="task-description-short">@tarea.Descripcion</p>
                         }
                         <div class="task-meta">
-                            <span class="badge task-status-badge @(tarea.IsSubmittedApproved ? "badge-success" : (tarea.SubmissionStatusText == "EnRevision" ? "badge-warning" : (tarea.SubmissionStatusText == "Reprobado" ? "badge-danger" : "badge-info")))">
+                            <span class="badge task-status-badge @(tarea.IsSubmittedApproved ? "badge-success" : (tarea.SubmissionStatusText == "En Revision" ? "badge-warning" : (tarea.SubmissionStatusText == "Reprobado" ? "badge-danger" : "badge-info")))">
                                 @tarea.SubmissionStatusText
                             </span>
                             @if (tarea.HasFileRequirement)
@@ -71,7 +80,7 @@
                                 }
                                 else
                                 {
-                                    <span>Entregar Tarea</span>
+                                    <span>Ver Tarea</span>
                                 }
                             </a>
                         </div>

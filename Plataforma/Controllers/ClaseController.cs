@@ -24,9 +24,9 @@ namespace Plataforma.Controllers
         public async Task<IActionResult> GetClassDetails(Guid claseId)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            if (!User.Identity.IsAuthenticated)
             {
-                return Unauthorized();
+                return RedirectToAction("Index", "ingreso");
             }
 
             var estudianteId = user.Id; // Assuming EstudianteId is Guid
@@ -65,7 +65,7 @@ namespace Plataforma.Controllers
                     string submissionStatusText = "Pendiente";
                     if (studentSubmissions.TryGetValue(t.TareaId, out var submission))
                     {
-                        submissionStatusText = submission.Estado.ToString(); // "EnRevision", "Aprobado", "Reprobado"
+                        submissionStatusText = submission.Estado.GetDisplayName(); // "EnRevision", "Aprobado", "Reprobado"
                     }
 
                     return new TareaViewModel

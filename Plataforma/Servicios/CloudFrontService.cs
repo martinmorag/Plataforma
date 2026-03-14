@@ -5,18 +5,19 @@ public class CloudFrontService
 {
     private readonly string _distributionDomain;
     private readonly string _keyPairId;
-    private readonly string _privateKeyPath;
+    private readonly string _privateKey;
 
     public CloudFrontService(IConfiguration config)
     {
         _distributionDomain = config["CloudFront:Domain"];
         _keyPairId = config["CloudFront:KeyPairId"];
-        _privateKeyPath = config["CloudFront:PrivateKey"];
+        _privateKey = config["CloudFront:PrivateKey"];
     }
 
     public string GenerateSignedUrl(string fileKey, int expireMinutes = 60)
     {
         var url = $"https://{_distributionDomain}/{fileKey}";
+
         var expires = DateTimeOffset.UtcNow.AddMinutes(expireMinutes).ToUnixTimeSeconds();
 
         string policy = $"{{\"Statement\":[{{\"Resource\":\"{url}\",\"Condition\":{{\"DateLessThan\":{{\"AWS:EpochTime\":{expires}}}}}}}]}}";
@@ -26,7 +27,10 @@ public class CloudFrontService
         string signature;
         using (var rsa = RSA.Create())
         {
-            var privateKey = File.ReadAllText(_privateKeyPath);
+            var privateKey = _privateKey
+                .Replace("\\n", "\n")
+                .Replace("\r", "");
+
             rsa.ImportFromPem(privateKey.ToCharArray());
 
             var signedBytes = rsa.SignData(policyBytes, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);

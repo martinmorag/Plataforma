@@ -18,14 +18,15 @@ namespace Plataforma.Controllers
             _userManager = userManager;
         }
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return View(new LoginModel()); 
         }
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> login(LoginModel model)
+        public async Task<IActionResult> login(LoginModel model, string returnUrl = null)
             {
             if (ModelState.IsValid)
             {
@@ -39,6 +40,11 @@ namespace Plataforma.Controllers
                     {
                         await _signInManager.SignInAsync(user, model.RememberMe);
 
+                        if (!string.IsNullOrEmpty(returnUrl))
+                        {
+                            return LocalRedirect(returnUrl);
+                        }
+
                         var roles = await _userManager.GetRolesAsync(user);
 
                         if (roles.Contains("Administrador"))
@@ -51,17 +57,23 @@ namespace Plataforma.Controllers
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Inicio de sesión inválido.");
+
+                        ViewData["ReturnUrl"] = returnUrl;
                         return View("Index", model); 
                         
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Email o contraseña incorrectos."); // to not reveal that there is not a user with that email
+                    ModelState.AddModelError(string.Empty, "Email o contraseña incorrectos.");
+
+                    ViewData["ReturnUrl"] = returnUrl;
                     return View("Index", model); 
                 }
             }
-            return View("Index", model); // Or View("Index", model) if your login form is on the Index page.
+
+            ViewData["ReturnUrl"] = returnUrl;
+            return View("Index", model); 
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -81,7 +93,7 @@ namespace Plataforma.Controllers
             var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
-                return NotFound();
+                return RedirectToAction("Index");
 
             // ✅ Prevent link reuse
             if (user.PasswordHash != null)

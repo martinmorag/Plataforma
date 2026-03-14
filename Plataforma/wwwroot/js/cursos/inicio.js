@@ -3,38 +3,33 @@
 const courseSelect = document.getElementById("courseSelect");
 const moduloSelect = document.getElementById("moduloSelect");
 const claseSelect = document.getElementById("claseSelect");
+
 const moduloGroup = document.getElementById("moduloSelectGroup");
 const claseGroup = document.getElementById("claseSelectGroup");
 const submitButton = document.querySelector('.upload-tarea-button');
 
-// Populate Curso options
-cursos.forEach(curso => {
-    const option = document.createElement("option");
-    option.value = curso.CursoId;
-    option.textContent = curso.Nombre;
-    courseSelect.appendChild(option);
-});
+// Store original options
+const allModuloOptions = Array.from(moduloSelect.querySelectorAll("option[data-curso-id]"));
+const allClaseOptions = Array.from(claseSelect.querySelectorAll("option[data-modulo-id]"));
 
 courseSelect.addEventListener("change", function () {
     const selectedCursoId = this.value;
 
-    // Reset next dropdowns
     moduloSelect.innerHTML = '<option value="">Seleccione un módulo</option>';
     claseSelect.innerHTML = '<option value="">Seleccione una clase</option>';
     claseGroup.style.display = "none";
-    submitButton.disabled = true; // Disable submit button
+    submitButton.disabled = true;
 
     if (!selectedCursoId) {
         moduloGroup.style.display = "none";
         return;
     }
 
-    // Filter and populate Modulos
-    const filteredModulos = modulos.filter(m => m.CursoId === selectedCursoId);
-    filteredModulos.forEach(modulo => {
-        const option = document.createElement("option");
-        option.value = modulo.ModuloId;
-        option.textContent = modulo.Titulo;
+    const filteredModulos = allModuloOptions.filter(
+        option => option.dataset.cursoId === selectedCursoId
+    );
+
+    filteredModulos.forEach(option => {
         moduloSelect.appendChild(option);
     });
 
@@ -45,68 +40,44 @@ moduloSelect.addEventListener("change", function () {
     const selectedModuloId = this.value;
 
     claseSelect.innerHTML = '<option value="">Seleccione una clase</option>';
-    submitButton.disabled = true; // Disable submit button
+    submitButton.disabled = true;
+
     if (!selectedModuloId) {
         claseGroup.style.display = "none";
         return;
     }
 
-    const filteredClases = clases.filter(clase => clase.ModuloId === selectedModuloId);
-    filteredClases.forEach(clase => {
-        const option = document.createElement("option");
-        option.value = clase.ClaseId;
-        option.textContent = clase.Nombre;
+    const filteredClases = allClaseOptions.filter(
+        option => option.dataset.moduloId === selectedModuloId
+    );
+
+    filteredClases.forEach(option => {
         claseSelect.appendChild(option);
     });
 
     claseGroup.style.display = "block";
 });
 
-claseSelect.addEventListener("change", function () {
-    const selectedClaseId = this.value;
+claseSelect.addEventListener("change", validateSubmit);
+document.querySelectorAll('input[name="contentType"]').forEach(radio =>
+    radio.addEventListener("change", validateSubmit)
+);
+
+function validateSubmit() {
+    const selectedClaseId = claseSelect.value;
     const selectedContentType = document.querySelector('input[name="contentType"]:checked')?.value;
 
-    if (selectedClaseId && selectedContentType) {
-        submitButton.disabled = false; // Enable submit button
-    } else {
-        submitButton.disabled = true; // Disable if either is not selected
-    }
-});
-
-const radioDivs = document.querySelectorAll('.radio-card');
-const radioInputs = document.querySelectorAll('.upload-tarea-radio');
-
-radioDivs.forEach((div, index) => {
-    div.addEventListener('click', () => {
-        // Unselect all radio inputs and divs
-        radioInputs.forEach(input => input.checked = false);
-        radioDivs.forEach(d => d.classList.remove('selected'));
-
-        // Select the clicked radio input and div
-        radioInputs[index].checked = true;
-        div.classList.add('selected');
-
-        // Check if a clase is selected to update submit button state
-        const selectedClaseId = claseSelect.value;
-        const selectedContentType = document.querySelector('input[name="contentType"]:checked')?.value;
-        if (selectedClaseId && selectedContentType) {
-            submitButton.disabled = false;
-        } else {
-            submitButton.disabled = true;
-        }
-    });
-});
+    submitButton.disabled = !(selectedClaseId && selectedContentType);
+}
 
 document.getElementById("uploadForm").addEventListener("submit", function (event) {
-    event.preventDefault(); // Prevent the default form submission
+    event.preventDefault();
 
     const selectedClaseId = claseSelect.value;
     const selectedContentType = document.querySelector('input[name="contentType"]:checked')?.value;
 
     if (selectedClaseId && selectedContentType) {
-        // Redirect to the CrearTarea action with query parameters
-        const redirectUrl = `tareas/crear?claseId=${selectedClaseId}&contentType=${selectedContentType}`;
-        window.location.href = redirectUrl;
+        window.location.href = `tareas/crear?claseId=${selectedClaseId}&contentType=${selectedContentType}`;
     } else {
         alert("Por favor, seleccione una clase y un tipo de contenido.");
     }
@@ -122,34 +93,58 @@ const cursoIdForClaseSelect = document.getElementById('cursoIdForClase');
 const moduloIdForClaseSelect = document.getElementById('moduloIdForClase');
 const moduloSelectForClaseGroup = document.getElementById('moduloSelectForClaseGroup');
 
-if (cursoIdForClaseSelect && moduloIdForClaseSelect && moduloSelectForClaseGroup) {
-    // Initially hide the modulo dropdown
+if (cursoIdForClaseSelect && moduloIdForClaseSelect) {
+
+    const allModuloOptionsClase = Array.from(
+        moduloIdForClaseSelect.querySelectorAll("option[data-curso-id]")
+    );
+
     moduloSelectForClaseGroup.style.display = 'none';
 
     cursoIdForClaseSelect.addEventListener('change', function () {
+
         const selectedCursoId = this.value;
 
-        // Reset the modulo dropdown
         moduloIdForClaseSelect.innerHTML = '<option value="">Seleccione un módulo</option>';
 
-        if (selectedCursoId) {
-            // Filter modulos based on the selected CursoId
-            const filteredModulos = modulos.filter(modulo => modulo.CursoId === selectedCursoId);
-
-            // Populate the modulo dropdown with the filtered options
-            filteredModulos.forEach(modulo => {
-                const option = document.createElement('option');
-                option.value = modulo.ModuloId;
-                option.textContent = modulo.Titulo;
-                option.dataset.cursoId = modulo.CursoId; // Keep the curso ID for filtering (already in HTML)
-                moduloIdForClaseSelect.appendChild(option);
-            });
-
-            // Show the modulo dropdown
-            moduloSelectForClaseGroup.style.display = 'block';
-        } else {
-            // Hide the modulo dropdown if no curso is selected
+        if (!selectedCursoId) {
             moduloSelectForClaseGroup.style.display = 'none';
+            return;
         }
+
+        const filtered = allModuloOptionsClase.filter(
+            option => option.dataset.cursoId === selectedCursoId
+        );
+
+        filtered.forEach(option => {
+            moduloIdForClaseSelect.appendChild(option);
+        });
+
+        moduloSelectForClaseGroup.style.display = 'block';
     });
 }
+
+
+
+
+
+
+// deseleccionar seleccionar tarea item
+
+document.querySelectorAll('.radio-card input[type="radio"]').forEach(radio => {
+
+    radio.addEventListener('click', function (e) {
+
+        if (this.dataset.waschecked === "true") {
+            this.checked = false;
+            this.dataset.waschecked = "false";
+            this.dispatchEvent(new Event('change'));
+        } else {
+            document.querySelectorAll('.radio-card input[type="radio"]')
+                .forEach(r => r.dataset.waschecked = "false");
+
+            this.dataset.waschecked = "true";
+        }
+    });
+
+});

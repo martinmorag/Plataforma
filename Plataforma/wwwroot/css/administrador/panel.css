@@ -245,9 +245,57 @@ table {
 }
 
     /* Ensure consistent button sizing within modals */
-    .modal-footer .btn {
-        min-width: 90px; /* Give buttons a consistent width */
+.modal-footer .btn {
+    min-width: 90px; /* Give buttons a consistent width */
+}
+
+
+
+
+/* ===== Admin Navigation Card ===== */
+
+.admin-navigation {
+    margin: 25px 0 35px 0;
+}
+
+.nav-card {
+    background: linear-gradient(135deg, #1f2937, #111827);
+    border-radius: 14px;
+    padding: 22px 28px;
+    color: white;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.nav-card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.nav-action-btn {
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: 0.2s ease;
+    white-space: nowrap;
+}
+
+
+    /* Optional subtle difference for second button */
+    .nav-action-btn.secondary {
+        opacity: 0.9;
     }
+
+
+
+
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {

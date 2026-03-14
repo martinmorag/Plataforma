@@ -14,9 +14,9 @@ namespace Plataforma.Servicios
             _bucketName = config["AWS:BucketName"];
         }
 
-        public async Task<string> UploadFileAsync(IFormFile file, string folder)
+        public async Task<string> UploadFileAsync(IFormFile file, string folder, string fileName)
         {
-            var key = $"private/{folder}/{Guid.NewGuid()}_{file.FileName}";
+            var key = $"private/{folder}/{Guid.NewGuid()}_{fileName}";
 
             using var stream = file.OpenReadStream();
 

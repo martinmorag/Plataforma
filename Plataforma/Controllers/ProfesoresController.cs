@@ -155,8 +155,10 @@ namespace Plataforma.Controllers
         {
             var usuario = await _userManager.FindByIdAsync(id.ToString());
 
-            if (usuario == null)
-                return NotFound();
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "ingreso");
+            }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(usuario);
 
@@ -182,9 +184,9 @@ namespace Plataforma.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var usuario = await _userManager.FindByIdAsync(id.ToString());
-            if (usuario == null)
+            if (!User.Identity.IsAuthenticated)
             {
-                return NotFound();
+                return RedirectToAction("Index", "ingreso");
             }
 
             var result = await _userManager.DeleteAsync(usuario);

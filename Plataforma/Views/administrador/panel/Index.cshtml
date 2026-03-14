@@ -9,6 +9,31 @@
 <div class="admin-panel-container">
     <h1>@ViewData["Title"]</h1>
 
+    <section class="admin-navigation">
+        <div class="nav-card">
+            <div class="nav-card-content">
+                <div>
+                    <h3>Gestión de Cursos</h3>
+                    <p>Administra cursos, módulos, clases y asignaciones de profesores.</p>
+                </div>
+
+                <div class="nav-actions">
+                    <a asp-controller="administrador"
+                           asp-action="Crear_Curso"
+                           class="btn btn-light nav-action-btn">
+                        Crear Curso
+                    </a>
+
+                    <a asp-controller="administrador"
+                           asp-action="cursos"
+                           class="btn btn-outline-light nav-action-btn secondary">
+                        Ver Cursos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     @if (TempData["SetupLink"] != null)
     {
         <div class="alert alert-success">

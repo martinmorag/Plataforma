@@ -2,7 +2,8 @@
 
 <link rel="stylesheet" href="~/css/curso/details.css" asp-append-version="true" />
 
-<div class="tarea-details-container" id="current-tarea-details">
+
+<div class="tarea-details-container" id="current-tarea-details" data-deadline-blocked="@ViewBag.IsBlockedByDeadline.ToString().ToLower()">
     <div class="tarea-header-with-button">
         <h1>@Model.Nombre</h1>
         <a href="javascript:void(0);"
@@ -23,7 +24,13 @@
 
     @* Dynamic Content Section *@
     <div class="tarea-content-section">
-        @if (Model.TipoContenido == "video" && !string.IsNullOrEmpty(Model.ContenidoUrl))
+        @if (ViewBag.IsBlockedByDeadline)
+        {
+            <div class="alert alert-danger">
+                Esta actividad está bloqueada porque la fecha límite ha vencido.
+            </div>
+        }
+        else if (Model.TipoContenido == "video" && !string.IsNullOrEmpty(Model.ContenidoUrl))
         {
             <h3>Contenido del Video</h3>
             <div class="video-player-container">
@@ -54,9 +61,9 @@
         else if (Model.TipoContenido == "Documento" && !string.IsNullOrEmpty(Model.ContenidoUrl))
         {
             <h3>Documento de la Tarea</h3>
-            <p>Puedes descargar o ver el documento a continuación:</p>
-            <a href="@Model.ContenidoUrl" target="_blank" class="btn btn-info">
-                <i class="fa-solid fa-file-arrow-down"></i> Descargar Documento
+            <p>Puedes ver el documento a continuación:</p>
+            <a href="@Model.ContenidoUrl" class="btn btn-info" target="_blank">
+                <i class="fa-solid fa-file-arrow-down"></i> Ver Documento
             </a>
         }
         else
@@ -95,19 +102,30 @@
                     <p>@Model.SubmissionComentarios</p>
                 </div>
             }
-            @* @if (Model.SubmissionStatusText == "Reprobado" || Model.SubmissionStatusText == "Pendiente") // Allow re-submission if reprobado or still pending *@
-            @* { *@
-            @*     <a href="#" class="btn btn-warning submit-task-btn" data-task-id="@Model.TareaId">Revisar y Entregar @(Model.SubmissionStatusText == "Reprobado" ? "Nuevamente" : "")</a> *@
-            @* } *@
-            @* else if (Model.SubmissionStatusText == "Aprobado" || Model.SubmissionStatusText == "EnRevision") *@
-            @* { *@
-            @*     <a href="#" class="btn btn-secondary view-submission-btn" data-task-id="@Model.TareaId">Ver Detalle de Entrega</a> *@
-            @* } *@
+            @if (Model.SubmissionStatusText == "Rehacer" && !ViewBag.IsBlockedByDeadline)
+            {
+                <button type="button"
+                        class="btn btn-warning mt-3"
+                        onclick="showSubmissionForm('@Model.TareaId')">
+                    Rehacer Entrega
+                </button>
+            }
         }
-        else if (Model.TipoContenido == "Documento")
+        else if (Model.TipoContenido == "Documento" && !ViewBag.IsBlockedByDeadline)
         {
             <p class="alert alert-info">Aún no has entregado esta tarea.</p>
-            <button type="button" class="btn btn-primary" onclick="showSubmissionForm('@Model.TareaId')">Entregar Tarea</button>
+            <button type="button"
+                    class="btn btn-primary"
+                    onclick="showSubmissionForm('@Model.TareaId')">
+                Entregar Tarea
+            </button>
+        }
+        else if (Model.TipoContenido == "Documento" && ViewBag.IsBlockedByDeadline)
+        {
+            <div class="alert alert-danger d-flex align-items-center">
+                <i class="fa-solid fa-lock me-2"></i>
+                La fecha límite de esta tarea ha vencido. Ya no es posible realizar entregas.
+            </div>
         }
         else if (Model.TipoContenido == "video")
         {
@@ -126,10 +144,10 @@
                         <div class="form-text">Tamaño máximo: 10MB. Formatos permitidos: .pdf, .doc, .docx, .txt.</div>
                     </div>
                    
-                    <div class="mb-3">
+                    @* <div class="mb-3">
                         <label for="comments-@Model.TareaId" class="form-label">Comentarios (opcional)</label>
                         <textarea class="form-control" id="comments-@Model.TareaId" name="Comments" rows="3"></textarea>
-                    </div>
+                    </div> *@
 
                     <button type="submit" class="btn btn-success">Enviar Entrega</button>
                     <button type="button" class="btn btn-secondary" onclick="hideSubmissionForm('@Model.TareaId')">Cancelar</button>
@@ -139,5 +157,8 @@
     </div>
 </div>
 
-
-<script src="~/js/curso/tarea.js" asp-append-version="true"></script>
+<script>
+    const isBlocked = document
+    .getElementById("current-tarea-details")
+    ?.dataset.deadlineBlocked === "true";
+</script>

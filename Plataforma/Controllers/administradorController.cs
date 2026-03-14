@@ -15,12 +15,13 @@ namespace Plataforma.Controllers
         private readonly UserManager<UsuarioIdentidad> _userManager;
         private readonly PlataformaContext _context;
         private readonly S3Service _s3Service;
-        public administradorController(UserManager<UsuarioIdentidad> userManager, PlataformaContext context, S3Service s3Service)
+        private readonly CloudFrontService _cloudFrontService;
+        public administradorController(UserManager<UsuarioIdentidad> userManager, PlataformaContext context, S3Service s3Service, CloudFrontService cloudFrontService)
         {
             _userManager = userManager;
             _context = context;
             _s3Service = s3Service;
-
+            _cloudFrontService = cloudFrontService;
         }
         public async Task<IActionResult> panel()
         {
@@ -74,7 +75,7 @@ namespace Plataforma.Controllers
                 CantidadEstudiantes = c.CursoEstudiantes.Count,
 
                 Profesores = c.CursoProfesores
-                    .Select(cp => cp.Profesor.Nombre)
+                    .Select(cp => $"{cp.Profesor.Nombre} {cp.Profesor.Apellido}")
                     .ToList(),
 
                 Modulos = c.Modulos.Select(m => new ModuloAdminViewModel
@@ -91,8 +92,8 @@ namespace Plataforma.Controllers
         }
         // Crear un curso
         [HttpGet]
-        [Route("adminisrtador/cursos/crear")]
-        public IActionResult CrearCurso()
+        [Route("administrador/cursos/crear")]
+        public IActionResult Crear_Curso()
         {
             return View("~/Views/administrador/cursos/crear.cshtml");
         }
@@ -132,15 +133,58 @@ namespace Plataforma.Controllers
 
             return View("~/Views/administrador/profesores/cursos.cshtml", viewModel);
         }
+        [HttpGet]
+        [Route("administrador/cursos/editar/{id}")]
+        public async Task<IActionResult> Editar_Curso(Guid id)
+        {
+            var curso = await _context.cursos
+                .FirstOrDefaultAsync(c => c.CursoId == id);
+
+            curso.ImageUrl = _cloudFrontService.GenerateSignedUrl(curso.ImageUrl);
+
+            if (curso == null)
+                return NotFound();
+
+            var model = new CrearCursoViewModel
+            {
+                Nombre = curso.Nombre,
+                Disponible = curso.Habilitado
+            };
+
+            ViewBag.CursoId = curso.CursoId;
+            ViewBag.ImageUrl = curso.ImageUrl;
+
+            return View("~/Views/administrador/cursos/editar.cshtml", model);
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("admin/cursos/crear")]
+        [Route("administrador/cursos/toggle/{id}")]
+        public async Task<IActionResult> ToggleHabilitado(Guid id)
+        {
+            var curso = await _context.cursos.FindAsync(id);
+
+            if (curso == null)
+                return NotFound();
+
+            curso.Habilitado = !curso.Habilitado;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                habilitado = curso.Habilitado
+            });
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("administrador/cursos/crear")]
         public async Task<IActionResult> CrearCurso(
             CrearCursoViewModel model,
             IFormFile? imagenCurso)
         {
             if (!ModelState.IsValid)
-                return View("~/Views/admin/cursos/crear.cshtml", model);
+                return View("~/Views/administrador/cursos/crear.cshtml", model);
 
             bool exists = await _context.cursos
                 .AnyAsync(c => c.Nombre == model.Nombre);
@@ -148,22 +192,60 @@ namespace Plataforma.Controllers
             if (exists)
             {
                 ModelState.AddModelError("Nombre", "Ya existe un curso con ese nombre.");
-                return View("~/Views/admin/cursos/crear.cshtml", model);
+                return View("~/Views/administrador/cursos/crear.cshtml", model);
             }
 
             string? imageKey = null;
 
+            var cursoId = Guid.NewGuid();
+
             if (imagenCurso != null && imagenCurso.Length > 0)
             {
+                var extension = Path.GetExtension(imagenCurso.FileName);
+                var fileName = $"curso-{cursoId}-{Guid.NewGuid()}{extension}";
+
                 imageKey = await _s3Service.UploadFileAsync(
                     imagenCurso,
-                    "cursos"
+                    "cursos",
+                    fileName
                 );
+            }
+            else
+            {
+                var defaultImages = new List<string>
+                {
+                    "public/cursos/default-1.jpg",
+                    "public/cursos/default-2.jpg",
+                    "public/cursos/default-3.jpg",
+                    "public/cursos/default-4.jpg",
+                    "public/cursos/default-5.jpg"
+                };
+
+                var lastDefaultCurso = await _context.cursos
+                    .Where(c => c.ImageUrl != null &&
+                                c.ImageUrl.StartsWith("public/cursos/default-"))
+                    .OrderByDescending(c => c.CursoId)
+                    .FirstOrDefaultAsync();
+
+                int nextIndex = 0;
+
+                if (lastDefaultCurso != null)
+                {
+                    int lastIndex = defaultImages
+                        .FindIndex(x => x == lastDefaultCurso.ImageUrl);
+
+                    if (lastIndex >= 0)
+                    {
+                        nextIndex = (lastIndex + 1) % defaultImages.Count;
+                    }
+                }
+
+                imageKey = defaultImages[nextIndex];
             }
 
             var curso = new Curso
             {
-                CursoId = Guid.NewGuid(),
+                CursoId = cursoId,
                 Nombre = model.Nombre,
                 Habilitado = model.Disponible,
                 ImageUrl = imageKey
@@ -172,7 +254,77 @@ namespace Plataforma.Controllers
             _context.cursos.Add(curso);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("ListaCursos"); 
+            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("administrador/cursos/editar/{id}")]
+        public async Task<IActionResult> EditarCurso(
+            Guid id,
+            CrearCursoViewModel model,
+            IFormFile? imagenCurso)
+        {
+            if (!ModelState.IsValid)
+                return View("~/Views/administrador/cursos/editar.cshtml", model);
+
+            var curso = await _context.cursos
+                .FirstOrDefaultAsync(c => c.CursoId == id);
+
+            if (curso == null)
+                return NotFound();
+
+            bool exists = await _context.cursos
+                .AnyAsync(c => c.Nombre == model.Nombre && c.CursoId != id);
+
+            if (exists)
+            {
+                ModelState.AddModelError("Nombre", "Ya existe un curso con ese nombre.");
+                return View("~/Views/administrador/cursos/editar.cshtml", model);
+            }
+
+            if (imagenCurso != null && imagenCurso.Length > 0)
+            {
+                if (!string.IsNullOrEmpty(curso.ImageUrl) &&
+                    !curso.ImageUrl.StartsWith("public/cursos/default-"))
+                {
+                    await _s3Service.DeleteFileAsync(curso.ImageUrl);
+                }
+
+                var extension = Path.GetExtension(imagenCurso.FileName);
+                var fileName = $"{Guid.NewGuid()}{extension}";
+
+                curso.ImageUrl = await _s3Service.UploadFileAsync(imagenCurso, "cursos", fileName);
+            }
+
+            curso.Nombre = model.Nombre;
+            curso.Habilitado = model.Disponible;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("administrador/cursos/eliminar/{id}")]
+        public async Task<IActionResult> EliminarCurso(Guid id)
+        {
+            var curso = await _context.cursos
+                .FirstOrDefaultAsync(c => c.CursoId == id);
+
+            if (curso == null)
+                return NotFound();
+
+            // Delete image if NOT default
+            if (!string.IsNullOrEmpty(curso.ImageUrl) &&
+                !curso.ImageUrl.StartsWith("public/cursos/default-"))
+            {
+                await _s3Service.DeleteFileAsync(curso.ImageUrl);
+            }
+
+            _context.cursos.Remove(curso);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -241,9 +393,9 @@ namespace Plataforma.Controllers
             }
 
             var usuario = await _userManager.FindByIdAsync(id.ToString());
-            if (usuario == null)
+            if (!User.Identity.IsAuthenticated)
             {
-                return NotFound();
+                return RedirectToAction("Index", "ingreso");
             }
             var estudianteAEditar = new Estudiante
             {
@@ -282,9 +434,9 @@ namespace Plataforma.Controllers
             }
 
             var usuario = await _userManager.FindByIdAsync(id.ToString());
-            if (usuario == null)
+            if (!User.Identity.IsAuthenticated)
             {
-                return NotFound();
+                return RedirectToAction("Index", "ingreso");
             }
             var profesoraEditar = new Profesor
             {

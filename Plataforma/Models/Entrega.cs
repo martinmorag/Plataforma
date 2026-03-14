@@ -24,10 +24,19 @@ namespace Plataforma.Models
         // --- Status of the submission ---
         public enum EstadoEntrega
         {
+            [Display(Name = "En Revisión")]
             EnRevision,
+
+            [Display(Name = "En Progreso")]
             EnProgreso,
+
+            [Display(Name = "Aprobado")]
             Aprobado,
+
+            [Display(Name = "Reprobado")]
             Reprobado,
+
+            [Display(Name = "Rehacer")]
             Rehacer
         }
 

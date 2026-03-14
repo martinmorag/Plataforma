@@ -96,7 +96,6 @@ namespace Plataforma.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(AdministracionViewModel model)
         {
-            //var id = Guid.Parse(Id);
             if (model.EstudianteAEditar?.Id != model.EstudianteAEditar?.Id)
             {
                 return NotFound();
@@ -153,8 +152,10 @@ namespace Plataforma.Controllers
         {
             var usuario = await _userManager.FindByIdAsync(id.ToString());
 
-            if (usuario == null)
-                return NotFound();
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "ingreso");
+            }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(usuario);
 
@@ -180,9 +181,9 @@ namespace Plataforma.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var usuario = await _userManager.FindByIdAsync(id.ToString());
-            if (usuario == null)
+            if (!User.Identity.IsAuthenticated)
             {
-                return NotFound();
+                return RedirectToAction("Index", "ingreso");
             }
 
             var result = await _userManager.DeleteAsync(usuario);
@@ -203,11 +204,6 @@ namespace Plataforma.Controllers
                 return RedirectToAction("panel", "administrador");
             }
         }
-        //[HttpPost]
-        //public async Task<IActionResult> AssignCourse(AdministracionViewModel model)
-        //{
-
-        //}
         private bool UsuarioIdentidadExists(Guid id)
         {
             return _context.Users.Any(e => e.Id == id);

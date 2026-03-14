@@ -28,9 +28,9 @@ namespace Plataforma.Controllers
             }
 
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            if (!User.Identity.IsAuthenticated)
             {
-                return Unauthorized();
+                return RedirectToAction("Index", "ingreso");
             }
 
             var estudianteId = user.Id; // Assuming EstudianteId is a Guid, parse from user.Id

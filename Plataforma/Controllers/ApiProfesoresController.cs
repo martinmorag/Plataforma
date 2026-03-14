@@ -14,52 +14,47 @@ namespace Plataforma.Controllers
         private readonly PlataformaContext _context;
         private readonly UserManager<UsuarioIdentidad> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly CloudFrontService _cloudFrontService;
 
-        public ApiProfesoresController(PlataformaContext context, UserManager<UsuarioIdentidad> userManager, IWebHostEnvironment webHostEnvironment)
+        public ApiProfesoresController(PlataformaContext context, UserManager<UsuarioIdentidad> userManager, IWebHostEnvironment webHostEnvironment, CloudFrontService cloudFrontService)
         {
             _context = context;
             _userManager = userManager;
             _webHostEnvironment = webHostEnvironment;
+            _cloudFrontService = cloudFrontService;
+
         }
 
         // API Endpoint for Professor to Download a Submitted File
         // The route here will be /api/Profesores/DownloadSubmittedFile/{entregaId}
-        [HttpGet("DownloadSubmittedFile/{entregaId}")]
-        public async Task<IActionResult> DownloadSubmittedFile(Guid entregaId)
+        [HttpGet("AccessSubmittedFile/{entregaId}")]
+        public async Task<IActionResult> AccessSubmittedFile(Guid entregaId)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Unauthorized();
-
-            Guid profesorId = user.Id;
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "ingreso");
+            }
 
             var entrega = await _context.entregas
-                                 .Include(e => e.Archivo)
-                                 .FirstOrDefaultAsync(e => e.EntregaId == entregaId);
+                .Include(e => e.Archivo)
+                .FirstOrDefaultAsync(e => e.EntregaId == entregaId);
 
             if (entrega == null || entrega.Archivo == null)
-            {
                 return NotFound("Entrega o archivo no encontrado.");
-            }
 
-            // Construct the absolute path to the file
-            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, entrega.Archivo.ArchivoUrl.TrimStart('/'));
+            var signedUrl = _cloudFrontService.GenerateSignedUrl(entrega.Archivo.ArchivoUrl);
 
-            if (!System.IO.File.Exists(filePath))
-            {
-                return NotFound("El archivo no existe en el servidor.");
-            }
-
-            var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-            var contentType = entrega.Archivo.ContentType ?? "application/octet-stream";
-            var fileName = entrega.Archivo.FileName;
-
-            return File(fileBytes, contentType, fileName);
+            return Redirect(signedUrl);
         }
         [HttpPost("EvaluarEntrega")]
         public async Task<IActionResult> EvaluarEntrega([FromBody] EvaluarEntregaDto evaluacionDto)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Unauthorized();
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "ingreso");
+            }
 
             Guid profesorId = user.Id;
 

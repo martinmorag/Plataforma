@@ -6,12 +6,13 @@ using Plataforma.Data;
 using Plataforma.Models;
 using Plataforma.Models.Profesores;
 using Plataforma.Servicios;
+using System.Data;
 using System.Net.Http;
 using Xabe.FFmpeg;
 
 namespace Plataforma.Controllers
 {
-    [Authorize(Roles = "Profesor")]
+    [Authorize]
     public class tareasController : Controller
     {
         private readonly PlataformaContext _context;
@@ -19,26 +20,28 @@ namespace Plataforma.Controllers
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _environment;
         private readonly UserManager<UsuarioIdentidad> _userManager;
+        private readonly SignInManager<UsuarioIdentidad> _signInManager;
         private readonly S3Service _s3Service;
 
-        public tareasController(PlataformaContext context, IHttpClientFactory httpClientFactory, IConfiguration configuration, IWebHostEnvironment environment, UserManager<UsuarioIdentidad> userManager, S3Service s3service) // Modify this
+        public tareasController(PlataformaContext context, IHttpClientFactory httpClientFactory, IConfiguration configuration, IWebHostEnvironment environment, UserManager<UsuarioIdentidad> userManager, SignInManager<UsuarioIdentidad> signInManager, S3Service s3service) 
         {
             _context = context;
             _httpClient = httpClientFactory.CreateClient();
             _configuration = configuration; 
             _environment = environment;
             _userManager = userManager;
+            _signInManager = signInManager;
             _s3Service = s3service;
         }
         [HttpGet("profesor/tareas/crear")]
+        [Authorize(Roles = "Profesor")]
         public IActionResult crear(Guid claseId, string contentType)
         {
             var clase = _context.clases.FirstOrDefault(c => c.ClaseId == claseId);
 
             if (clase == null)
-            {
-                return NotFound();
-            }
+                return RedirectToAction("Index", "ingreso");
+            
 
             var tarea = new Tarea
             {
@@ -50,12 +53,15 @@ namespace Plataforma.Controllers
             return View("~/Views/profesor/tareas/crear.cshtml", tarea);
         }
         [HttpGet]
+        [Authorize(Roles = "Profesor")]
         [Route("profesor/tareas/editar")]
         public async Task<IActionResult> editar(Guid tareaId)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return Redirect("/Identity/Account/Login");
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "ingreso");
+            }
 
             var tarea = await _context.tareas
                 .Include(t => t.Archivo)
@@ -85,13 +91,14 @@ namespace Plataforma.Controllers
             return View("~/Views/profesor/tareas/editar.cshtml", vm);
         }
         [HttpGet]
+        [Authorize(Roles = "Profesor")]
         [Route("profesor/tareas/ver")] // Example route
         public async Task<IActionResult> MisCursosYTareas(Guid? cursoId = null)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            if (!User.Identity.IsAuthenticated)
             {
-                return Redirect("/Identity/Account/Login"); // Redirect to login if not authenticated
+                return RedirectToAction("Index", "ingreso");
             }
 
             Guid profesorId = user.Id;
@@ -153,76 +160,16 @@ namespace Plataforma.Controllers
             ViewBag.SelectedCursoNombre = selectedCursoNombre; // This will be null if no course is initially selected
 
             return View("~/Views/profesor/tareas/ver.cshtml");
-            //var user = await _userManager.GetUserAsync(User);
-            //if (user == null)
-            //{
-            //    return Redirect("/Identity/Account/Login"); // Redirect to login if not authenticated
-            //}
-
-            //Guid profesorId = user.Id;
-
-            //// Get courses assigned to the current professor
-            //var cursos = await _context.CursoProfesores
-            //                           .Where(cp => cp.ProfesorId == profesorId)
-            //                           .Select(cp => new Models.Profesores.ProfesorCursoDto
-            //                           {
-            //                               CursoId = cp.Curso.CursoId,
-            //                               NombreCurso = cp.Curso.Nombre,
-            //                               TotalClases = cp.Curso.Modulos.SelectMany(m => m.Clases).Count(),
-            //                               TotalTareas = cp.Curso.Modulos.SelectMany(m => m.Clases).SelectMany(cl => cl.Tareas).Count()
-            //                           })
-            //                           .ToListAsync();
-
-            //// Pass courses to the view
-            //ViewBag.Cursos = cursos;
-
-            //// Optionally, pre-load tasks for the first course
-            //if (cursos.Any())
-            //{
-            //    var firstCursoId = cursos.First().CursoId;
-            //    // First, get the tasks with their relevant navigation properties
-            //    // We'll perform the counts separately or within the select if EF Core can handle it
-            //    var tareasQuery = _context.tareas
-            //       .Include(t => t.Clase)
-            //           .ThenInclude(cl => cl.Modulo)
-            //               .ThenInclude(m => m.Curso)
-            //       .Where(t => t.Clase.Modulo.CursoId == firstCursoId);
-
-            //    // Now, select into your ViewModel and calculate counts
-            //    // EF Core should be able to translate this more reliably
-            //    var tareas = await tareasQuery
-            //        .Select(t => new ProfesorTareaViewModel
-            //        {
-            //            TareaId = t.TareaId,
-            //            Nombre = t.Nombre,
-            //            FechaLimite = t.FechaVencimiento,
-            //            ClaseNombre = t.Clase.Nombre,
-            //            // Explicitly count related entities using a subquery
-            //            TotalEntregas = _context.entregas.Count(e => e.TareaId == t.TareaId),
-            //            EntregasPendientes = _context.entregas.Count(e => e.TareaId == t.TareaId &&
-            //                                                                (e.Estado == Entrega.EstadoEntrega.EnRevision ||
-            //                                                                e.Estado == Entrega.EstadoEntrega.EnProgreso))
-            //        })
-            //        .ToListAsync();
-            //    ViewBag.Tareas = tareas;
-            //    ViewBag.SelectedCursoNombre = cursos.First().NombreCurso;
-            //}
-            //else
-            //{
-            //    ViewBag.Tareas = new List<ProfesorTareaViewModel>();
-            //    ViewBag.SelectedCursoNombre = "Ninguno";
-            //}
-
-            //return View("~/Views/profesor/tareas/ver.cshtml");
         }
         [HttpGet]
-        [Route("profesor/tareas/GetTareasByCurso")] // A new, dedicated API route
-        public async Task<IActionResult> GetTareasByCurso(Guid cursoId) // No longer optional, as it's required for this API
+        [Authorize(Roles = "Profesor")]
+        [Route("profesor/tareas/GetTareasByCurso")] 
+        public async Task<IActionResult> GetTareasByCurso(Guid cursoId) 
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            if (!User.Identity.IsAuthenticated)
             {
-                return Unauthorized(); // Return 401 if not authenticated
+                return RedirectToAction("Index", "ingreso");
             }
 
             // Ensure the course belongs to the current professor through the CursoProfesores join table
@@ -243,6 +190,7 @@ namespace Plataforma.Controllers
                     Nombre = t.Nombre,
                     ClaseNombre = t.Clase.Nombre,
                     FechaLimite = t.FechaVencimiento,
+                    TipoContenido = t.TipoEntregaEsperado,
                     TotalEntregas = _context.entregas.Count(e => e.TareaId == t.TareaId),
                     EntregasPendientes = _context.entregas.Count(e => e.TareaId == t.TareaId &&
                                                                        (e.Estado == Entrega.EstadoEntrega.EnRevision ||
@@ -253,13 +201,22 @@ namespace Plataforma.Controllers
             return Ok(tareas); // This is the key: return JSON data
         }
         [HttpGet]
-        [Route("profesor/tareas/entregas")] // Example route
+        [Route("profesor/tareas/entregas")]
         public async Task<IActionResult> VerEntregas(Guid tareaId)
         {
+            if (!User.IsInRole("Profesor"))
+            {
+                await _signInManager.SignOutAsync();
+                var returnUrl = Url.Action("VerEntregas", "tareas", new { tareaId });
+                return RedirectToAction("Index", "ingreso", new { ReturnUrl = returnUrl });
+            }
+
             var user = await _userManager.GetUserAsync(User);
+
             if (user == null)
             {
-                return Redirect("/Identity/Account/Login");
+                var returnUrl = Url.Action("VerEntregas", "tareas", new { tareaId });
+                return RedirectToAction("Index", "ingreso", new { ReturnUrl = returnUrl });
             }
 
             Guid profesorId = user.Id;
@@ -295,7 +252,7 @@ namespace Plataforma.Controllers
                                              FechaEntrega = e.FechaEntrega,
                                              ComentariosProfesor = e.ComentariosProfesor,
                                              // For MVC, the URL needs to point to your *API* endpoint
-                                             ArchivoUrl = e.Archivo != null ? $"/api/Profesores/DownloadSubmittedFile/{e.EntregaId}" : null,
+                                             ArchivoUrl = e.Archivo != null ? $"/api/Profesores/AccessSubmittedFile/{e.EntregaId}" : null,
                                              ArchivoNombreOriginal = e.Archivo != null ? e.Archivo.FileName : null,
                                          })
                                          .ToListAsync();
@@ -305,6 +262,7 @@ namespace Plataforma.Controllers
             return View("~/Views/profesor/tareas/entregas.cshtml", entregas);
         }
         [HttpPost]
+        [Authorize(Roles = "Profesor")]
         [ValidateAntiForgeryToken] 
         public async Task<IActionResult> Create(Tarea asignacionModel, IFormFile? archivoAsignacion) 
         {
@@ -328,16 +286,19 @@ namespace Plataforma.Controllers
                     return View("Crear", asignacionModel);
                 }
 
+                var safeName = archivoAsignacion.FileName.Replace(" ", "_");
+
                 string s3Key = await _s3Service.UploadFileAsync(
                                     archivoAsignacion,
-                                    "asignaciones"
+                                    "asignaciones",
+                                    safeName
                                 );
 
                 archivoGuardado = new Archivo
                 {
                     ArchivoId = Guid.NewGuid(),
                     ArchivoUrl = s3Key,
-                    FileName = archivoAsignacion.FileName,
+                    FileName = safeName,
                     ContentType = archivoAsignacion.ContentType,
                     SizeInBytes = archivoAsignacion.Length,
                     FechaSubida = DateTime.UtcNow
@@ -365,16 +326,19 @@ namespace Plataforma.Controllers
             _context.tareas.Add(nuevaAsignacion);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("cursos", "Inicio");
+            return RedirectToAction("Inicio", "cursos");
         }
         [HttpPost]
+        [Authorize(Roles = "Profesor")]
         [ValidateAntiForgeryToken]
         [Route("profesor/tareas/editar")]
         public async Task<IActionResult> Editar(EditarTareaViewModel model, IFormFile? nuevoArchivo)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return Redirect("/Identity/Account/Login");
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "ingreso");
+            }
 
             var tarea = await _context.tareas
                 .Include(t => t.Archivo)
@@ -402,16 +366,19 @@ namespace Plataforma.Controllers
                     _context.archivos.Remove(tarea.Archivo);
                 }
 
+                var safeName = nuevoArchivo.FileName.Replace(" ", "_");
+
                 string newKey = await _s3Service.UploadFileAsync(
                     nuevoArchivo,
-                    "asignaciones"
+                    "asignaciones",
+                    safeName
                 );
 
                 var nuevoArchivoDb = new Archivo
                 {
                     ArchivoId = Guid.NewGuid(),
                     ArchivoUrl = newKey,
-                    FileName = nuevoArchivo.FileName,
+                    FileName = safeName,
                     ContentType = nuevoArchivo.ContentType,
                     SizeInBytes = nuevoArchivo.Length,
                     FechaSubida = DateTime.UtcNow
@@ -429,6 +396,7 @@ namespace Plataforma.Controllers
                 new { cursoId = model.CursoId });
         }
         [HttpPost]
+        [Authorize(Roles = "Profesor")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Eliminar(Guid tareaId)
         {

@@ -54,9 +54,9 @@ function getStatusClass(status) {
     switch (status) {
         case "Aprobado":
             return "status-approved";
-        case "EnRevision":
+        case "En Revision":
             return "status-in-review";
-        case "EnProgreso":
+        case "En Progreso":
             return "status-in-progress";
         case "Rehacer": // Assuming this is also a possible status from the backend or dropdown
             return "status-redo";
@@ -124,85 +124,4 @@ saveEvaluationBtn.addEventListener('click', async function () {
         console.error('Error saving evaluation:', error);
         evaluationMessage.innerHTML = '<div class="error-message">Error de red al guardar la evaluación.</div>';
     }
-});
-
-
-
-
-
-
-
-
-
-
-
-document.querySelectorAll('.download-button').forEach(button => {
-    button.addEventListener('click', async function (event) {
-        event.preventDefault(); // Prevent the default link behavior
-        console.log("triggereed")
-
-        const entregaId = this.dataset.entregaId;
-        const fileName = this.dataset.fileName; // Get the original file name
-        const downloadUrl = `/api/ApiProfesores/DownloadSubmittedFile/${entregaId}`;
-
-        // Optional: Provide visual feedback (e.g., spinning icon)
-        const originalHtml = this.innerHTML;
-        this.innerHTML = '<i class="fa-solid fa-spinner fa-spin-pulse"></i> Descargando...';
-        this.disabled = true; // Disable button during download
-
-        try {
-            const response = await fetch(downloadUrl, {
-                method: 'GET',
-                // Add any necessary headers, e.g., authorization if using JWT/bearer tokens
-                // 'Authorization': `Bearer ${yourAuthToken}`
-            });
-
-            if (!response.ok) {
-                // Handle HTTP errors (e.g., 404 Not Found, 401 Unauthorized)
-                const errorText = await response.text();
-                console.error('Download failed:', response.status, errorText);
-                alert(`Error al descargar el archivo: ${response.statusText || 'Error de red.'}`);
-                return;
-            }
-
-            // Get the Content-Disposition header for a more accurate filename if available
-            const contentDisposition = response.headers.get('Content-Disposition');
-            let actualFileName = fileName; // Start with the filename from data attribute
-            if (contentDisposition) {
-                const fileNameMatch = contentDisposition.match(/filename\*?=(?:UTF-8'')?([^;]+)/i);
-                if (fileNameMatch && fileNameMatch[1]) {
-                    try {
-                        actualFileName = decodeURIComponent(fileNameMatch[1].replace(/^"|"$/g, ''));
-                    } catch (e) {
-                        console.warn('Could not decode filename from Content-Disposition, using provided name.');
-                        actualFileName = fileNameMatch[1].replace(/^"|"$/g, ''); // Fallback for decoding
-                    }
-                }
-            }
-
-            const blob = await response.blob(); // Get the response as a Blob
-
-            // Create a temporary URL for the Blob
-            const url = window.URL.createObjectURL(blob);
-
-            // Create a temporary <a> element
-            const a = document.createElement('a');
-            a.style.display = 'none'; // Hide the link
-            a.href = url;
-            a.download = actualFileName; // Set the desired filename for the download
-
-            document.body.appendChild(a); // Append to body (required for Firefox)
-            a.click(); // Programmatically click the link to trigger download
-
-            window.URL.revokeObjectURL(url); // Clean up the Blob URL
-
-        } catch (error) {
-            console.error('Network or unknown error during download:', error);
-            alert('Error de red al intentar descargar el archivo.');
-        } finally {
-            // Restore button state
-            this.innerHTML = originalHtml;
-            this.disabled = false;
-        }
-    })
 });

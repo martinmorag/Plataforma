@@ -82,7 +82,7 @@ function renderTasks(tareas, cursoNombre) {
                         <td data-label="Clase">${tarea.claseNombre}</td>
                         <td data-label="Fecha Límite">${new Date(tarea.fechaLimite).toLocaleDateString()}</td>
                         <td data-label="Entregas">${tarea.totalEntregas}</td>
-                        <td data-label="Pendientes de Revisión">${tarea.entregasPendientes}</td>
+                        <td data-label="Pendientes de Revisión">${tarea.tipoContenido == "video" ? "0" : tarea.entregasPendientes}</td>
                         <td data-label="">
                             <a href="/profesor/tareas/entregas?tareaId=${tarea.tareaId}" class="action-button view-button">
                                 <i class="fa-solid fa-list"></i> Ver Entregas
