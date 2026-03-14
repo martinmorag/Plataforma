@@ -43,6 +43,34 @@
     gap: 15px; /* Space between the "Add" button and the "Toggle" button */
 }
 
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box input {
+    padding: 8px 12px 8px 35px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 220px;
+    transition: all 0.2s ease;
+}
+
+.search-box input:focus {
+    border-color: #0d6efd;
+    outline: none;
+    box-shadow: 0 0 4px rgba(13,110,253,0.3);
+}
+
+.search-box i {
+    position: absolute;
+    left: 10px;
+    color: #777;
+    font-size: 13px;
+}
+
 /* New: Style for the "Add New" button */
 .add-new-btn {
     display: inline-flex; /* Allows icon and text to sit side-by-side */
