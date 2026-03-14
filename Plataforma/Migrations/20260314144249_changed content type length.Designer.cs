@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Plataforma.Data;
@@ -11,9 +12,11 @@ using Plataforma.Data;
 namespace Plataforma.Migrations
 {
     [DbContext(typeof(PlataformaContext))]
-    partial class PlataformaContextModelSnapshot : ModelSnapshot
+    [Migration("20260314144249_changed content type length")]
+    partial class changedcontenttypelength
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -165,8 +168,8 @@ namespace Plataforma.Migrations
 
                     b.Property<string>("ContentType")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<TimeSpan?>("DuracionVideo")
                         .HasColumnType("interval");

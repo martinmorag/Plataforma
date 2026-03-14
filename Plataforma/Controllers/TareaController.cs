@@ -371,14 +371,22 @@ namespace Plataforma.Controllers
             // Check if the submitted file is a PDF (or other allowed types)
             if (model.SubmittedFile != null)
             {
-                var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".txt" }; 
+                var allowedExtensions = new[]
+                            {
+                                ".pdf",
+                                ".doc",
+                                ".docx",
+                                ".xls",
+                                ".xlsx",
+                            };
+
                 var fileExtension = Path.GetExtension(model.SubmittedFile.FileName).ToLowerInvariant();
+
                 if (!allowedExtensions.Contains(fileExtension))
                 {
-                    return BadRequest($"Unsupported file type. Allowed types are: {string.Join(", ", allowedExtensions)}");
+                    return BadRequest($"Tipo de archivo no permitido. Los tipos permitidos son: {string.Join(", ", allowedExtensions)}");
                 }
 
-                // Optional: Check file size
                 if (model.SubmittedFile.Length > 10 * 1024 * 1024) // Max 10MB
                 {
                     return BadRequest("File size exceeds 10MB limit.");
@@ -394,19 +402,22 @@ namespace Plataforma.Controllers
                 {
                     var file = model.SubmittedFile;
 
-                    var safeName = file.FileName.Replace(" ", "_");
+                    var originalName = Path.GetFileName(file.FileName);
+                    var extension = Path.GetExtension(originalName).ToLowerInvariant();
+
+                    var storedFileName = $"{Guid.NewGuid()}{extension}";
 
                     string s3Key = await _s3Service.UploadFileAsync(
                         file,
                         "entregas",
-                        safeName
+                        storedFileName
                     );
 
                     var archivo = new Archivo
                     {
                         ArchivoId = Guid.NewGuid(),
                         ArchivoUrl = s3Key, 
-                        FileName = safeName,
+                        FileName = storedFileName,
                         ContentType = file.ContentType,
                         SizeInBytes = file.Length,
                         FechaSubida = DateTime.UtcNow

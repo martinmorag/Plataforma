@@ -276,29 +276,62 @@ namespace Plataforma.Controllers
 
             if (archivoAsignacion != null && archivoAsignacion.Length > 0)
             {
-                var isPdf = archivoAsignacion.ContentType == "application/pdf";
-                var isVideo = archivoAsignacion.ContentType.StartsWith("video/");
+                var extension = Path.GetExtension(archivoAsignacion.FileName).ToLowerInvariant();
 
-                if (!isPdf && !isVideo && !archivoAsignacion.ContentType.StartsWith("image/")) // Example: allow PDF, video, image
+                var allowedExtensions = new[]
+                            {
+                                ".pdf",
+                                ".doc",
+                                ".docx",
+                                ".xls",
+                                ".xlsx",
+                                ".gif",
+                                ".mp4",
+                                ".mov",
+                                ".avi"
+                            };
+
+                if (!allowedExtensions.Contains(extension))
                 {
-                    ModelState.AddModelError("archivoAsignacion", "Solo se permiten archivos PDF, videos o para la asignación.");
+                    ModelState.AddModelError("archivoAsignacion", "Tipo de archivo no permitido.");
                     asignacionModel.Clase = await _context.clases.FindAsync(asignacionModel.ClaseId);
-                    return View("Crear", asignacionModel);
+                    return View("crear", asignacionModel);
                 }
 
-                var safeName = archivoAsignacion.FileName.Replace(" ", "_");
+                // Optional: also validate MIME type
+                var contentType = archivoAsignacion.ContentType;
+
+                var allowedMimeTypes = new[]
+                {
+                    "application/pdf",
+                    "application/msword",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "application/vnd.ms-excel",
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                };
+
+                var isVideo = contentType.StartsWith("video/");
+
+                if (!allowedMimeTypes.Contains(contentType) && !isVideo)
+                {
+                    ModelState.AddModelError("archivoAsignacion", "Tipo de archivo inválido.");
+                    asignacionModel.Clase = await _context.clases.FindAsync(asignacionModel.ClaseId);
+                    return View("crear", asignacionModel);
+                }
+
+                var fileName = $"{Guid.NewGuid()}{extension}";
 
                 string s3Key = await _s3Service.UploadFileAsync(
                                     archivoAsignacion,
                                     "asignaciones",
-                                    safeName
+                                    fileName
                                 );
 
                 archivoGuardado = new Archivo
                 {
                     ArchivoId = Guid.NewGuid(),
                     ArchivoUrl = s3Key,
-                    FileName = safeName,
+                    FileName = fileName,
                     ContentType = archivoAsignacion.ContentType,
                     SizeInBytes = archivoAsignacion.Length,
                     FechaSubida = DateTime.UtcNow
@@ -366,19 +399,22 @@ namespace Plataforma.Controllers
                     _context.archivos.Remove(tarea.Archivo);
                 }
 
-                var safeName = nuevoArchivo.FileName.Replace(" ", "_");
+                var originalName = Path.GetFileName(nuevoArchivo.FileName);
+                var extension = Path.GetExtension(originalName).ToLowerInvariant();
+
+                var storedFileName = $"{Guid.NewGuid()}{extension}";
 
                 string newKey = await _s3Service.UploadFileAsync(
                     nuevoArchivo,
                     "asignaciones",
-                    safeName
+                    storedFileName
                 );
 
                 var nuevoArchivoDb = new Archivo
                 {
                     ArchivoId = Guid.NewGuid(),
                     ArchivoUrl = newKey,
-                    FileName = safeName,
+                    FileName = storedFileName,
                     ContentType = nuevoArchivo.ContentType,
                     SizeInBytes = nuevoArchivo.Length,
                     FechaSubida = DateTime.UtcNow

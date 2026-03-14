@@ -139,9 +139,9 @@
                     @Html.AntiForgeryToken() @* Include Anti-Forgery Token for POST requests *@
 
                     <div class="mb-3">
-                        <label for="submittedFile-@Model.TareaId" class="form-label">Archivo de Entrega (PDF, DOCX, TXT)</label>
-                        <input type="file" class="form-control" id="submittedFile-@Model.TareaId" name="SubmittedFile" accept=".pdf,.doc,.docx,.txt" required />
-                        <div class="form-text">Tamaño máximo: 10MB. Formatos permitidos: .pdf, .doc, .docx, .txt.</div>
+                        <label for="submittedFile-@Model.TareaId" class="form-label">Archivo de Entrega (PDF, DOC, DOCX, XLS, XLSX)</label>
+                    <input type="file" class="form-control" id="submittedFile-@Model.TareaId" name="SubmittedFile" accept=".pdf,.doc,.docx,.xls,.xlsx" required />
+                        <div class="form-text">Tamaño máximo: 10MB. Formatos permitidos: .pdf, .doc, .docx, .xls, xlsx.</div>
                     </div>
                    
                     @* <div class="mb-3">

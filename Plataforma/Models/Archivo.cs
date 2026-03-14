@@ -16,7 +16,7 @@ namespace Plataforma.Models
         public string FileName { get; set; } // Original file name
 
         [Required]
-        [StringLength(50)] // e.g., "video/mp4", "application/pdf"
+        [StringLength(255)] // e.g., "video/mp4", "application/pdf"
         public string ContentType { get; set; } // MIME type of the file
 
         public long SizeInBytes { get; set; } // File size for better management (optional but recommended)
