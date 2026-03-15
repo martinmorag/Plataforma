@@ -27,11 +27,16 @@ public class CloudFrontService
         string signature;
         using (var rsa = RSA.Create())
         {
-            var privateKey = _privateKey
+            var privateKey = _privateKey;
+
+            if (File.Exists(privateKey))
+            {
+                privateKey = File.ReadAllText(privateKey);
+            }
+
+            privateKey = privateKey
                 .Replace("\\n", "\n")
                 .Replace("\r", "");
-
-            Console.WriteLine(_privateKey.Substring(0, 40));
 
             rsa.ImportFromPem(privateKey.ToCharArray());
 
