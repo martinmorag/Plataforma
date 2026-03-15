@@ -31,6 +31,8 @@ public class CloudFrontService
                 .Replace("\\n", "\n")
                 .Replace("\r", "");
 
+            Console.WriteLine(_privateKey.Substring(0, 40));
+
             rsa.ImportFromPem(privateKey.ToCharArray());
 
             var signedBytes = rsa.SignData(policyBytes, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
