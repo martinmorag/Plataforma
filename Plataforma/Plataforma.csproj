@@ -27,7 +27,6 @@
 
   <ItemGroup>
     <Folder Include="Models\Tareas\" />
-    <Folder Include="wwwroot\images\" />
     <Folder Include="wwwroot\ffmpeg\" />
   </ItemGroup>
 
