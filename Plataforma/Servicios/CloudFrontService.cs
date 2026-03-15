@@ -27,14 +27,7 @@ public class CloudFrontService
         string signature;
         using (var rsa = RSA.Create())
         {
-            var privateKey = _privateKey;
-
-            if (File.Exists(privateKey))
-            {
-                privateKey = File.ReadAllText(privateKey);
-            }
-
-            privateKey = privateKey
+            var privateKey = _privateKey
                 .Replace("\\n", "\n")
                 .Replace("\r", "");
 
