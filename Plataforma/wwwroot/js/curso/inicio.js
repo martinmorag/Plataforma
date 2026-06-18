@@ -1,28 +1,23 @@
 ﻿
 function toggleModule(header) {
-    header.classList.toggle('expanded');
-    const content = header.nextElementSibling; // The .class-nav-list div
-    content.classList.toggle('expanded');
-    const arrow = header.querySelector('.arrow i');
+    const content = header.nextElementSibling;
+    const arrow = header.querySelector(".arrow i");
 
-    if (content.classList.contains('expanded')) {
-        content.style.display = 'block';
-        content.style.maxHeight = content.scrollHeight + 'px';
-        arrow.classList.remove('fa-chevron-right');
-        arrow.classList.add('fa-chevron-down');
+    header.classList.toggle("expanded");
+    content.classList.toggle("expanded");
+
+    if (content.classList.contains("expanded")) {
+        // Set the height to the content's real height
+        content.style.maxHeight = content.scrollHeight + "px";
+
+        arrow.classList.remove("fa-chevron-right");
+        arrow.classList.add("fa-chevron-down");
     } else {
-        content.style.maxHeight = '0';
-        arrow.classList.remove('fa-chevron-down');
-        arrow.classList.add('fa-chevron-right');
+        // Animate back to zero
+        content.style.maxHeight = "0";
 
-        // After the animation, set display to 'none'
-        // You'll need to listen for the 'transitionend' event or use a timeout
-        content.addEventListener('transitionend', function handler() {
-            if (!content.classList.contains('expanded')) { // Only hide if it's truly collapsed
-                content.style.display = 'none';
-            }
-            content.removeEventListener('transitionend', handler); // Remove the listener
-        }, { once: true }); // Ensure the listener runs only once
+        arrow.classList.remove("fa-chevron-down");
+        arrow.classList.add("fa-chevron-right");
     }
 }
 
@@ -126,7 +121,27 @@ async function loadClassDetails(clickedLink, claseId) {
 
 
 
+// Hamburger button
 
+const toggleButton = document.getElementById("sidebarToggle");
+const sidebar = document.querySelector(".course-sidebar");
+
+toggleButton.addEventListener("click", () => {
+
+    sidebar.classList.toggle("open");
+    toggleButton.classList.toggle("active");
+
+    const icon = toggleButton.querySelector("i");
+
+    if (sidebar.classList.contains("open")) {
+        icon.classList.remove("fa-bars");
+        icon.classList.add("fa-xmark");
+    } else {
+        icon.classList.remove("fa-xmark");
+        icon.classList.add("fa-bars");
+    }
+
+});
 
 
 

@@ -5,6 +5,8 @@
         public Guid TareaId { get; set; }
         public string Nombre { get; set; }
         public string Descripcion { get; set; }
+        public string? GrabacionUrl { get; set; }
+        public string? ReunionUrl { get; set; }
         public DateTime FechaLimite { get; set; }
         public string TipoContenido { get; set; } // "Video", "Documento", "Texto", "Cuestionario"
         public string ContenidoUrl { get; set; } // URL for content (e.g., video source, document path)

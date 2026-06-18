@@ -9,6 +9,8 @@
         public string? ClaseNombre { get; set; }
         public string Nombre { get; set; }
         public string Descripcion { get; set; }
+        public string? GrabacionUrl { get; set; }
+        public string? ReunionUrl { get; set; }
         public DateTime FechaVencimiento { get; set; }
         public string TipoEntregaEsperado { get; set; }
 

@@ -28,18 +28,18 @@
     margin-bottom: 20px;
 }
 
-    .sidebar-header h3 {
-        margin-top: 0;
-        color: #2c3e50;
-        font-size: 1.6em;
-        font-weight: 600;
-    }
+.sidebar-header h3 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 1.6em;
+    font-weight: 600;
+}
 
-    .sidebar-header p {
-        font-size: 0.9em;
-        color: #666;
-        margin-bottom: 10px;
-    }
+.sidebar-header p {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 10px;
+}
 
 .progress-bar-container {
     width: 100%;
@@ -119,28 +119,26 @@
     }
 
 .class-nav-list {
-    display: none;
     list-style: none;
-    padding: 0;
     margin: 0;
-    max-height: 0; /* Hidden by default */
+    padding: 0;
+    max-height: 0;
     overflow: hidden;
-    transition: max-height 0.5s ease-out; /* Smooth slide effect */
-    background-color: #fdfdfd; /* Lighter background for classes */
+    opacity: 0;
+    transition: max-height .35s ease, opacity .25s ease, padding .35s ease;
+    background: #fdfdfd;
     border-top: 1px solid #eee;
     border-radius: 0 0 5px 5px;
-    padding-bottom: 5px; /* Small padding at bottom when open */
 }
 
     .class-nav-list.expanded {
-        max-height: 1000px; /* Large enough to show all classes */
-        padding-top: 10px;
+        opacity: 1;
+        padding-bottom: 5px;
     }
 
 .class-nav-item {
-    padding: 8px 25px 8px 45px; /* Indent classes */
-    font-size: 0.95em;
     border-bottom: 1px dashed #f5f5f5;
+    padding: 0;
 }
 
     .class-nav-item:last-child {
@@ -148,15 +146,19 @@
     }
 
     .class-nav-item a {
-        text-decoration: none;
-        color: #495057; /* Dark gray text */
         display: flex;
         align-items: center;
-        transition: color 0.2s ease;
+        width: 100%;
+        padding: 10px 25px 10px 45px;
+        text-decoration: none;
+        color: #495057;
+        transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+        border-left: 4px solid transparent;
+        box-sizing: border-box;
     }
 
         .class-nav-item a:hover {
-            color: #007bff; /* Blue on hover */
+            color: #007bff;
         }
 
     /* Class completion status in sidebar classes */
@@ -271,22 +273,82 @@
         opacity: 0.8;
     }
 
-/* Responsive adjustments */
+
+.sidebar-toggle {
+    display: none;
+    border-radius: 0 0 8px  8px;
+}
+
+
 @media (max-width: 992px) {
     .course-page-wrapper {
-        flex-direction: column; /* Stack columns on smaller screens */
-        border-radius: 0; /* No rounded corners if it takes full width */
-        box-shadow: none;
-        margin: 0; /* Remove side margins on full width */
+        display: block;
+        height: auto;
+        overflow: visible;
     }
 
-    .course-sidebar {
-        width: 100%; /* Full width sidebar */
-        border-right: none;
-        border-bottom: 1px solid #e0e0e0; /* Separator at bottom */
-        padding: 15px 0;
-        max-height: 80vh; /* Limit height for mobile (scrollable) */
+
+    .sidebar-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 14px 18px;
+        background: #2c3e50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
     }
+
+        .sidebar-toggle i {
+            font-size: 1.2rem;
+            transition: transform .25s ease;
+        }
+
+/*    .course-sidebar {
+        width: 100%;
+        max-height: 0;
+        overflow: hidden;
+        padding: 0;
+        border: none;
+        transition: max-height .35s ease, padding .35s ease;
+    }*/
+
+    .course-sidebar {
+        width: 100%;
+        max-height: 0;
+        overflow: hidden;
+        padding: 0;
+        border-right: none;
+        border-bottom: none;
+        transition: max-height .35s ease, padding .35s ease;
+    }
+
+        .course-sidebar.open {
+            max-height: 80vh;
+            padding: 15px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .course-sidebar.open {
+            max-height: 80vh;
+            padding: 15px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+    .sidebar-toggle.active i {
+        transform: rotate(90deg);
+    }
+
+    /*.course-sidebar {
+        width: 100%;*/ /* Full width sidebar */
+        /*border-right: none;
+        border-bottom: 1px solid #e0e0e0;*/ /* Separator at bottom */
+        /*padding: 15px 0;
+        max-height: 80vh;*/ /* Limit height for mobile (scrollable) */
+    /*}*/
 
     .sidebar-header {
         padding: 0 20px 15px;
@@ -334,10 +396,6 @@
 
     .course-description-main {
         font-size: 0.9em;
-    }
-
-    .course-sidebar {
-        padding: 10px 0;
     }
 
     .sidebar-header {

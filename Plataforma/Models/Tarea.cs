@@ -11,6 +11,7 @@ namespace Plataforma.Models
         public Guid TareaId { get; set; } // Unique identifier for the task
         public string Nombre { get; set; }
         public string Descripcion { get; set; } // Optional description of the assignment
+        public string? ReunionUrl { get; set; }
 
         [Required]
         [ForeignKey("Clase")]
@@ -25,6 +26,7 @@ namespace Plataforma.Models
         public Guid? ArchivoId { get; set; } // Nullable foreign key to the Archivo table
         [ValidateNever]
         public Archivo? Archivo { get; set; } // Navigation property to the assignment's file
+        public string? GrabacionUrl { get; set; }
 
         private DateTime _fechaVencimiento;
         public DateTime FechaVencimiento // Due date for the assignment

@@ -195,6 +195,9 @@
     color: #666;
     margin-bottom: 15px;
     line-height: 1.6;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .task-meta {

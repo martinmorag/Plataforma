@@ -44,7 +44,23 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="FechaVencimiento" class="form-label"></label>
+                <label asp-for="ReunionUrl" class="form-label">URL de la Reunión (opcional)</label>
+                <input asp-for="ReunionUrl" class="form-input" />
+                <span asp-validation-for="ReunionUrl" class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="GrabacionUrl" class="form-label">
+                    Link de grabación
+                </label>
+
+                <input asp-for="GrabacionUrl"
+                       class="form-control"
+                       placeholder="https://..." />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="FechaVencimiento" class="form-label">Fecha de Vencimiento</label>
                 <input asp-for="FechaVencimiento"
                        type="datetime-local"
                        class="form-input"
@@ -53,10 +69,11 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="TipoEntregaEsperado" class="form-label"></label>
+                <label asp-for="TipoEntregaEsperado" class="form-label">Tipo de Entrega Esperado</label>
                 <select asp-for="TipoEntregaEsperado" class="form-input">
                     <option value="Documento">Documento</option>
                     <option value="video">Video</option>
+                    <option value="texto">Video</option>
                 </select>
                 <span asp-validation-for="TipoEntregaEsperado" class="validation-error"></span>
             </div>

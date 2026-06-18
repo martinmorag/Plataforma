@@ -14,7 +14,7 @@
         </a>
     </div>
 
-    @if (!string.IsNullOrEmpty(Model.Descripcion))
+    @if (!string.IsNullOrEmpty(Model.Descripcion) && Model.TipoContenido != "texto")
     {
         <div class="tarea-description">
             <h3>Descripción</h3>
@@ -51,11 +51,28 @@
                 </video>
             </div>
         }
-        else if (Model.TipoContenido == "Texto" && !string.IsNullOrEmpty(Model.TextoContenido))
+        else if (Model.TipoContenido == "texto")
         {
-            <h3>Contenido de la Tarea</h3>
+            <h3>Información</h3>
+
+            @if (!string.IsNullOrEmpty(Model.ReunionUrl))
+            {
+                <div class="meeting-link-card">
+                    <h4>
+                        <i class="fa-solid fa-video"></i>
+                        Clase en vivo
+                    </h4>
+
+                    <a href="@Model.ReunionUrl"
+                       target="_blank"
+                       class="btn btn-primary">
+                        Unirse a la reunión
+                    </a>
+                </div>
+            }
+
             <div class="tarea-text-content">
-                @Html.Raw(Model.TextoContenido)
+                @Html.Raw(Model.Descripcion)
             </div>
         }
         else if (Model.TipoContenido == "Documento" && !string.IsNullOrEmpty(Model.ContenidoUrl))
@@ -76,85 +93,105 @@
 
     <hr />
 
-    @* Submission Section (can be moved to its own partial if it gets complex) *@
-    <div class="tarea-submission-section">
-        <h3>Tu Entrega</h3>
-        @if (Model.HasSubmitted)
-        {
-            <p>
-                <strong>Estado:</strong>
-                <span class="badge @(Model.IsSubmittedApproved ? "badge-success" : (Model.SubmissionStatusText == "EnRevision" ? "badge-warning" : "badge-danger"))">
-                    @Model.SubmissionStatusText
-                </span>
-            </p>
-            @if (Model.SubmissionFecha.HasValue)
+    @if (!string.IsNullOrEmpty(Model.GrabacionUrl))
+    {
+        <div class="recording-section">
+            <h3>Grabación de la clase</h3>
+
+            <a href="@Model.GrabacionUrl"
+               target="_blank"
+               class="btn btn-success">
+                Ver grabación
+            </a>
+        </div>
+
+        <hr />
+    }
+
+    
+
+    @if (Model.TipoContenido != "texto")
+    {
+        <div class="tarea-submission-section">
+            <h3>Tu Entrega</h3>
+            @if (Model.HasSubmitted)
             {
-                <p><strong>Fecha de Entrega:</strong> @Model.SubmissionFecha.Value.ToShortDateString()</p>
+                <p>
+                    <strong>Estado:</strong>
+                    <span class="badge @(Model.IsSubmittedApproved ? "badge-success" : (Model.SubmissionStatusText == "EnRevision" ? "badge-warning" : "badge-danger"))">
+                        @Model.SubmissionStatusText
+                    </span>
+                </p>
+                @if (Model.SubmissionFecha.HasValue)
+                {
+                    <p><strong>Fecha de Entrega:</strong> @Model.SubmissionFecha.Value.ToShortDateString()</p>
+                }
+                @if (!string.IsNullOrEmpty(Model.SubmittedFileUrl))
+                {
+                    <p><strong>Archivo Entregado:</strong> <a href="@Model.SubmittedFileUrl" target="_blank">Ver archivo</a></p>
+                }
+                @if (!string.IsNullOrEmpty(Model.SubmissionComentarios))
+                {
+                    <div class="professor-comments">
+                        <h4>Comentarios del Profesor:</h4>
+                        <p>@Model.SubmissionComentarios</p>
+                    </div>
+                }
+                @if (Model.SubmissionStatusText == "Rehacer" && !ViewBag.IsBlockedByDeadline)
+                {
+                    <button type="button"
+                            class="btn btn-warning mt-3"
+                            onclick="showSubmissionForm('@Model.TareaId')">
+                        Rehacer Entrega
+                    </button>
+                }
+
             }
-            @if (!string.IsNullOrEmpty(Model.SubmittedFileUrl))
+            else if (Model.TipoContenido == "Documento" && !ViewBag.IsBlockedByDeadline)
             {
-                <p><strong>Archivo Entregado:</strong> <a href="@Model.SubmittedFileUrl" target="_blank">Ver archivo</a></p>
-            }
-            @if (!string.IsNullOrEmpty(Model.SubmissionComentarios))
-            {
-                <div class="professor-comments">
-                    <h4>Comentarios del Profesor:</h4>
-                    <p>@Model.SubmissionComentarios</p>
-                </div>
-            }
-            @if (Model.SubmissionStatusText == "Rehacer" && !ViewBag.IsBlockedByDeadline)
-            {
+                <p class="alert alert-info">Aún no has entregado esta tarea.</p>
                 <button type="button"
-                        class="btn btn-warning mt-3"
+                        class="btn btn-primary"
                         onclick="showSubmissionForm('@Model.TareaId')">
-                    Rehacer Entrega
+                    Entregar Tarea
                 </button>
             }
-        }
-        else if (Model.TipoContenido == "Documento" && !ViewBag.IsBlockedByDeadline)
-        {
-            <p class="alert alert-info">Aún no has entregado esta tarea.</p>
-            <button type="button"
-                    class="btn btn-primary"
-                    onclick="showSubmissionForm('@Model.TareaId')">
-                Entregar Tarea
-            </button>
-        }
-        else if (Model.TipoContenido == "Documento" && ViewBag.IsBlockedByDeadline)
-        {
-            <div class="alert alert-danger d-flex align-items-center">
-                <i class="fa-solid fa-lock me-2"></i>
-                La fecha límite de esta tarea ha vencido. Ya no es posible realizar entregas.
-            </div>
-        }
-        else if (Model.TipoContenido == "video")
-        {
-            <p class="alert alert-info">Ver video completo.</p>
-        }
-            @* Submission Form (hidden by default) *@
-            <div id="submission-form-container-@Model.TareaId" class="mt-4" style="display:none;">
-                <h4>Formulario de Entrega</h4>
-                <form id="submissionForm-@Model.TareaId" enctype="multipart/form-data">
-                    <input type="hidden" name="TareaId" value="@Model.TareaId" />
-                    @Html.AntiForgeryToken() @* Include Anti-Forgery Token for POST requests *@
+            else if (Model.TipoContenido == "Documento" && ViewBag.IsBlockedByDeadline)
+            {
+                <div class="alert alert-danger d-flex align-items-center">
+                    <i class="fa-solid fa-lock me-2"></i>
+                    La fecha límite de esta tarea ha vencido. Ya no es posible realizar entregas.
+                </div>
+            }
+            else if (Model.TipoContenido == "video")
+            {
+                <p class="alert alert-info">Ver video completo.</p>
+            }
+                @* Submission Form (hidden by default) *@
+                <div id="submission-form-container-@Model.TareaId" class="mt-4" style="display:none;">
+                    <h4>Formulario de Entrega</h4>
+                    <form id="submissionForm-@Model.TareaId" enctype="multipart/form-data">
+                        <input type="hidden" name="TareaId" value="@Model.TareaId" />
+                        @Html.AntiForgeryToken() @* Include Anti-Forgery Token for POST requests *@
 
-                    <div class="mb-3">
-                        <label for="submittedFile-@Model.TareaId" class="form-label">Archivo de Entrega (PDF, DOC, DOCX, XLS, XLSX)</label>
-                    <input type="file" class="form-control" id="submittedFile-@Model.TareaId" name="SubmittedFile" accept=".pdf,.doc,.docx,.xls,.xlsx" required />
-                        <div class="form-text">Tamaño máximo: 10MB. Formatos permitidos: .pdf, .doc, .docx, .xls, xlsx.</div>
-                    </div>
+                        <div class="mb-3">
+                            <label for="submittedFile-@Model.TareaId" class="form-label">Archivo de Entrega (PDF, DOC, DOCX, XLS, XLSX)</label>
+                        <input type="file" class="form-control" id="submittedFile-@Model.TareaId" name="SubmittedFile" accept=".pdf,.doc,.docx,.xls,.xlsx" required />
+                            <div class="form-text">Tamaño máximo: 10MB. Formatos permitidos: .pdf, .doc, .docx, .xls, xlsx.</div>
+                        </div>
                    
-                    @* <div class="mb-3">
-                        <label for="comments-@Model.TareaId" class="form-label">Comentarios (opcional)</label>
-                        <textarea class="form-control" id="comments-@Model.TareaId" name="Comments" rows="3"></textarea>
-                    </div> *@
+                        @* <div class="mb-3">
+                            <label for="comments-@Model.TareaId" class="form-label">Comentarios (opcional)</label>
+                            <textarea class="form-control" id="comments-@Model.TareaId" name="Comments" rows="3"></textarea>
+                        </div> *@
 
-                    <button type="submit" class="btn btn-success">Enviar Entrega</button>
-                    <button type="button" class="btn btn-secondary" onclick="hideSubmissionForm('@Model.TareaId')">Cancelar</button>
-                </form>
-                <div id="submission-message-@Model.TareaId" class="mt-2"></div>
-            </div>
-    </div>
+                        <button type="submit" class="btn btn-success">Enviar Entrega</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideSubmissionForm('@Model.TareaId')">Cancelar</button>
+                    </form>
+                    <div id="submission-message-@Model.TareaId" class="mt-2"></div>
+                </div>
+        </div>
+    }
 </div>
 
 <script>

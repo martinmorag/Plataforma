@@ -83,6 +83,8 @@ namespace Plataforma.Controllers
                 ClaseNombre = tarea.Clase.Nombre,
                 Nombre = tarea.Nombre,
                 Descripcion = tarea.Descripcion,
+                GrabacionUrl = tarea.GrabacionUrl,
+                ReunionUrl = tarea.ReunionUrl,
                 FechaVencimiento = tarea.FechaVencimiento,
                 TipoEntregaEsperado = tarea.TipoEntregaEsperado,
                 ArchivoNombre = tarea.Archivo?.FileName
@@ -346,6 +348,7 @@ namespace Plataforma.Controllers
                 TareaId = Guid.NewGuid(),
                 Nombre = asignacionModel.Nombre,
                 Descripcion = asignacionModel.Descripcion,
+                ReunionUrl = asignacionModel.ReunionUrl,
                 FechaVencimiento = asignacionModel.FechaVencimiento.ToUniversalTime(), // Ensure UTC
                 ClaseId = asignacionModel.ClaseId,
                 TipoEntregaEsperado = asignacionModel.TipoEntregaEsperado // Set the expected submission type
@@ -388,6 +391,8 @@ namespace Plataforma.Controllers
 
             tarea.Nombre = model.Nombre;
             tarea.Descripcion = model.Descripcion;
+            tarea.GrabacionUrl = model.GrabacionUrl;
+            tarea.ReunionUrl = model.ReunionUrl;
             tarea.FechaVencimiento = model.FechaVencimiento.ToUniversalTime();
             tarea.TipoEntregaEsperado = model.TipoEntregaEsperado;
 
