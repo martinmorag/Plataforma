@@ -29,7 +29,12 @@
                         <p class="list-item @(curso.NombreCurso == selectedCursoNombre ? "active-item" : "")"
                            data-curso-id="@curso.CursoId"
                            data-curso-nombre="@curso.NombreCurso">
-                            @curso.NombreCurso <span class="task-count">(@curso.TotalTareas Tareas)</span>
+
+                            <span class="course-name">@curso.NombreCurso</span>
+
+                            <span class="task-count">
+                                (@curso.TotalTareas Tareas)
+                            </span>
                         </p>
                     }
                 }

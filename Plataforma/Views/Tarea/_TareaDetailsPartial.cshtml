@@ -18,6 +18,23 @@
     {
         <div class="tarea-description">
             <h3>Descripción</h3>
+
+            @if (!string.IsNullOrEmpty(Model.ReunionUrl))
+            {
+                <div class="meeting-link-card">
+                    <h4>
+                        <i class="fa-solid fa-video"></i>
+                        Clase en vivo
+                    </h4>
+
+                    <a href="@Model.ReunionUrl"
+                       target="_blank"
+                       class="btn btn-primary">
+                        Unirse a la reunión
+                    </a>
+                </div>
+            }
+
             <p>@Model.Descripcion</p>
         </div>
     }
@@ -89,26 +106,7 @@
                 No hay contenido específico para esta tarea.
             </div>
         }
-    </div>
-
-    <hr />
-
-    @if (!string.IsNullOrEmpty(Model.GrabacionUrl))
-    {
-        <div class="recording-section">
-            <h3>Grabación de la clase</h3>
-
-            <a href="@Model.GrabacionUrl"
-               target="_blank"
-               class="btn btn-success">
-                Ver grabación
-            </a>
-        </div>
-
-        <hr />
-    }
-
-    
+    </div>    
 
     @if (Model.TipoContenido != "texto")
     {
