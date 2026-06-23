@@ -116,7 +116,19 @@
             {
                 <p>
                     <strong>Estado:</strong>
-                    <span class="badge @(Model.IsSubmittedApproved ? "badge-success" : (Model.SubmissionStatusText == "EnRevision" ? "badge-warning" : "badge-danger"))">
+                    @{
+                        var statusClass = Model.SubmissionStatusText switch
+                        {
+                            "Aprobado" => "status-approved",
+                            "EnRevision" => "status-in-review",
+                            "En Progreso" => "status-in-progress",
+                            "Rehacer" => "status-redo",
+                            "Reprobado" => "status-rejected",
+                            _ => "status-unknown"
+                        };
+                    }
+
+                    <span class="badge @statusClass">
                         @Model.SubmissionStatusText
                     </span>
                 </p>
@@ -130,7 +142,7 @@
                 }
                 @if (!string.IsNullOrEmpty(Model.SubmissionComentarios))
                 {
-                    <div class="professor-comments">
+                    <div class="professor-comments @statusClass" >
                         <h4>Comentarios del Profesor:</h4>
                         <p>@Model.SubmissionComentarios</p>
                     </div>

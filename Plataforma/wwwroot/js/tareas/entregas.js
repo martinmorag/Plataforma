@@ -100,22 +100,23 @@ saveEvaluationBtn.addEventListener('click', async function () {
         const result = await response.json();
 
         if (response.ok) {
-            evaluationMessage.innerHTML = `<div class="success-message">${result.message || 'Evaluación guardada.'}</div>`;
-            // Update the status in the table row
-            const row = document.querySelector(`button[data-entrega-id="${entregaId}"]`).closest('tr');
-            if (row) {
-                const statusBadge = row.querySelector('td:nth-child(2) span'); // Assuming status is the second <td> with a span
-                if (statusBadge) {
-                    statusBadge.textContent = result.newStatus;
-                    // Update class for new status color
-                    statusBadge.className = 'status-badge ' + getStatusClass(result.newStatus);
-                }
-                const commentsCell = row.querySelector('td:nth-child(4)');
-                if (commentsCell) {
-                    commentsCell.textContent = comments || 'Sin comentarios';
-                }
-            }
-            // Close modal after a short delay to show success message
+            evaluationMessage.innerHTML =
+                `<div class="success-message">${result.message}</div>`;
+
+            const evaluateButton = document.querySelector(
+                `button[data-entrega-id="${entregaId}"]`
+            );
+
+            evaluateButton.dataset.currentStatus = result.newStatus;
+            evaluateButton.dataset.currentComments = comments;
+
+            const row = evaluateButton.closest("tr");
+
+            const statusBadge = row.querySelector("td:nth-child(2) span");
+            statusBadge.textContent = result.newStatus;
+            statusBadge.className =
+                "status-badge " + getStatusClass(result.newStatus);
+
             setTimeout(hideModal, 1500);
         } else {
             evaluationMessage.innerHTML = `<div class="error-message">Error: ${result.message || 'No se pudo guardar la evaluación.'}</div>`;

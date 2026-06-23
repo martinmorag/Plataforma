@@ -335,6 +335,7 @@ a:hover {
 
     .primary-button:hover {
         background-color: #0056b3;
+        color: #ffffff;
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
@@ -347,6 +348,7 @@ a:hover {
     .secondary-button:hover {
         background-color: #5a6268;
         transform: translateY(-1px);
+        color: #ffffff;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
 
