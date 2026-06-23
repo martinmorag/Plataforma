@@ -148,3 +148,18 @@ document.querySelectorAll('.radio-card input[type="radio"]').forEach(radio => {
     });
 
 });
+
+
+
+
+const toast = document.getElementById("successToast");
+
+if (toast) {
+    setTimeout(() => {
+        toast.classList.add("hide");
+
+        setTimeout(() => {
+            toast.remove();
+        }, 500);
+    }, 3000);
+}

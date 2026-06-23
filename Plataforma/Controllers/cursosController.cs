@@ -129,6 +129,9 @@ namespace Plataforma.Controllers
 
                 _context.modulos.Add(modulo);
                 await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "¡Módulo creado correctamente!";
+
                 return RedirectToAction("Index", "cursos");
             }
             if (!ModelState.IsValid)
@@ -170,6 +173,9 @@ namespace Plataforma.Controllers
 
                 _context.clases.Add(clase);
                 await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "¡Clase creada correctamente!";
+
                 return RedirectToAction("Index", "cursos");
             }
             if (!ModelState.IsValid)

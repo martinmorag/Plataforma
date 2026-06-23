@@ -362,6 +362,8 @@ namespace Plataforma.Controllers
             _context.tareas.Add(nuevaAsignacion);
             await _context.SaveChangesAsync();
 
+            TempData["SuccessMessage"] = "¡Tarea creada correctamente!";
+
             return RedirectToAction("Inicio", "cursos");
         }
         [HttpPost]

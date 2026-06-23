@@ -147,6 +147,26 @@ main {
 
 
 
+.success-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #22c55e;
+    color: white;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0,0,0,.15);
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity .5s ease;
+}
+
+    .success-toast.hide {
+        opacity: 0;
+    }
+
+
 
 
 
