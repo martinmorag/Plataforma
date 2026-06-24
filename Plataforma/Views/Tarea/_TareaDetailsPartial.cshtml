@@ -100,6 +100,17 @@
                 <i class="fa-solid fa-file-arrow-down"></i> Ver Documento
             </a>
         }
+        else if (Model.TipoContenido == "lectura" && !string.IsNullOrEmpty(Model.ContenidoUrl))
+        {
+            <h3>Material de Lectura</h3>
+            <p>Consulta el material de lectura a continuación:</p>
+
+            <a href="@Model.ContenidoUrl"
+               class="btn btn-info"
+               target="_blank">
+                <i class="fa-solid fa-book-open"></i> Abrir Lectura
+            </a>
+        }
         else
         {
             <div class="alert alert-info">
@@ -108,8 +119,7 @@
         }
     </div>    
 
-    @if (Model.TipoContenido != "texto")
-    {
+    @if (Model.TipoContenido != "texto" && Model.TipoContenido != "lectura")    {
         <div class="tarea-submission-section">
             <h3>Tu Entrega</h3>
             @if (Model.HasSubmitted)
