@@ -64,11 +64,6 @@ builder.Services.AddIdentity<UsuarioIdentidad, IdentityRole<Guid>>(options => //
 .AddEntityFrameworkStores<PlataformaContext>()
 .AddDefaultTokenProviders();
 
-builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
-{
-    options.TokenLifespan = TimeSpan.FromDays(7);
-});
-
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/ingreso"; // Your custom login path

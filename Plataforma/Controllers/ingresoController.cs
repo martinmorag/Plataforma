@@ -95,13 +95,6 @@ namespace Plataforma.Controllers
             if (user == null)
                 return RedirectToAction("Index");
 
-            // ✅ Prevent link reuse
-            if (user.PasswordHash != null)
-            {
-                TempData["Message"] = "Tu cuenta ya fue activada.";
-                return RedirectToAction(nameof(Index));
-            }
-
             var model = new SetPasswordViewModel
             {
                 UserId = Guid.Parse(userId),
@@ -122,13 +115,6 @@ namespace Plataforma.Controllers
 
             if (user == null)
                 return NotFound();
-
-            // ✅ Prevent reuse again (security layer)
-            if (user.PasswordHash != null)
-            {
-                TempData["Message"] = "La contraseña ya fue creada.";
-                return RedirectToAction(nameof(Index));
-            }
 
             // ✅ Decode token
             var decodedToken = Encoding.UTF8.GetString(
