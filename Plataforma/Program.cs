@@ -69,6 +69,11 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/ingreso"; // Your custom login path
 });
 
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+{
+    options.TokenLifespan = TimeSpan.FromDays(7);
+});
+
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
