@@ -1,0 +1,37 @@
+﻿@using Plataforma.Models
+@{
+    ViewData["Title"] = "Tareas";
+    var cursos = (List<Curso>)ViewBag.Cursos;
+}
+
+<link rel="stylesheet" href="~/css/tareas/tareas.css" asp-append-version="true" />
+
+<div class="tareas-layout">
+
+    <div class="cursos-panel">
+
+        <h3>Cursos</h3>
+
+        @foreach (var curso in cursos)
+        {
+            <button class="curso-btn"
+                    onclick="loadTareas('@curso.CursoId')">
+                @curso.Nombre
+            </button>
+        }
+
+    </div>
+
+    <div class="contenido-panel">
+
+        <div id="tareasList">
+            Selecciona un curso.
+        </div>
+
+        <div id="tareaPreview"></div>
+
+    </div>
+
+</div>
+
+<script src="~/js/tareas/tareas.js" asp-append-version="true"></script>

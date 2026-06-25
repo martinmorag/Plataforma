@@ -6,8 +6,15 @@ main {
     width: 100%;
 }
 .header-container-cfp {
-    position: relative; /* Allows for absolute positioning of children */
-    text-align: center; /* Centers the title if it's not absolutely positioned */
+    height: 92vh;
+    position: relative;
+    background-image: url('https://divt8gz3bbw6l.cloudfront.net/public/fondo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .header-image-cfp {
@@ -26,6 +33,7 @@ main {
     font-size: 3em; /* Example font size, adjust as needed */
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Adds a subtle shadow for better readability */
     z-index: 2; /* Ensures the title appears above the image */
+    text-align: center;
 }
 
 /* You might want to add media queries for smaller screens to adjust font size */

@@ -16,12 +16,14 @@ namespace Plataforma.Controllers
         private readonly PlataformaContext _context;
         private readonly UserManager<UsuarioIdentidad> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        private readonly CloudFrontService _cloudFrontService;
 
-        public ProfesoresController(PlataformaContext context, UserManager<UsuarioIdentidad> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+        public ProfesoresController(PlataformaContext context, UserManager<UsuarioIdentidad> userManager, RoleManager<IdentityRole<Guid>> roleManager, CloudFrontService cloudFrontService)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _cloudFrontService = cloudFrontService;
         }
         [HttpPost]
         public async Task<IActionResult> Create(AdministracionViewModel model)
@@ -211,16 +213,78 @@ namespace Plataforma.Controllers
         {
             return _context.Users.Any(e => e.Id == id);
         }
-        private async Task<List<Profesor>> ObtenerListaProfesores()
+        [Route("profesor/tareas")]
+        public async Task<IActionResult> Tareas()
         {
-            var profesoresUsuarios = await _userManager.GetUsersInRoleAsync("Profesor");
-            return profesoresUsuarios.Select(u => new Profesor
+            var user = await _userManager.GetUserAsync(User);
+
+            var cursos = await _context.cursos
+                .Where(c => c.CursoProfesores.Any(cp => cp.ProfesorId == user.Id))
+                .OrderBy(c => c.Nombre)
+                .ToListAsync();
+
+            ViewBag.Cursos = cursos;
+
+            return View("~/Views/profesor/tareas/tareas.cshtml");
+        }
+        [HttpGet]
+        [Route("profesor/tareas/GetByCurso")]
+        public async Task<IActionResult> GetByCurso(Guid cursoId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var tareas = await _context.tareas
+                .Where(t =>
+                    t.Clase.Modulo.CursoId == cursoId &&
+                    t.Clase.Modulo.Curso.CursoProfesores
+                        .Any(cp => cp.ProfesorId == user.Id))
+                .Select(t => new
+                {
+                    t.TareaId,
+                    t.Nombre,
+                    t.TipoEntregaEsperado,
+                    Clase = t.Clase.Nombre,
+                    Fecha = t.FechaVencimiento
+                })
+                .OrderBy(t => t.Fecha)
+                .ToListAsync();
+
+            return Ok(tareas);
+        }
+        [HttpGet]
+        [Route("profesor/tareas/GetDetalle")]
+        public async Task<IActionResult> GetDetalle(Guid tareaId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var tarea = await _context.tareas
+                .Include(t => t.Archivo)
+                .Include(t => t.Clase)
+                    .ThenInclude(c => c.Modulo)
+                .FirstOrDefaultAsync(t => t.TareaId == tareaId);
+
+            if (tarea == null)
+                return NotFound();
+
+            var autorizado = await _context.CursoProfesores.AnyAsync(cp =>
+                cp.CursoId == tarea.Clase.Modulo.CursoId &&
+                cp.ProfesorId == user.Id);
+
+            if (!autorizado)
+                return Forbid();
+
+            return Ok(new
             {
-                Id = u.Id,
-                Nombre = u.Nombre,
-                Apellido = u.Apellido,
-                Email = u.Email
-            }).ToList();
+                tarea.Nombre,
+                tarea.Descripcion,
+                Tipo = tarea.TipoEntregaEsperado,
+                ArchivoUrl = tarea.Archivo != null
+                    ? _cloudFrontService.GenerateSignedUrl(tarea.Archivo.ArchivoUrl)
+                    : null,
+                tarea.ReunionUrl,
+                Clase = tarea.Clase.Nombre,
+                Fecha = tarea.FechaVencimiento
+            });
         }
     }
 }
