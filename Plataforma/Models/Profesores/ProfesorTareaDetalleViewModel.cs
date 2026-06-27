@@ -7,6 +7,7 @@
         public string Nombre { get; set; }
 
         public string Descripcion { get; set; }
+        public DateTime? FechaReunion { get; set; }
 
         public string TipoContenido { get; set; }
 
@@ -16,6 +17,6 @@
 
         public string ClaseNombre { get; set; }
 
-        public DateTime FechaLimite { get; set; }
+        public DateTime? FechaLimite { get; set; }
     }
 }

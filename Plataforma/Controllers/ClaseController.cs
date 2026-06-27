@@ -62,10 +62,17 @@ namespace Plataforma.Controllers
                 Tareas = clase.Tareas.OrderBy(t => t.Nombre).Select(t =>
                 {
                     bool isSubmittedApproved = approvedSubmittedTareaIds.Contains(t.TareaId);
-                    string submissionStatusText = "Pendiente";
-                    if (studentSubmissions.TryGetValue(t.TareaId, out var submission))
+
+                    string submissionStatusText = "";
+
+                    if (t.TipoEntregaEsperado == "Documento" || t.TipoEntregaEsperado == "video")
                     {
-                        submissionStatusText = submission.Estado.GetDisplayName(); // "EnRevision", "Aprobado", "Reprobado"
+                        submissionStatusText = "Pendiente";
+
+                        if (studentSubmissions.TryGetValue(t.TareaId, out var entregaSubmissions))
+                        {
+                            submissionStatusText = entregaSubmissions.Estado.GetDisplayName();
+                        }
                     }
 
                     return new TareaViewModel
@@ -73,6 +80,8 @@ namespace Plataforma.Controllers
                         TareaId = t.TareaId,
                         Nombre = t.Nombre,
                         Descripcion = t.Descripcion,
+                        TipoContenido = t.TipoEntregaEsperado,
+                        FechaReunion = t.FechaReunion,
                         FechaLimite = t.FechaVencimiento,
                         IsSubmittedApproved = isSubmittedApproved,
                         SubmissionStatusText = submissionStatusText,
@@ -81,14 +90,17 @@ namespace Plataforma.Controllers
                 }).ToList()
             };
 
-            // Determine if the class itself is completed based on its tasks
-            if (!claseViewModel.Tareas.Any())
+            var tareasEvaluables = claseViewModel.Tareas
+                .Where(t => t.TipoContenido == "Documento" || t.TipoContenido == "video")
+                .ToList();
+
+            if (!tareasEvaluables.Any())
             {
-                claseViewModel.IsCompleted = true; // No tasks, so considered complete
+                claseViewModel.IsCompleted = true;
             }
             else
             {
-                claseViewModel.IsCompleted = claseViewModel.Tareas.All(t => t.IsSubmittedApproved);
+                claseViewModel.IsCompleted = tareasEvaluables.All(t => t.IsSubmittedApproved);
             }
 
             return PartialView("_ClassDetailsPartial", claseViewModel);

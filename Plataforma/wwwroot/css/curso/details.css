@@ -1,45 +1,4 @@
-﻿.tarea-details-container {
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,.05);
-    margin-bottom: 20px;
-}
-
-/* --- NEW CSS FOR HEADER WITH BUTTON --- */
-.tarea-header-with-button {
-    display: flex; /* Enable Flexbox */
-    align-items: center; /* Vertically align items */
-    justify-content: space-between; /* Push items to opposite ends */
-    margin-bottom: 10px; /* Space below the header */
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    gap: 15px; /* Space between items if they wrap */
-}
-
-.tarea-header-with-button h1 {
-    margin: 0; /* Remove default h1 margin */
-    font-size: 2.2rem; /* Adjust font size */
-    color: #333;
-    /* Optional: If h1 should take most space on smaller screens, allow it to grow */
-    flex-grow: 1;
-    flex-shrink: 1;
-    min-width: 150px; /* Ensures h1 doesn't shrink too much */
-}
-.due-date {
-    color: #6c757d;
-    font-size: 0.9em;
-}
-
-.tarea-description, .tarea-content-section, .tarea-submission-section {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #e9ecef;
-}
-
-    .tarea-content-section h3, .tarea-submission-section h3 {
-        color: #495057;
-        margin-bottom: 15px;
-    }
+﻿
 
 .video-player-container {
     margin-bottom: 20px;
@@ -66,147 +25,370 @@
 
 
 
-.meeting-link-card {
-    background: #eef6ff;
-    border: 1px solid #b6d4fe;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 20px;
-    margin-top: 20px;
+.tarea-details-container {
+    max-width: 1500px;
+    margin: 30px auto;
+    padding: 0 24px 40px;
 }
-.meeting-link-card h4 {
-    margin: 0 0 12px 0;
-    color: #0d6efd;
+
+
+.task-header {
+    margin-bottom: 35px;
 }
-.meeting-link-card .btn {
+
+.back-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-}
-
-
-.tarea-text-content {
-    background-color: #fff;
-    border: 1px solid #dee2e6;
-    padding: 15px;
-    border-radius: 5px;
-}
-.return-to-class-btn-in-header {
-    background-color: #6c757d; /* Gray for back button */
-    color: #fff;
+    color: #6c757d;
     text-decoration: none;
-    border: none;
-    transition: background-color 0.2s ease;
-}
-.return-to-class-btn-in-header:hover {
-    background-color: #5a6268;
-    color: white;
-}
-.btn-info {
-    background-color: #17a2b8;
-    border-color: #17a2b8;
-    color: white;
+    font-weight: 500;
+    margin-bottom: 20px;
+    transition: .2s;
 }
 
-    .btn-info:hover {
-        background-color: #138496;
-        border-color: #138496;
+    .back-link:hover {
+        color: #0d6efd;
     }
 
+.task-header h1 {
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 12px;
+}
+
+.task-intro {
+    max-width: 850px;
+    font-size: 1.08rem;
+    line-height: 1.7;
+    color: #666;
+}
+
+
+
+
+.task-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 35px;
+    align-items: start;
+}
+
+
+
+
+.task-main {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+
+
+
+.task-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 25px;
+}
+
+
+
+.content-card,
+.info-card,
+.submission-card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid #ececec;
+    box-shadow: 0 10px 30px rgba(0,0,0,.05);
+}
+
+
+
+
+    .content-card h2,
+    .info-card h3,
+    .submission-card h2 {
+        margin-bottom: 18px;
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    .content-card p {
+        line-height: 1.8;
+        color: #555;
+    }
+
+
+
+.info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+    .info-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-row i {
+        color: #0d6efd;
+        font-size: 20px;
+        width: 24px;
+        margin-top: 3px;
+    }
+
+    .info-row span {
+        display: block;
+        font-size: .82rem;
+        color: #888;
+    }
+
+    .info-row strong {
+        display: block;
+        margin-top: 2px;
+        font-size: 1rem;
+        color: #222;
+    }
+
+    .info-row small {
+        display: block;
+        margin-top: 4px;
+        color: #666;
+    }
+
+
+
+
+
+.btn {
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-weight: 600;
+}
+
+
+
+.submission-card {
+    margin-top: 35px;
+}
+
+
+
+
+.submission-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+    .submission-header p {
+        margin: 8px 0 0;
+        color: #777;
+    }
+
+
+
+
+
+.submission-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+    .submission-row:last-child {
+        border-bottom: none;
+    }
+
+
+
+
+
+
+.empty-submission {
+    text-align: center;
+    padding: 35px 10px;
+}
+
+    .empty-submission i {
+        font-size: 48px;
+        color: #0d6efd;
+        margin-bottom: 18px;
+    }
+
+    .empty-submission h3 {
+        margin-bottom: 10px;
+    }
+
+    .empty-submission p {
+        color: #777;
+        margin-bottom: 25px;
+    }
+
+
+
+
+
+.teacher-feedback {
+    margin-top: 30px;
+    padding: 22px;
+    border-radius: 14px;
+    border-left: 5px solid;
+    background: #fff;
+    color: #2d3748;
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+}
+
+    .teacher-feedback h3 {
+        margin-bottom: 12px;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .teacher-feedback p {
+        margin: 0;
+        line-height: 1.7;
+    }
+
+
+
+
+
 .badge {
-    padding: .4em .7em;
-    border-radius: .35rem;
-    font-size: .8rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: .82rem;
     font-weight: 600;
     color: white;
 }
 
-.status-approved {
+
+.badge.status-approved {
     background-color: #28a745;
     color: white;
 }
 
-.status-in-review {
+.badge.status-in-review {
     background-color: #ffc107;
     color: #343a40;
 }
 
-.status-in-progress {
+.badge.status-in-progress {
     background-color: #007bff;
     color: white;
 }
 
-.status-redo {
+.badge.status-redo {
     background-color: #6f42c1;
     color: white;
 }
 
-.status-rejected {
+.badge.status-rejected {
     background-color: #dc3545;
     color: white;
 }
 
-.status-unknown {
+.badge.status-unknown {
     background-color: #6c757d;
     color: white;
 }
 
-.professor-comments {
-    margin-top: 18px;
-    padding: 16px;
-    border-radius: 8px;
-    border-left: 5px solid;
+
+.teacher-feedback.status-approved {
+    background: #edf9f0;
+    border-left-color: #28a745;
 }
 
-    .professor-comments h4 {
-        margin: 0 0 10px;
-        font-size: 1rem;
-        font-weight: 600;
+.teacher-feedback.status-in-review {
+    background: #fff9e6;
+    border-left-color: #ffc107;
+}
+
+.teacher-feedback.status-in-progress {
+    background: #eef6ff;
+    border-left-color: #0d6efd;
+}
+
+.teacher-feedback.status-redo {
+    background: #f5efff;
+    border-left-color: #6f42c1;
+}
+
+.teacher-feedback.status-rejected {
+    background: #fff1f2;
+    border-left-color: #dc3545;
+}
+
+.teacher-feedback.status-unknown {
+    background: #f8f9fa;
+    border-left-color: #6c757d;
+}
+
+
+
+
+@media (max-width: 1000px) {
+
+    .task-layout {
+        grid-template-columns: 1fr;
     }
 
-    .professor-comments p {
-        margin: 0;
-        line-height: 1.6;
+    .task-sidebar {
+        position: static;
     }
 
-    /* Approved */
-    .professor-comments.status-approved {
-        background: #eaf7ed;
-        border-color: #28a745;
-        color: #1f5130;
+    .submission-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+}
+
+
+
+.recording-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #f4f6f9;
+    text-decoration: none;
+    color: #1f2937;
+    transition: all 0.2s ease;
+    border: 1px solid #e5e7eb;
+}
+
+    .recording-card:hover {
+        background: #eef2ff;
+        border-color: #c7d2fe;
     }
 
-    /* In Review */
-    .professor-comments.status-in-review {
-        background: #fff8e1;
-        border-color: #ffc107;
-        color: #6b5500;
+    .recording-card i {
+        font-size: 20px;
+        color: #4f46e5;
     }
 
-    /* In Progress */
-    .professor-comments.status-in-progress {
-        background: #eaf4ff;
-        border-color: #007bff;
-        color: #0a4d9c;
-    }
+.recording-title {
+    font-weight: 600;
+    display: block;
+}
 
-    /* Rehacer */
-    .professor-comments.status-redo {
-        background: #f3ebfb;
-        border-color: #6f42c1;
-        color: #4c2c86;
-    }
-
-    /* Reprobado */
-    .professor-comments.status-rejected {
-        background: #fdecec;
-        border-color: #dc3545;
-        color: #8b1e2d;
-    }
-
-    /* Unknown */
-    .professor-comments.status-unknown {
-        background: #f1f3f5;
-        border-color: #6c757d;
-        color: #495057;
-    }
+.recording-card small {
+    color: #6b7280;
+}

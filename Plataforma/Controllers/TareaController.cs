@@ -75,6 +75,7 @@ namespace Plataforma.Controllers
                 Descripcion = tarea.Descripcion,
                 GrabacionUrl = tarea.GrabacionUrl,
                 ReunionUrl = tarea.ReunionUrl,
+                FechaReunion = tarea.FechaReunion,
                 FechaLimite = tarea.FechaVencimiento,
                 TipoContenido = tarea.TipoEntregaEsperado,
                 ContenidoUrl = tarea.Archivo != null

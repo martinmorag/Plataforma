@@ -12,6 +12,25 @@ namespace Plataforma.Models
         public string Nombre { get; set; }
         public string Descripcion { get; set; } // Optional description of the assignment
         public string? ReunionUrl { get; set; }
+        private DateTime? _fechaReunion;
+
+        public DateTime? FechaReunion
+        {
+            get => _fechaReunion;
+            set
+            {
+                if (value.HasValue)
+                {
+                    _fechaReunion = value.Value.Kind == DateTimeKind.Utc
+                        ? value
+                        : DateTime.SpecifyKind(value.Value, DateTimeKind.Utc);
+                }
+                else
+                {
+                    _fechaReunion = null;
+                }
+            }
+        }
 
         [Required]
         [ForeignKey("Clase")]
@@ -28,19 +47,21 @@ namespace Plataforma.Models
         public Archivo? Archivo { get; set; } // Navigation property to the assignment's file
         public string? GrabacionUrl { get; set; }
 
-        private DateTime _fechaVencimiento;
-        public DateTime FechaVencimiento // Due date for the assignment
+        private DateTime? _fechaVencimiento;
+        public DateTime? FechaVencimiento // Due date for the assignment
         {
             get => _fechaVencimiento;
             set
             {
-                if (value.Kind != DateTimeKind.Utc)
+                if (value.HasValue)
                 {
-                    _fechaVencimiento = DateTime.SpecifyKind(value, DateTimeKind.Utc);
+                    _fechaVencimiento = value.Value.Kind == DateTimeKind.Utc
+                        ? value
+                        : DateTime.SpecifyKind(value.Value, DateTimeKind.Utc);
                 }
                 else
                 {
-                    _fechaVencimiento = value;
+                    _fechaVencimiento = null;
                 }
             }
         }

@@ -5,8 +5,10 @@
         public Guid TareaId { get; set; }
         public string? Nombre { get; set; }
         public string? Descripcion { get; set; }
+        public string TipoContenido { get; set; }
         public string? GrabacionUrl { get; set; }
-        public DateTime FechaLimite { get; set; } // Due date
+        public DateTime? FechaReunion { get; set; }
+        public DateTime? FechaLimite { get; set; }
         public bool IsSubmittedApproved { get; set; } // Indicates if this task has an approved submission
         public string? SubmissionStatusText { get; set; } // e.g., "Aprobado", "En Revisión", "Pendiente"
         public bool HasFileRequirement { get; set; } // Does this task require a file submission?

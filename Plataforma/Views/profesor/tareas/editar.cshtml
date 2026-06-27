@@ -49,6 +49,12 @@
                 <span asp-validation-for="ReunionUrl" class="validation-error"></span>
             </div>
 
+            <div class="mb-3">
+                <label asp-for="FechaReunion" class="form-label"></label>
+                <input asp-for="FechaReunion" type="datetime-local" class="form-control" />
+                <span asp-validation-for="FechaReunion" class="text-danger"></span>
+            </div>
+
             <div class="form-group">
                 <label asp-for="GrabacionUrl" class="form-label">
                     Link de grabación
@@ -59,21 +65,22 @@
                        placeholder="https://..." />
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="fechaVencimientoGroup">
                 <label asp-for="FechaVencimiento" class="form-label">Fecha de Vencimiento</label>
                 <input asp-for="FechaVencimiento"
-                       type="datetime-local"
-                       class="form-input"
-                       value="@Model.FechaVencimiento.ToString("yyyy-MM-ddTHH:mm")" />
+                   type="datetime-local"
+                   class="form-input"
+                   value="@(Model.FechaVencimiento?.ToString("yyyy-MM-ddTHH:mm"))" />
                 <span asp-validation-for="FechaVencimiento" class="validation-error"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="TipoEntregaEsperado" class="form-label">Tipo de Entrega Esperado</label>
-                <select asp-for="TipoEntregaEsperado" class="form-input">
+                <select asp-for="TipoEntregaEsperado" id="TipoEntregaEsperado" class="form-input">
+                    <option value="lectura">Lectura</option>
                     <option value="Documento">Documento</option>
                     <option value="video">Video</option>
-                    <option value="texto">Video</option>
+                    <option value="texto">Texto</option>
                 </select>
                 <span asp-validation-for="TipoEntregaEsperado" class="validation-error"></span>
             </div>
@@ -115,6 +122,8 @@
         </form>
     </div>
 </div>
+
+<script src="~/js/tareas/editar.js" asp-append-version="true"></script>
 
 @section Scripts {
     @{

@@ -41,6 +41,7 @@ async function loadDetalle(tareaId)
     if (tarea.reunionUrl)
     {
         content += `
+        <p>Fecha de reunión: ${tarea.fechaReunion ? new Date(tarea.fechaReunion).toLocaleDateString() : 'No especificada'}</p>
         <a href="${tarea.reunionUrl}"
            target="_blank"
            class="btn btn-primary">
@@ -51,6 +52,7 @@ async function loadDetalle(tareaId)
     if (tarea.tipo === "Documento")
     {
         content += `
+        <p>Fecha límite: ${tarea.fecha ? new Date(tarea.fecha).toLocaleDateString() : 'No especificada'}</p>
         <a href="${tarea.archivoUrl}"
            target="_blank"
            class="btn btn-info">
@@ -71,6 +73,7 @@ async function loadDetalle(tareaId)
     if (tarea.tipo === "video")
     {
         content += `
+        <p>Fecha límite: ${tarea.fecha ? new Date(tarea.fecha).toLocaleDateString() : 'No especificada'}</p>
         <video controls width="100%">
             <source src="${tarea.archivoUrl}">
         </video>`;

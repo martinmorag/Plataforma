@@ -49,7 +49,6 @@
     .curso-btn:hover {
         background: #2563eb;
         color: white;
-        transform: translateX(4px);
     }
 
 /* Right side */
@@ -90,7 +89,6 @@
     }
 
     .tarea-card:hover {
-        transform: translateY(-4px);
         box-shadow: 0 14px 30px rgba(0,0,0,.12);
     }
 

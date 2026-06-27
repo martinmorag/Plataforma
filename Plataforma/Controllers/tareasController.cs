@@ -113,7 +113,12 @@ namespace Plataforma.Controllers
                                            CursoId = cp.Curso.CursoId,
                                            NombreCurso = cp.Curso.Nombre,
                                            TotalClases = cp.Curso.Modulos.SelectMany(m => m.Clases).Count(), // Consider if this is needed in the UI
-                                           TotalTareas = cp.Curso.Modulos.SelectMany(m => m.Clases).SelectMany(cl => cl.Tareas).Count()
+                                           TotalTareas = cp.Curso.Modulos
+                                                .SelectMany(m => m.Clases)
+                                                .SelectMany(cl => cl.Tareas)
+                                                .Count(t =>
+                                                    t.TipoEntregaEsperado == "Documento" ||
+                                                    t.TipoEntregaEsperado == "video")
                                        })
                                        .ToListAsync();
 
@@ -132,14 +137,11 @@ namespace Plataforma.Controllers
                 {
                     selectedCursoNombre = selectedCourse.NombreCurso;
 
-                    var tareasQuery = _context.tareas
-                        .Where(t => t.Clase.Modulo.CursoId == cursoId.Value &&
-                                    t.Clase.Modulo.Curso.CursoProfesores.Any(cp => cp.ProfesorId == user.Id)); // Corrected navigation
-                                                                                                               // ... rest of the select and ToListAsync()
-
                     tareas = await _context.tareas
                         .Where(t => t.Clase.Modulo.CursoId == cursoId &&
-                                    t.Clase.Modulo.Curso.CursoProfesores.Any(cp => cp.ProfesorId == user.Id)) // Corrected navigation
+                                    t.Clase.Modulo.Curso.CursoProfesores.Any(cp => cp.ProfesorId == user.Id) &&
+                                    (t.TipoEntregaEsperado == "Documento" ||
+                                     t.TipoEntregaEsperado == "video"))
                         .Select(t => new ProfesorTareaViewModel
                         {
                             TareaId = t.TareaId,
@@ -185,7 +187,9 @@ namespace Plataforma.Controllers
 
             var tareas = await _context.tareas
                 .Where(t => t.Clase.Modulo.CursoId == cursoId &&
-                            t.Clase.Modulo.Curso.CursoProfesores.Any(cp => cp.ProfesorId == user.Id)) // Corrected navigation
+                    t.Clase.Modulo.Curso.CursoProfesores.Any(cp => cp.ProfesorId == user.Id) &&
+                    (t.TipoEntregaEsperado == "Documento" ||
+                     t.TipoEntregaEsperado == "video"))
                 .Select(t => new ProfesorTareaViewModel
                 {
                     TareaId = t.TareaId,
@@ -349,7 +353,8 @@ namespace Plataforma.Controllers
                 Nombre = asignacionModel.Nombre,
                 Descripcion = asignacionModel.Descripcion,
                 ReunionUrl = asignacionModel.ReunionUrl,
-                FechaVencimiento = asignacionModel.FechaVencimiento.ToUniversalTime(), // Ensure UTC
+                FechaReunion = asignacionModel.FechaReunion?.ToUniversalTime(),
+                FechaVencimiento = asignacionModel.FechaVencimiento?.ToUniversalTime(), // Ensure UTC
                 ClaseId = asignacionModel.ClaseId,
                 TipoEntregaEsperado = asignacionModel.TipoEntregaEsperado // Set the expected submission type
             };
@@ -388,6 +393,45 @@ namespace Plataforma.Controllers
             if (tarea == null)
                 return NotFound();
 
+            if (model.TipoEntregaEsperado == "lectura" ||
+                model.TipoEntregaEsperado == "texto")
+            {
+                model.FechaVencimiento = null;
+            }
+
+            if ((model.TipoEntregaEsperado == "Documento" ||
+                 model.TipoEntregaEsperado == "video") &&
+                !model.FechaVencimiento.HasValue)
+            {
+                ModelState.AddModelError(nameof(model.FechaVencimiento),
+                    "Debe indicar una fecha de vencimiento para este tipo de asignación.");
+            }
+
+            // Reading/Text shouldn't have a due date.
+            if ((model.TipoEntregaEsperado == "lectura" ||
+                 model.TipoEntregaEsperado == "texto") &&
+                model.FechaVencimiento.HasValue)
+            {
+                ModelState.AddModelError(nameof(model.FechaVencimiento),
+                    "Las lecturas y textos no requieren fecha de vencimiento.");
+            }
+
+            // Meeting URL requires a meeting date.
+            if (!string.IsNullOrWhiteSpace(model.ReunionUrl) &&
+                !model.FechaReunion.HasValue)
+            {
+                ModelState.AddModelError(nameof(model.FechaReunion),
+                    "Debe indicar la fecha y hora de la reunión.");
+            }
+
+            // Meeting date requires a meeting URL.
+            if (model.FechaReunion.HasValue &&
+                string.IsNullOrWhiteSpace(model.ReunionUrl))
+            {
+                ModelState.AddModelError(nameof(model.ReunionUrl),
+                    "Debe indicar la URL de la reunión.");
+            }
+
             if (!ModelState.IsValid)
                 return View("~/Views/profesor/tareas/editar.cshtml", model);
 
@@ -395,7 +439,8 @@ namespace Plataforma.Controllers
             tarea.Descripcion = model.Descripcion;
             tarea.GrabacionUrl = model.GrabacionUrl;
             tarea.ReunionUrl = model.ReunionUrl;
-            tarea.FechaVencimiento = model.FechaVencimiento.ToUniversalTime();
+            tarea.FechaReunion = model.FechaReunion?.ToUniversalTime();
+            tarea.FechaVencimiento = model.FechaVencimiento?.ToUniversalTime();
             tarea.TipoEntregaEsperado = model.TipoEntregaEsperado;
 
             if (nuevoArchivo != null && nuevoArchivo.Length > 0)

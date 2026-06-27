@@ -3,215 +3,581 @@
 <link rel="stylesheet" href="~/css/curso/details.css" asp-append-version="true" />
 
 
-<div class="tarea-details-container" id="current-tarea-details" data-deadline-blocked="@ViewBag.IsBlockedByDeadline.ToString().ToLower()">
-    <div class="tarea-header-with-button">
-        <h1>@Model.Nombre</h1>
-        <a href="javascript:void(0);"
-           data-class-id="@Model.ClaseId"
-           onclick="loadClassDetailsFromTask(this, '@Model.ClaseId')"
-           class="btn btn-outline-primary return-to-class-btn-in-header">
-            <i class="fa-solid fa-arrow-left"></i> Volver a la Clase
-        </a>
-    </div>
+<div class="tarea-details-container"
+     id="current-tarea-details"
+     data-deadline-blocked="@ViewBag.IsBlockedByDeadline.ToString().ToLower()">
 
-    @if (!string.IsNullOrEmpty(Model.Descripcion) && Model.TipoContenido != "texto")
-    {
-        <div class="tarea-description">
-            <h3>Descripción</h3>
-
-            @if (!string.IsNullOrEmpty(Model.ReunionUrl))
-            {
-                <div class="meeting-link-card">
-                    <h4>
-                        <i class="fa-solid fa-video"></i>
-                        Clase en vivo
-                    </h4>
-
-                    <a href="@Model.ReunionUrl"
-                       target="_blank"
-                       class="btn btn-primary">
-                        Unirse a la reunión
-                    </a>
-                </div>
-            }
-
-            <p>@Model.Descripcion</p>
-        </div>
+    @{
+        var statusClass = Model.SubmissionStatusText switch
+        {
+            "Aprobado" => "status-approved",
+            "EnRevision" => "status-in-review",
+            "En Progreso" => "status-in-progress",
+            "Rehacer" => "status-redo",
+            "Reprobado" => "status-rejected",
+            _ => "status-unknown"
+        };
     }
 
-    @* Dynamic Content Section *@
-    <div class="tarea-content-section">
-        @if (ViewBag.IsBlockedByDeadline)
-        {
-            <div class="alert alert-danger">
-                Esta actividad está bloqueada porque la fecha límite ha vencido.
-            </div>
-        }
-        else if (Model.TipoContenido == "video" && !string.IsNullOrEmpty(Model.ContenidoUrl))
-        {
-            <h3>Contenido del Video</h3>
-            <div class="video-player-container">
-                <video id="my-video"
-                       class="video-js vjs-default-skin vjs-big-play-centered"
-                       controls
-                       preload="auto"
-                       data-setup='{}'
-                       data-tarea-id="@Model.TareaId" 
-                       data-initial-time="@(ViewBag.InitialVideoTime ?? 0)"
-                       data-completed="@(ViewBag.VideoCompleted?.ToString().ToLower() ?? "false")">
-                    @* Video completion status *@
-                    <source src="@Model.ContenidoUrl" type="video/mp4" />
-                    <p class="vjs-no-js">
-                        To view this video please enable JavaScript, and consider upgrading to a
-                        web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
-                    </p>
-                </video>
-            </div>
-        }
-        else if (Model.TipoContenido == "texto")
-        {
-            <h3>Información</h3>
+    <!-- HEADER -->
 
-            @if (!string.IsNullOrEmpty(Model.ReunionUrl))
+    <div class="task-header">
+
+        <div>
+
+            <a href="javascript:void(0);"
+               data-class-id="@Model.ClaseId"
+               onclick="loadClassDetailsFromTask(this, '@Model.ClaseId')"
+               class="back-link">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                Volver a la clase
+
+            </a>
+
+            <h1>@Model.Nombre</h1>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Descripcion)
+                && Model.TipoContenido != "texto")
             {
-                <div class="meeting-link-card">
-                    <h4>
-                        <i class="fa-solid fa-video"></i>
-                        Clase en vivo
-                    </h4>
+                <p class="task-intro">
 
+                    @Model.Descripcion
+
+                </p>
+            }
+
+        </div>
+
+    </div>
+
+    <!-- MAIN LAYOUT -->
+
+    <div class="task-layout">
+
+        <!-- ========================= -->
+
+        <!-- MAIN CONTENT -->
+
+        <!-- ========================= -->
+
+        <main class="task-main">
+
+    @if (ViewBag.IsBlockedByDeadline)
+{
+    <div class="alert alert-danger">
+
+        <i class="fa-solid fa-lock"></i>
+
+        Esta actividad está bloqueada porque la fecha límite ha vencido.
+
+    </div>
+}
+
+@if (Model.TipoContenido == "video"
+    && !string.IsNullOrEmpty(Model.ContenidoUrl))
+{
+    <section class="content-card">
+
+        <h2>Video</h2>
+
+        <div class="video-player-container">
+
+            <video id="my-video"
+                   class="video-js vjs-default-skin vjs-big-play-centered"
+                   controls
+                   preload="auto"
+                   data-setup='{}'
+                   data-tarea-id="@Model.TareaId"
+                   data-initial-time="@(ViewBag.InitialVideoTime ?? 0)"
+                   data-completed="@(ViewBag.VideoCompleted?.ToString().ToLower() ?? "false")">
+
+                <source src="@Model.ContenidoUrl"
+                        type="video/mp4"/>
+
+            </video>
+
+        </div>
+
+    </section>
+}
+
+else if (Model.TipoContenido == "Documento")
+{
+    <section class="content-card">
+
+        <h2>Documento</h2>
+
+        <p>
+
+            Descarga el documento de esta actividad.
+
+        </p>
+
+        <a class="btn btn-primary"
+
+           href="@Model.ContenidoUrl"
+
+           target="_blank">
+
+            <i class="fa-solid fa-file-arrow-down"></i>
+
+            Abrir documento
+
+        </a>
+
+    </section>
+}
+
+else if (Model.TipoContenido == "lectura")
+{
+    <section class="content-card">
+
+        <h2>Lectura</h2>
+
+        <p>
+
+            Consulta el material de lectura.
+
+        </p>
+
+        <a class="btn btn-primary"
+
+           href="@Model.ContenidoUrl"
+
+           target="_blank">
+
+            <i class="fa-solid fa-book-open"></i>
+
+            Abrir lectura
+
+        </a>
+
+    </section>
+}
+
+else if (Model.TipoContenido == "texto")
+{
+    <section class="content-card">
+
+        @Html.Raw(Model.Descripcion)
+
+    </section>
+}
+
+        </main>
+
+        <!-- ========================= -->
+        <!-- SIDEBAR -->
+        <!-- ========================= -->
+
+        <aside class="task-sidebar">
+
+            <div class="info-card">
+
+                <h3>Información</h3>
+
+                @if (Model.TipoContenido == "Documento" || Model.TipoContenido == "video")
+                {
+                    <div class="info-row">
+                        <i class="fa-regular fa-calendar"></i>
+
+                        <div>
+
+                            <span>Fecha límite</span>
+
+                            <strong>
+
+                                @Model.FechaLimite.Value.ToString("dd/MM/yyyy")
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+                }
+
+                @if (Model.FechaReunion.HasValue)
+                {
+                    <div class="info-row">
+
+                        <i class="fa-solid fa-video"></i>
+
+                        <div>
+
+                            <span>Clase en vivo</span>
+
+                            <strong>
+
+                                @Model.FechaReunion.Value.ToString("dd/MM/yyyy HH:mm")
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.GrabacionUrl))
+                {
+                    <a href="@Model.GrabacionUrl"
+                       target="_blank"
+                       class="recording-card">
+
+                        <i class="fa-solid fa-circle-play"></i>
+
+                        <div>
+                            <span class="recording-title">Grabación</span>
+                            <small>Ver clase grabada</small>
+                        </div>
+
+                    </a>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.ReunionUrl))
+                {
                     <a href="@Model.ReunionUrl"
                        target="_blank"
-                       class="btn btn-primary">
+                       class="btn btn-primary w-100 mt-3">
+
+                        <i class="fa-solid fa-video"></i>
+
                         Unirse a la reunión
+
                     </a>
+                }
+
+            </div>
+
+            <div class="info-card">
+
+                <h3>Actividad</h3>
+
+                <div class="info-row">
+
+                    <i class="fa-solid fa-file-lines"></i>
+
+                    <div>
+
+                        <span>Tipo</span>
+
+                        <strong>
+
+                            <strong>
+                                @(string.IsNullOrWhiteSpace(Model.TipoContenido)
+                                    ? "-"
+                                    : char.ToUpper(Model.TipoContenido[0]) + Model.TipoContenido.Substring(1).ToLower())
+                            </strong>
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                @if (Model.TipoContenido == "Documento" || Model.TipoContenido == "video")
+                {
+                    <div class="info-row">
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                        <div>
+
+                            <span>Estado</span>
+
+
+                            @if (Model.HasSubmitted)
+                            {
+                                <span class="badge @statusClass">
+
+                                    @Model.SubmissionStatusText
+
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge status-in-progress">
+
+                                    Pendiente
+
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+            @if (Model.HasSubmitted &&
+                 Model.SubmissionFecha.HasValue)
+            {
+                <div class="info-card">
+
+                    <h3>Última entrega</h3>
+
+                    <p>
+
+                        @Model.SubmissionFecha.Value.ToString("dd/MM/yyyy HH:mm")
+
+                    </p>
+
+                    @if (!string.IsNullOrEmpty(Model.SubmittedFileUrl))
+                    {
+                        <a href="@Model.SubmittedFileUrl"
+                           target="_blank">
+
+                            Ver archivo entregado
+
+                        </a>
+                    }
+
                 </div>
             }
 
-            <div class="tarea-text-content">
-                @Html.Raw(Model.Descripcion)
-            </div>
-        }
-        else if (Model.TipoContenido == "Documento" && !string.IsNullOrEmpty(Model.ContenidoUrl))
-        {
-            <h3>Documento de la Tarea</h3>
-            <p>Puedes ver el documento a continuación:</p>
-            <a href="@Model.ContenidoUrl" class="btn btn-info" target="_blank">
-                <i class="fa-solid fa-file-arrow-down"></i> Ver Documento
-            </a>
-        }
-        else if (Model.TipoContenido == "lectura" && !string.IsNullOrEmpty(Model.ContenidoUrl))
-        {
-            <h3>Material de Lectura</h3>
-            <p>Consulta el material de lectura a continuación:</p>
+        </aside>
 
-            <a href="@Model.ContenidoUrl"
-               class="btn btn-info"
-               target="_blank">
-                <i class="fa-solid fa-book-open"></i> Abrir Lectura
-            </a>
+    </div>
+
+
+    @if (Model.TipoContenido != "texto" &&
+     Model.TipoContenido != "lectura")
+{
+    <section class="submission-card">
+
+        <div class="submission-header">
+
+            <div>
+
+                <h2>Tu entrega</h2>
+
+                <p>
+
+                    Envía tu trabajo o revisa el estado de tu entrega.
+
+                </p>
+
+            </div>
+
+            @if (Model.HasSubmitted)
+            {
+                <span class="badge @statusClass">
+
+                    @Model.SubmissionStatusText
+
+                </span>
+            }
+
+        </div>
+
+        <hr />
+
+        @if (Model.HasSubmitted)
+        {
+
+            @if (Model.SubmissionFecha.HasValue)
+            {
+                <div class="submission-row">
+
+                    <strong>Fecha de entrega</strong>
+
+                    <span>
+
+                        @Model.SubmissionFecha.Value.ToString("dd/MM/yyyy HH:mm")
+
+                    </span>
+
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.SubmittedFileUrl))
+            {
+                <div class="submission-row">
+
+                    <strong>Archivo</strong>
+
+                    <a href="@Model.SubmittedFileUrl"
+                       target="_blank">
+
+                        Ver archivo entregado
+
+                    </a>
+
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.SubmissionComentarios))
+            {
+
+                <div class="teacher-feedback @statusClass">
+
+                    <h3>
+
+                        <i class="fa-solid fa-comments"></i>
+
+                        Comentarios del profesor
+
+                    </h3>
+
+                    <p>
+
+                        @Model.SubmissionComentarios
+
+                    </p>
+
+                </div>
+
+            }
+
+            @if (Model.SubmissionStatusText == "Rehacer"
+                 && !ViewBag.IsBlockedByDeadline)
+            {
+
+                <button class="btn btn-warning mt-3"
+
+                        onclick="showSubmissionForm('@Model.TareaId')">
+
+                    <i class="fa-solid fa-rotate-right"></i>
+
+                    Rehacer entrega
+
+                </button>
+
+            }
+
         }
         else
         {
-            <div class="alert alert-info">
-                No hay contenido específico para esta tarea.
-            </div>
-        }
-    </div>    
 
-    @if (Model.TipoContenido != "texto" && Model.TipoContenido != "lectura")    {
-        <div class="tarea-submission-section">
-            <h3>Tu Entrega</h3>
-            @if (Model.HasSubmitted)
+            @if (ViewBag.IsBlockedByDeadline)
             {
-                <p>
-                    <strong>Estado:</strong>
-                    @{
-                        var statusClass = Model.SubmissionStatusText switch
-                        {
-                            "Aprobado" => "status-approved",
-                            "EnRevision" => "status-in-review",
-                            "En Progreso" => "status-in-progress",
-                            "Rehacer" => "status-redo",
-                            "Reprobado" => "status-rejected",
-                            _ => "status-unknown"
-                        };
-                    }
 
-                    <span class="badge @statusClass">
-                        @Model.SubmissionStatusText
-                    </span>
-                </p>
-                @if (Model.SubmissionFecha.HasValue)
-                {
-                    <p><strong>Fecha de Entrega:</strong> @Model.SubmissionFecha.Value.ToShortDateString()</p>
-                }
-                @if (!string.IsNullOrEmpty(Model.SubmittedFileUrl))
-                {
-                    <p><strong>Archivo Entregado:</strong> <a href="@Model.SubmittedFileUrl" target="_blank">Ver archivo</a></p>
-                }
-                @if (!string.IsNullOrEmpty(Model.SubmissionComentarios))
-                {
-                    <div class="professor-comments @statusClass" >
-                        <h4>Comentarios del Profesor:</h4>
-                        <p>@Model.SubmissionComentarios</p>
-                    </div>
-                }
-                @if (Model.SubmissionStatusText == "Rehacer" && !ViewBag.IsBlockedByDeadline)
-                {
-                    <button type="button"
-                            class="btn btn-warning mt-3"
+                <div class="alert alert-danger">
+
+                    <i class="fa-solid fa-lock"></i>
+
+                    La fecha límite venció.
+
+                </div>
+
+            }
+            else
+            {
+
+                <div class="empty-submission">
+
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                    <h3>
+
+                        Todavía no entregaste esta actividad
+
+                    </h3>
+
+                    <p>
+
+                        Cuando termines, envía tu archivo aquí.
+
+                    </p>
+
+                    <button class="btn btn-primary"
+
                             onclick="showSubmissionForm('@Model.TareaId')">
-                        Rehacer Entrega
+
+                        Entregar actividad
+
                     </button>
-                }
 
-            }
-            else if (Model.TipoContenido == "Documento" && !ViewBag.IsBlockedByDeadline)
-            {
-                <p class="alert alert-info">Aún no has entregado esta tarea.</p>
-                <button type="button"
-                        class="btn btn-primary"
-                        onclick="showSubmissionForm('@Model.TareaId')">
-                    Entregar Tarea
-                </button>
-            }
-            else if (Model.TipoContenido == "Documento" && ViewBag.IsBlockedByDeadline)
-            {
-                <div class="alert alert-danger d-flex align-items-center">
-                    <i class="fa-solid fa-lock me-2"></i>
-                    La fecha límite de esta tarea ha vencido. Ya no es posible realizar entregas.
                 </div>
-            }
-            else if (Model.TipoContenido == "video")
-            {
-                <p class="alert alert-info">Ver video completo.</p>
-            }
-                @* Submission Form (hidden by default) *@
-                <div id="submission-form-container-@Model.TareaId" class="mt-4" style="display:none;">
-                    <h4>Formulario de Entrega</h4>
-                    <form id="submissionForm-@Model.TareaId" enctype="multipart/form-data">
-                        <input type="hidden" name="TareaId" value="@Model.TareaId" />
-                        @Html.AntiForgeryToken() @* Include Anti-Forgery Token for POST requests *@
 
-                        <div class="mb-3">
-                            <label for="submittedFile-@Model.TareaId" class="form-label">Archivo de Entrega (PDF, DOC, DOCX, XLS, XLSX)</label>
-                        <input type="file" class="form-control" id="submittedFile-@Model.TareaId" name="SubmittedFile" accept=".pdf,.doc,.docx,.xls,.xlsx" required />
-                            <div class="form-text">Tamaño máximo: 10MB. Formatos permitidos: .pdf, .doc, .docx, .xls, xlsx.</div>
-                        </div>
-                   
-                        @* <div class="mb-3">
-                            <label for="comments-@Model.TareaId" class="form-label">Comentarios (opcional)</label>
-                            <textarea class="form-control" id="comments-@Model.TareaId" name="Comments" rows="3"></textarea>
-                        </div> *@
+            }
 
-                        <button type="submit" class="btn btn-success">Enviar Entrega</button>
-                        <button type="button" class="btn btn-secondary" onclick="hideSubmissionForm('@Model.TareaId')">Cancelar</button>
-                    </form>
-                    <div id="submission-message-@Model.TareaId" class="mt-2"></div>
+        }
+
+        <div id="submission-form-container-@Model.TareaId"
+             style="display:none;"
+             class="submission-form">
+
+            <hr />
+
+            <h3>
+
+                Enviar entrega
+
+            </h3>
+
+            <form id="submissionForm-@Model.TareaId"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="TareaId"
+                       value="@Model.TareaId"/>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Archivo
+
+                    </label>
+
+                    <input class="form-control"
+
+                           type="file"
+
+                           id="submittedFile-@Model.TareaId"
+
+                           name="SubmittedFile"
+
+                           accept=".pdf,.doc,.docx,.xls,.xlsx"
+
+                           required/>
+
+                    <div class="form-text">
+
+                        PDF, Word o Excel (máx. 10 MB)
+
+                    </div>
+
                 </div>
+
+                <div class="d-flex gap-2">
+
+                    <button class="btn btn-success"
+                            type="submit">
+
+                        Enviar entrega
+
+                    </button>
+
+                    <button class="btn btn-outline-secondary"
+
+                            type="button"
+
+                            onclick="hideSubmissionForm('@Model.TareaId')">
+
+                        Cancelar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+            <div id="submission-message-@Model.TareaId"
+                 class="mt-3">
+
+            </div>
+
         </div>
-    }
+
+    </section>
+}
+
 </div>
 
 <script>

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Plataforma.Data;
@@ -11,9 +12,11 @@ using Plataforma.Data;
 namespace Plataforma.Migrations
 {
     [DbContext(typeof(PlataformaContext))]
-    partial class PlataformaContextModelSnapshot : ModelSnapshot
+    [Migration("20260626150212_reunion-time")]
+    partial class reuniontime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -347,7 +350,7 @@ namespace Plataforma.Migrations
                     b.Property<DateTime?>("FechaReunion")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("FechaVencimiento")
+                    b.Property<DateTime>("FechaVencimiento")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("GrabacionUrl")

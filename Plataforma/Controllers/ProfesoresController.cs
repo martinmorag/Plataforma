@@ -277,6 +277,7 @@ namespace Plataforma.Controllers
             {
                 tarea.Nombre,
                 tarea.Descripcion,
+                tarea.FechaReunion,
                 Tipo = tarea.TipoEntregaEsperado,
                 ArchivoUrl = tarea.Archivo != null
                     ? _cloudFrontService.GenerateSignedUrl(tarea.Archivo.ArchivoUrl)

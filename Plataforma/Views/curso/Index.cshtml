@@ -3,6 +3,12 @@
     ViewData["Title"] = Model.CursoNombre;
 }
 @model Plataforma.Models.Cursos.CursoClasesViewModel
+@using System.Globalization
+
+@{
+    var porcentaje = ((double)Model.CompletedClases / Model.TotalClases * 100)
+        .ToString(CultureInfo.InvariantCulture);
+}
 
 <link rel="stylesheet" href="~/css/curso/inicio.css" asp-append-version="true" />
 
@@ -21,7 +27,7 @@
             {
                 <p>@Model.CompletedClases de @Model.TotalClases clases completadas</p>
                 <div class="progress-bar-container">
-                    <div class="progress-bar" style="width: @((double)Model.CompletedClases / Model.TotalClases * 100)%;"></div>
+                    <div class="progress-bar" style="width: @porcentaje%;"></div>
                 </div>
             }
             else

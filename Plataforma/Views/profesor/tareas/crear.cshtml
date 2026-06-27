@@ -29,22 +29,31 @@
                 <span asp-validation-for="Descripcion" class="validation-error"></span>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="reunionUrlGroup">
                 <label asp-for="ReunionUrl" class="form-label">URL de la Reunión (opcional)</label>
                 <input asp-for="ReunionUrl" class="form-input" />
                 <span asp-validation-for="ReunionUrl" class="validation-error"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="FechaVencimiento" class="form-label">Fecha de Vencimiento</label> @* Changed "Fecha de Entrega" to "Fecha de Vencimiento" *@
-                <input asp-for="FechaVencimiento" type="datetime-local" class="form-input" value="@(Model.FechaVencimiento != default(DateTime) ? Model.FechaVencimiento.ToString("yyyy-MM-ddTHH:mm") : "")" />
+            <div class="form-group" id="fechaReunionGroup">
+                <label asp-for="FechaReunion" class="form-label">Fecha de Reunión</label>
+                <input asp-for="FechaReunion" type="datetime-local" class="form-control" />
+                <span asp-validation-for="FechaReunion" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" id="fechaVencimientoGroup">
+                <label asp-for="FechaVencimiento" class="form-label">Fecha de Vencimiento</label>
+                <input asp-for="FechaVencimiento"
+                       type="datetime-local"
+                       class="form-input"
+                       value="@(Model.FechaVencimiento.HasValue ? Model.FechaVencimiento.Value.ToString("yyyy-MM-ddTHH:mm") : "")" />
                 <span asp-validation-for="FechaVencimiento" class="validation-error"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="TipoEntregaEsperado" class="form-label">Tipo de Entrega Esperado (para estudiantes)</label>
                 @* Changed from input for ContentType to a select for TipoEntregaEsperado *@
-                <select asp-for="TipoEntregaEsperado" class="form-input">
+                <select asp-for="TipoEntregaEsperado" id="TipoEntregaEsperado" class="form-input">
                     <option value="lectura">Lectura</option>
                     <option value="Documento">Documento para subir</option>
                     <option value="video">Video</option>

@@ -86,14 +86,18 @@ namespace Plataforma.Controllers
                     Clases = m.Clases.Select(c =>
                     {
                         bool isClaseCompleted;
-                        if (!c.Tareas.Any()) // If the class has no tasks, consider it completed by default
+                        var tareasEvaluables = c.Tareas
+                            .Where(t => t.TipoEntregaEsperado == "Documento" || t.TipoEntregaEsperado == "video")
+                            .ToList();
+
+                        if (!tareasEvaluables.Any())
                         {
+                            // The class only contains reading/material.
                             isClaseCompleted = true;
                         }
                         else
                         {
-                            // A class is completed if ALL its tasks have an approved Entrega by the student
-                            isClaseCompleted = c.Tareas.All(tarea => approvedSubmittedTareaIds.Contains(tarea.TareaId));
+                            isClaseCompleted = tareasEvaluables.All(t => approvedSubmittedTareaIds.Contains(t.TareaId));
                         }
 
                         return new ClaseViewModel

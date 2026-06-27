@@ -12,14 +12,25 @@
     @if (Model.HasTareas && Model.Tareas.Any())
     {
         <div class="class-tasks-section">
-            <h3><i class="fa-solid fa-clipboard-list"></i> Tareas de la Clase</h3>
+            <h3><i class="fa-solid fa-clipboard-list"></i> Material de la Clase</h3>
             <ul class="task-list">
                 @foreach (var tarea in Model.Tareas)
                 {
+                    var esVideo = tarea.TipoContenido == "texto";
+                    var esLectura = tarea.TipoContenido == "lectura";
+
                     <li class="task-item @(tarea.IsSubmittedApproved ? "task-completed" : "task-pending")">
                         <div class="task-header">
                             <span class="task-status-icon">
-                                @if (tarea.IsSubmittedApproved)
+                                @if (esLectura)
+                                {
+                                    <i class="fa-solid fa-book-open"></i>
+                                }
+                                else if (esVideo)
+                                {
+                                    <i class="fa-solid fa-video"></i>
+                                }
+                                else if (tarea.IsSubmittedApproved)
                                 {
                                     <i class="fa-solid fa-check-circle completed-icon"></i>
                                 }
@@ -38,12 +49,22 @@
                             </span>
                             <h4>@tarea.Nombre</h4>
                             <span class="task-due-date">
-                                Fecha Límite: @tarea.FechaLimite.ToShortDateString()
-
-                                @if (tarea.FechaLimite < DateTime.UtcNow)
+                                @if (tarea.TipoContenido != "lectura" && tarea.TipoContenido != "texto")
                                 {
-                                    <span class="badge badge-danger ms-2">
-                                        Vencida
+                                    <span>
+                                        Fecha Límite: @tarea.FechaLimite.Value.ToShortDateString()
+
+                                        @if (tarea.FechaLimite < DateTime.UtcNow)
+                                        {
+                                            <span class="badge badge-danger ms-2">
+                                                Vencida
+                                            </span>
+                                        }
+                                    </span>
+                                } else if (tarea.FechaReunion.HasValue)
+                                {
+                                    <span>
+                                        Fecha Reunión: @tarea.FechaReunion.Value.ToShortDateString()
                                     </span>
                                 }
                             </span>
@@ -52,15 +73,23 @@
                         {
                             <p class="task-description-short">@tarea.Descripcion</p>
                         }
-                        <div class="task-meta">
-                            <span class="badge task-status-badge @(tarea.IsSubmittedApproved ? "badge-success" : (tarea.SubmissionStatusText == "En Revision" ? "badge-warning" : (tarea.SubmissionStatusText == "Reprobado" ? "badge-danger" : "badge-info")))">
-                                @tarea.SubmissionStatusText
-                            </span>
-                            @if (tarea.HasFileRequirement)
-                            {
-                                <span class="task-requirement"><i class="fa-solid fa-file-arrow-up"></i> Requiere archivo</span>
-                            }
-                        </div>
+                        @if (tarea.TipoContenido != "lectura" && tarea.TipoContenido != "texto") 
+                        {
+                            <div class="task-meta">
+                                @if (!esVideo || !esLectura)
+                                {
+                                    <span class="badge task-status-badge @(tarea.IsSubmittedApproved ? "badge-success" :
+                                        (tarea.SubmissionStatusText == "En Revision" ? "badge-warning" :
+                                        (tarea.SubmissionStatusText == "Reprobado" ? "badge-danger" : "badge-info")))">
+                                        @tarea.SubmissionStatusText
+                                    </span>
+                                }
+                                @if (tarea.HasFileRequirement)
+                                {
+                                    <span class="task-requirement"><i class="fa-solid fa-file-arrow-up"></i> Requiere archivo</span>
+                                }
+                            </div>
+                        }
                         <div class="task-actions">
                             <a href="/api/Tarea/GetTareaDetails?tareaId=@tarea.TareaId"
                                class="btn btn-primary btn-sm task-link"
@@ -80,7 +109,14 @@
                                 }
                                 else
                                 {
-                                    <span>Ver Tarea</span>
+                                    @if (tarea.TipoContenido == "Documento" || tarea.TipoContenido == "video")
+                                    {
+                                        <span>Ver Tarea</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Ver Material</span>
+                                    }
                                 }
                             </a>
                         </div>

@@ -68,7 +68,7 @@
                                 <tr>
                                     <td data-label="Nombre de la Tarea">@tarea.Nombre</td>
                                     <td data-label="Clase">@tarea.ClaseNombre</td>
-                                    <td data-label="Fecha Límite">@tarea.FechaLimite.ToShortDateString()</td>
+                                    <td data-label="Fecha Límite">@tarea.FechaLimite.Value.ToShortDateString()</td>
                                     <td data-label="Entregas">@tarea.TotalEntregas</td>
                                     <td data-label="Pendientes de Revisión">@(tarea.TipoContenido == "video" ? "-" : tarea.EntregasPendientes)</td>
                                     <td data-label="">
