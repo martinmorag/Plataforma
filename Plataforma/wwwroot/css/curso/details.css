@@ -340,6 +340,102 @@
 }
 
 
+.submission-form-card {
+    background: #fff;
+    border: 1px solid #e6e8ee;
+    border-radius: 16px;
+    padding: 28px;
+    margin-top: 24px;
+}
+
+.submission-form-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+    .submission-form-header i {
+        font-size: 26px;
+        color: #2563eb;
+    }
+
+    .submission-form-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .submission-form-header p {
+        margin: 4px 0 0;
+        color: #666;
+    }
+
+.submission-field {
+    margin-bottom: 22px;
+}
+
+    .submission-field label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+.submission-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d7dce3;
+    border-radius: 10px;
+    transition: .2s;
+}
+
+    .submission-input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+    }
+
+.submission-field small {
+    display: block;
+    margin-top: 8px;
+    color: #777;
+}
+
+.submission-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.submit-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 22px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+}
+
+    .submit-btn:hover {
+        background: #1d4ed8;
+    }
+
+.cancel-btn {
+    background: white;
+    border: 1px solid #d0d7de;
+    border-radius: 10px;
+    padding: 12px 22px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+    .cancel-btn:hover {
+        background: #f5f6f8;
+    }
+
+
+
 
 
 @media (max-width: 1000px) {

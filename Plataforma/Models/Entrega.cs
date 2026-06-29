@@ -73,5 +73,6 @@ namespace Plataforma.Models
         public Guid? ArchivoId { get; set; } // Nullable if submission is text-based or no file is required
         [ValidateNever]
         public Archivo? Archivo { get; set; } // Navigation property to the submitted file
+        public string? UrlEntrega { get; set; }
     }
 }

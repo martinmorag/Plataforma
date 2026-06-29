@@ -87,7 +87,10 @@ namespace Plataforma.Controllers
                     {
                         bool isClaseCompleted;
                         var tareasEvaluables = c.Tareas
-                            .Where(t => t.TipoEntregaEsperado == "Documento" || t.TipoEntregaEsperado == "video")
+                            .Where(t =>
+                                t.TipoEntregaEsperado == "Documento" ||
+                                t.TipoEntregaEsperado == "video" ||
+                                t.TipoEntregaEsperado == "link")
                             .ToList();
 
                         if (!tareasEvaluables.Any())

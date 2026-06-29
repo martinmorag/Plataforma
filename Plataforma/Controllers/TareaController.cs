@@ -75,6 +75,7 @@ namespace Plataforma.Controllers
                 Descripcion = tarea.Descripcion,
                 GrabacionUrl = tarea.GrabacionUrl,
                 ReunionUrl = tarea.ReunionUrl,
+                UrlEntrega = tarea.UrlEntrega,
                 FechaReunion = tarea.FechaReunion,
                 FechaLimite = tarea.FechaVencimiento,
                 TipoContenido = tarea.TipoEntregaEsperado,
@@ -87,6 +88,7 @@ namespace Plataforma.Controllers
                 SubmittedFileUrl = submission?.Archivo != null
                     ? _cloudFrontService.GenerateSignedUrl(submission.Archivo.ArchivoUrl)
                     : null,
+                SubmittedUrl = submission?.UrlEntrega,
                 SubmissionComentarios = submission?.ComentariosProfesor,
                 SubmissionFecha = submission?.FechaEntrega,
                 ClaseId = tarea?.ClaseId
@@ -366,9 +368,21 @@ namespace Plataforma.Controllers
                 return BadRequest("La fecha límite de entrega ya ha vencido.");
             }
 
-            if (model.SubmittedFile == null)
+            if (tarea.TipoEntregaEsperado == "Documento")
             {
-                return BadRequest("Una entrega ya ha sido hecha para esta tarea.");
+                if (model.SubmittedFile == null && string.IsNullOrWhiteSpace(model.SubmittedUrl))
+                    return BadRequest("Debe subir un archivo o ingresar un enlace.");
+            }
+
+            if (model.SubmittedFile == null && string.IsNullOrWhiteSpace(model.SubmittedUrl))
+            {
+                return BadRequest("Debe enviar un archivo o un enlace.");
+            }
+
+            if (tarea.TipoEntregaEsperado == "link")
+            {
+                if (string.IsNullOrWhiteSpace(model.SubmittedUrl))
+                    return BadRequest("Debe ingresar un enlace.");
             }
 
             // Check if the submitted file is a PDF (or other allowed types)
@@ -455,7 +469,8 @@ namespace Plataforma.Controllers
                     EstudianteId = estudianteId,
                     FechaEntrega = DateTime.Now,
                     Estado = Entrega.EstadoEntrega.EnRevision, // Initial status is pending review
-                    ArchivoId = fileId // Link to the uploaded file if any
+                    ArchivoId = fileId, // Link to the uploaded file if any
+                    UrlEntrega = model.SubmittedUrl
                 };
                 entregaid = newSubmission.EntregaId;
                 _context.entregas.Add(newSubmission);
@@ -465,7 +480,15 @@ namespace Plataforma.Controllers
                 entregaid = existingSubmission.EntregaId;
                 existingSubmission.FechaEntrega = DateTime.Now;
                 existingSubmission.Estado = Entrega.EstadoEntrega.EnRevision; // Reset to pending if re-submitting
-                existingSubmission.ArchivoId = fileId; // Update linked file
+                if (fileId != null)
+                {
+                    existingSubmission.ArchivoId = fileId;
+                }
+
+                if (!string.IsNullOrWhiteSpace(model.SubmittedUrl))
+                {
+                    existingSubmission.UrlEntrega = model.SubmittedUrl;
+                }
                 // Optional: Remove old file if it was replaced
                 // if (existingSubmission.ArchivoId != null && existingSubmission.ArchivoId != fileId) { /* Delete old file logic */ }
             }

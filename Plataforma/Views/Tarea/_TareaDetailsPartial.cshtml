@@ -157,6 +157,29 @@ else if (Model.TipoContenido == "lectura")
     </section>
 }
 
+else if (Model.TipoContenido == "link")
+{
+    <section class="content-card">
+
+        <h2>Enlace</h2>
+
+        <p>
+            Abre el siguiente enlace para acceder a la actividad.
+        </p>
+
+        <a class="btn btn-primary"
+           href="@Model.UrlEntrega"
+           target="_blank">
+
+            <i class="fa-solid fa-up-right-from-square"></i>
+
+            Abrir enlace
+
+        </a>
+
+    </section>
+}
+
 else if (Model.TipoContenido == "texto")
 {
     <section class="content-card">
@@ -178,7 +201,9 @@ else if (Model.TipoContenido == "texto")
 
                 <h3>Información</h3>
 
-                @if (Model.TipoContenido == "Documento" || Model.TipoContenido == "video")
+                @if (Model.TipoContenido == "Documento" ||
+                        Model.TipoContenido == "video" ||
+                        Model.TipoContenido == "link")
                 {
                     <div class="info-row">
                         <i class="fa-regular fa-calendar"></i>
@@ -324,14 +349,45 @@ else if (Model.TipoContenido == "texto")
 
                     </p>
 
-                    @if (!string.IsNullOrEmpty(Model.SubmittedFileUrl))
+                    @if (Model.TipoContenido == "link")
                     {
-                        <a href="@Model.SubmittedFileUrl"
-                           target="_blank">
+                        @if (!string.IsNullOrEmpty(Model.SubmittedUrl))
+                        {
+                            <div class="submission-row">
 
-                            Ver archivo entregado
+                                <strong>Enlace</strong>
 
-                        </a>
+                                <a href="@Model.SubmittedUrl"
+                                   target="_blank">
+
+                                    Abrir entrega
+
+                                </a>
+
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        @if (!string.IsNullOrEmpty(Model.SubmittedFileUrl))
+                    {
+                        <div class="submission-row">
+                            <strong>Archivo</strong>
+                            <a href="@Model.SubmittedFileUrl" target="_blank">
+                                Ver archivo entregado
+                            </a>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.SubmittedUrl))
+                    {
+                        <div class="submission-row">
+                            <strong>Enlace</strong>
+                            <a href="@Model.SubmittedUrl" target="_blank">
+                                Abrir entrega
+                            </a>
+                        </div>
+                    }
                     }
 
                 </div>
@@ -477,9 +533,14 @@ else if (Model.TipoContenido == "texto")
                     </h3>
 
                     <p>
-
-                        Cuando termines, envía tu archivo aquí.
-
+                        @if (Model.TipoContenido == "link")
+                        {
+                            <text>Cuando termines, envía el enlace de tu trabajo.</text>
+                        }
+                        else
+                        {
+                            <text>Cuando termines, envía tu archivo aquí.</text>
+                        }
                     </p>
 
                     <button class="btn btn-primary"
@@ -497,79 +558,98 @@ else if (Model.TipoContenido == "texto")
         }
 
         <div id="submission-form-container-@Model.TareaId"
-             style="display:none;"
-             class="submission-form">
+             class="submission-form"
+             style="display:none;">
 
-            <hr />
+            <div class="submission-form-card">
 
-            <h3>
+                <div class="submission-form-header">
 
-                Enviar entrega
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
 
-            </h3>
-
-            <form id="submissionForm-@Model.TareaId"
-                  enctype="multipart/form-data">
-
-                @Html.AntiForgeryToken()
-
-                <input type="hidden"
-                       name="TareaId"
-                       value="@Model.TareaId"/>
-
-                <div class="mb-3">
-
-                    <label class="form-label">
-
-                        Archivo
-
-                    </label>
-
-                    <input class="form-control"
-
-                           type="file"
-
-                           id="submittedFile-@Model.TareaId"
-
-                           name="SubmittedFile"
-
-                           accept=".pdf,.doc,.docx,.xls,.xlsx"
-
-                           required/>
-
-                    <div class="form-text">
-
-                        PDF, Word o Excel (máx. 10 MB)
-
+                    <div>
+                        <h3>Enviar entrega</h3>
+                        <p>Completa la información y envía tu trabajo.</p>
                     </div>
 
                 </div>
 
-                <div class="d-flex gap-2">
+                <form id="submissionForm-@Model.TareaId"
+                      enctype="multipart/form-data">
 
-                    <button class="btn btn-success"
-                            type="submit">
+                    @Html.AntiForgeryToken()
 
-                        Enviar entrega
+                    <input type="hidden"
+                           name="TareaId"
+                           value="@Model.TareaId" />
 
-                    </button>
+                    @if (Model.TipoContenido == "link")
+                    {
+                        <div class="submission-field">
 
-                    <button class="btn btn-outline-secondary"
+                            <label>Enlace</label>
 
-                            type="button"
+                            <input type="url"
+                                   class="submission-input"
+                                   name="SubmittedUrl"
+                                   placeholder="https://..."
+                                   required />
 
-                            onclick="hideSubmissionForm('@Model.TareaId')">
+                            <small>Pega aquí el enlace de tu trabajo.</small>
 
-                        Cancelar
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="submission-field">
 
-                    </button>
+                            <label>Archivo</label>
 
-                </div>
+                            <input type="file"
+                                   class="submission-input"
+                                   name="SubmittedFile"
+                                   accept=".pdf,.doc,.docx,.xls,.xlsx" />
 
-            </form>
+                            <small>Sube un archivo o completa el enlace abajo</small>
 
-            <div id="submission-message-@Model.TareaId"
-                 class="mt-3">
+                        </div>
+
+                        <div class="submission-field">
+
+                            <label>Enlace</label>
+
+                            <input type="url"
+                                   class="submission-input"
+                                   name="SubmittedUrl"
+                                   placeholder="https://..." />
+
+                        </div>
+                    }
+
+                    <div class="submission-actions">
+
+                        <button class="submit-btn"
+                                type="submit">
+
+                            <i class="fa-solid fa-paper-plane"></i>
+
+                            Enviar entrega
+
+                        </button>
+
+                        <button class="cancel-btn"
+                                type="button"
+                                onclick="hideSubmissionForm('@Model.TareaId')">
+
+                            Cancelar
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+                <div id="submission-message-@Model.TareaId"></div>
 
             </div>
 

@@ -11,6 +11,8 @@
         public string Descripcion { get; set; }
         public string? GrabacionUrl { get; set; }
         public string? ReunionUrl { get; set; }
+        public string? UrlEntrega { get; set; }
+        public string? SubmittedUrl { get; set; }
         public DateTime? FechaReunion { get; set; }
         public DateTime? FechaVencimiento { get; set; }
         public string TipoEntregaEsperado { get; set; }

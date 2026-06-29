@@ -49,26 +49,62 @@
                         <td>
                             @if (!string.IsNullOrEmpty(entrega.ArchivoUrl))
                             {
-                                <span class="type-badge file-type">Archivo</span>
+                                <span class="type-badge file-type">
+                                    <i class="fa-solid fa-file"></i>
+                                    Archivo
+                                </span>
+                            }
+                            else if (!string.IsNullOrEmpty(entrega.UrlEntrega))
+                            {
+                                <span class="type-badge link-type">
+                                    <i class="fa-solid fa-link"></i>
+                                    Enlace
+                                </span>
                             }
                             else
                             {
-                                <span class="type-badge unknown-type">Video</span>
+                                <span class="type-badge unknown-type">
+                                    Sin entrega
+                                </span>
                             }
                         </td>
                         <td>
                             @if (!string.IsNullOrEmpty(entrega.ArchivoUrl))
                             {
                                 <a href="/api/ApiProfesores/AccessSubmittedFile/@entrega.EntregaId"
-                                       class="action-button" target="_blank">
-                                       @(entrega.ArchivoNombreOriginal ?? "Archivo")
-                                </a>
+                                    class="action-button"
+                                    target="_blank">
 
-                                <button type="button" class="action-button evaluate-button"
+                                    <i class="fa-solid fa-file-arrow-down"></i>
+                                    @(entrega.ArchivoNombreOriginal ?? "Ver archivo")
+
+                                </a>
+                            }
+                            else if (!string.IsNullOrEmpty(entrega.UrlEntrega))
+                            {
+                                <a href="@entrega.UrlEntrega"
+                                    class="action-button"
+                                    target="_blank">
+
+                                    <i class="fa-solid fa-up-right-from-square"></i>
+                                    Abrir enlace
+
+                                </a>
+                            }
+
+                            @if (!string.IsNullOrEmpty(entrega.ArchivoUrl) ||
+                                    !string.IsNullOrEmpty(entrega.UrlEntrega))
+                            {
+                                <button type="button"
+                                        class="action-button evaluate-button"
                                         data-entrega-id="@entrega.EntregaId"
                                         data-current-status="@(entrega.Estado?.ToString() ?? "")"
                                         data-current-comments="@entrega.ComentariosProfesor">
-                                    <i class="fa-solid fa-pencil"></i> Evaluar
+
+                                    <i class="fa-solid fa-pencil"></i>
+
+                                    Evaluar
+
                                 </button>
                             }
                         </td>

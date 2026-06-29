@@ -50,9 +50,15 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="FechaReunion" class="form-label"></label>
+                <label asp-for="FechaReunion" class="form-label">Fecha de Reunión</label>
                 <input asp-for="FechaReunion" type="datetime-local" class="form-control" />
                 <span asp-validation-for="FechaReunion" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" id="entregaUrlGroup">
+                <label asp-for="UrlEntrega" class="form-label">URL de la Tarea</label>
+                <input asp-for="UrlEntrega" class="form-input" />
+                <span asp-validation-for="UrlEntrega" class="validation-error"></span>
             </div>
 
             <div class="form-group">
@@ -79,6 +85,7 @@
                 <select asp-for="TipoEntregaEsperado" id="TipoEntregaEsperado" class="form-input">
                     <option value="lectura">Lectura</option>
                     <option value="Documento">Documento</option>
+                    <option value="link">Enlace (URL)</option>
                     <option value="video">Video</option>
                     <option value="texto">Texto</option>
                 </select>

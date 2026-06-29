@@ -260,6 +260,7 @@ namespace Plataforma.Controllers
                                              // For MVC, the URL needs to point to your *API* endpoint
                                              ArchivoUrl = e.Archivo != null ? $"/api/Profesores/AccessSubmittedFile/{e.EntregaId}" : null,
                                              ArchivoNombreOriginal = e.Archivo != null ? e.Archivo.FileName : null,
+                                             UrlEntrega = e.UrlEntrega,
                                          })
                                          .ToListAsync();
 
@@ -353,6 +354,7 @@ namespace Plataforma.Controllers
                 Nombre = asignacionModel.Nombre,
                 Descripcion = asignacionModel.Descripcion,
                 ReunionUrl = asignacionModel.ReunionUrl,
+                UrlEntrega = asignacionModel.UrlEntrega,
                 FechaReunion = asignacionModel.FechaReunion?.ToUniversalTime(),
                 FechaVencimiento = asignacionModel.FechaVencimiento?.ToUniversalTime(), // Ensure UTC
                 ClaseId = asignacionModel.ClaseId,
@@ -369,7 +371,9 @@ namespace Plataforma.Controllers
 
             TempData["SuccessMessage"] = "¡Tarea creada correctamente!";
 
-            return RedirectToAction("Inicio", "cursos");
+
+
+            return RedirectToAction("Index", "cursos");
         }
         [HttpPost]
         [Authorize(Roles = "Profesor")]
@@ -432,6 +436,14 @@ namespace Plataforma.Controllers
                     "Debe indicar la URL de la reunión.");
             }
 
+            // URL of the assignment requires a due date.
+            if (!string.IsNullOrWhiteSpace(model.UrlEntrega) &&
+                !model.FechaVencimiento.HasValue)
+            {
+                ModelState.AddModelError(nameof(model.FechaVencimiento),
+                    "Debe indicar una fecha de vencimiento para este tipo de asignación.");
+            }
+
             if (!ModelState.IsValid)
                 return View("~/Views/profesor/tareas/editar.cshtml", model);
 
@@ -439,6 +451,7 @@ namespace Plataforma.Controllers
             tarea.Descripcion = model.Descripcion;
             tarea.GrabacionUrl = model.GrabacionUrl;
             tarea.ReunionUrl = model.ReunionUrl;
+            tarea.UrlEntrega = model.UrlEntrega;
             tarea.FechaReunion = model.FechaReunion?.ToUniversalTime();
             tarea.FechaVencimiento = model.FechaVencimiento?.ToUniversalTime();
             tarea.TipoEntregaEsperado = model.TipoEntregaEsperado;

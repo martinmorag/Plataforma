@@ -109,7 +109,9 @@
                                 }
                                 else
                                 {
-                                    @if (tarea.TipoContenido == "Documento" || tarea.TipoContenido == "video")
+                                    @if (tarea.TipoContenido == "Documento" ||
+                                        tarea.TipoContenido == "video" ||
+                                        tarea.TipoContenido == "link")
                                     {
                                         <span>Ver Tarea</span>
                                     }

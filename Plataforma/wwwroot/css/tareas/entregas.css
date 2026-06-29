@@ -447,6 +447,11 @@ a:hover {
     }
 }
 
+.link-type {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
 /* Responsive adjustments for modal (already done in your original CSS, good job!) */
 @media (max-width: 576px) {
     .modal-content-custom {

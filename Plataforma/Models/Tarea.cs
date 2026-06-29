@@ -40,7 +40,8 @@ namespace Plataforma.Models
 
         [StringLength(50)] // e.g., "video", "pdf", "any"
         public string TipoEntregaEsperado { get; set; } = "any";
-
+        [Url]
+        public string? UrlEntrega { get; set; }
         [ForeignKey("Archivo")] // Specify Archivo as the related table
         public Guid? ArchivoId { get; set; } // Nullable foreign key to the Archivo table
         [ValidateNever]

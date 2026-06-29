@@ -65,7 +65,9 @@ namespace Plataforma.Controllers
 
                     string submissionStatusText = "";
 
-                    if (t.TipoEntregaEsperado == "Documento" || t.TipoEntregaEsperado == "video")
+                    if (t.TipoEntregaEsperado == "Documento" ||
+                         t.TipoEntregaEsperado == "video" ||
+                         t.TipoEntregaEsperado == "link")
                     {
                         submissionStatusText = "Pendiente";
 
@@ -91,7 +93,10 @@ namespace Plataforma.Controllers
             };
 
             var tareasEvaluables = claseViewModel.Tareas
-                .Where(t => t.TipoContenido == "Documento" || t.TipoContenido == "video")
+                .Where(t =>
+                    t.TipoContenido == "Documento" ||
+                    t.TipoContenido == "video" ||
+                    t.TipoContenido == "link")
                 .ToList();
 
             if (!tareasEvaluables.Any())

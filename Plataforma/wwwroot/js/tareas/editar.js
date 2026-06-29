@@ -1,23 +1,40 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+﻿document.addEventListener("DOMContentLoaded", () => {
 
-    const tipo = document.getElementById("TipoEntregaEsperado");
+    const tipoSelect = document.getElementById("TipoEntregaEsperado");
+
     const fechaGroup = document.getElementById("fechaVencimientoGroup");
     const fechaInput = document.getElementById("FechaVencimiento");
+
+    const entregaUrlGroup = document.getElementById("entregaUrlGroup");
+    const entregaUrlInput = document.getElementById("UrlEntrega");
 
     function actualizarFormulario() {
 
         const requiereEntrega =
-            tipo.value === "Documento" ||
-            tipo.value === "video";
+            tipoSelect.value === "Documento" ||
+            tipoSelect.value === "link" ||
+            tipoSelect.value === "video";
 
-        fechaGroup.style.display = requiereEntrega ? "block" : "none";
+        const requiereUrl = tipoSelect.value === "link";
 
-        if (!requiereEntrega) {
+        // Fecha de vencimiento
+        if (requiereEntrega) {
+            fechaGroup.style.display = "block";
+        } else {
+            fechaGroup.style.display = "none";
             fechaInput.value = "";
+        }
+
+        // URL de la tarea
+        if (requiereUrl) {
+            entregaUrlGroup.style.display = "block";
+        } else {
+            entregaUrlGroup.style.display = "none";
+            entregaUrlInput.value = "";
         }
     }
 
-    tipo.addEventListener("change", actualizarFormulario);
+    tipoSelect.addEventListener("change", actualizarFormulario);
 
     actualizarFormulario();
 });

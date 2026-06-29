@@ -68,9 +68,14 @@
                                 <tr>
                                     <td data-label="Nombre de la Tarea">@tarea.Nombre</td>
                                     <td data-label="Clase">@tarea.ClaseNombre</td>
-                                    <td data-label="Fecha Límite">@tarea.FechaLimite.Value.ToShortDateString()</td>
+                                    <td data-label="Fecha Límite">@(tarea.FechaLimite?.ToShortDateString() ?? "-")</td>
                                     <td data-label="Entregas">@tarea.TotalEntregas</td>
-                                    <td data-label="Pendientes de Revisión">@(tarea.TipoContenido == "video" ? "-" : tarea.EntregasPendientes)</td>
+                                    @(
+                                        tarea.TipoContenido == "lectura" ||
+                                        tarea.TipoContenido == "texto"
+                                            ? "-"
+                                            : tarea.EntregasPendientes
+                                    )
                                     <td data-label="">
                                         <a asp-controller="tareas" asp-action="VerEntregas" asp-route-tareaId="@tarea.TareaId" class="action-button view-button">
                                             <i class="fa-solid fa-list"></i> Ver Entregas
